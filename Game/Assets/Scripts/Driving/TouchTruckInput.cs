@@ -32,7 +32,7 @@ namespace EuroHaul.Driving
         private void Update()
         {
             if (truck == null) return;
-            truck.SetInput(steering, accelerate ? 1f : reverse ? -1f : 0f, brake ? 1f : 0f);
+            float drive = accelerate ? 1f : (reverse && truck.CurrentGear < 0 ? 1f : 0f);\n            truck.SetInput(steering, drive, brake ? 1f : 0f);
             truck.SetClutchPedal(clutch ? 1f : 0f);
         }
 
