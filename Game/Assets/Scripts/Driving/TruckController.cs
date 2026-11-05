@@ -28,7 +28,7 @@ namespace EuroHaul.Driving
 
         public TruckDashboardTelemetry Telemetry { get; } = new TruckDashboardTelemetry();
         public float SpeedKmh => body != null ? body.linearVelocity.magnitude * 3.6f : 0f;
-        public float SignedSpeedKmh => body != null
+        public int CurrentGear => powertrain != null ? powertrain.Gear : 0;\n        public float SignedSpeedKmh => body != null
             ? Vector3.Dot(body.linearVelocity, transform.forward) * 3.6f : 0f;
 
         private void Awake()
