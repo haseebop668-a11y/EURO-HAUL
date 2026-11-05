@@ -22,7 +22,7 @@ namespace EuroHaul.Driving
         [SerializeField, Min(1f)] private float finalDriveRatio = 3.7f;
         [SerializeField, Range(0.5f, 1f)] private float drivetrainEfficiency = 0.88f;
         [SerializeField, Range(0.05f, 1f)] private float clutchEngagementRate = 0.65f;
-        [SerializeField, Range(0f, 1f)] private float clutchPedal = 1f;
+        [SerializeField, Range(0f, 1f)] private float clutchPedal = 0f;
         [SerializeField, Min(0f)] private float wheelRadiusMeters = 0.52f;
         [SerializeField, Min(0.1f)] private float shiftDelay = 0.25f;
 
