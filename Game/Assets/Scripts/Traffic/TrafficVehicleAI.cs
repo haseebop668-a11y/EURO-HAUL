@@ -24,7 +24,7 @@ namespace EuroHaul.Traffic
             point = route.GetWaypoint(index);
             Vector3 local = transform.InverseTransformPoint(point.position);
             float steer = Mathf.Clamp(local.x / Mathf.Max(4f, local.magnitude), -1f, 1f);
-            Vector3 sensorOrigin = transform.position + transform.forward * 2f + Vector3.up;\n            if (Physics.SphereCast(sensorOrigin, 0.85f, transform.forward, out RaycastHit hit, sensorRange, vehicleMask, QueryTriggerInteraction.Ignore) && hit.rigidbody != body)\n            {\n                float safeGap = standstillGap + (SpeedKmh / 3.6f) * timeHeadway;\n                if (hit.distance < safeGap) targetSpeedKmh = Mathf.Min(targetSpeedKmh, Mathf.Max(0f, SpeedKmh - (safeGap - hit.distance) * 3f));\n            }\n            float speedError = targetSpeedKmh - SpeedKmh;
+            float targetSpeed = targetSpeedKmh;\n            Vector3 sensorOrigin = transform.position + transform.forward * 2f + Vector3.up;\n            if (Physics.SphereCast(sensorOrigin, 0.85f, transform.forward, out RaycastHit hit, sensorRange, vehicleMask, QueryTriggerInteraction.Ignore) && hit.rigidbody != body)\n            {\n                float safeGap = standstillGap + (SpeedKmh / 3.6f) * timeHeadway;\n                if (hit.distance < safeGap) targetSpeed = Mathf.Min(targetSpeed, Mathf.Max(0f, SpeedKmh - (safeGap - hit.distance) * 3f));\n            }\n            float speedError = targetSpeed - SpeedKmh;
             float throttle = Mathf.Clamp01(speedError * 0.08f);
             float brake = Mathf.Clamp01(-speedError * 0.12f);
             Drive(throttle, brake, steer);
