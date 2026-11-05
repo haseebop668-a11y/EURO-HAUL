@@ -9,6 +9,7 @@ namespace EuroHaul.Driving
         [SerializeField] private TruckTrafficSensors sensors;
         [SerializeField] private TruckSafetyAdvisor safety;
         [SerializeField] private TruckSignals signals;
+        [SerializeField] private TruckCollisionMonitor collision;
         [SerializeField] private bool showHud = true;
 
         private void Awake()
@@ -17,23 +18,25 @@ namespace EuroHaul.Driving
             if (sensors == null) sensors = GetComponentInParent<TruckTrafficSensors>();
             if (safety == null) safety = GetComponentInParent<TruckSafetyAdvisor>();
             if (signals == null) signals = GetComponentInParent<TruckSignals>();
+            if (collision == null) collision = GetComponentInParent<TruckCollisionMonitor>();
         }
 
         private void OnGUI()
         {
             if (!showHud || truck == null) return;
             TruckDashboardTelemetry data = truck.Telemetry;
-            GUI.Box(new Rect(12f, 12f, 230f, 150f), "EURO HAUL | INSTRUMENTS");
+            GUI.Box(new Rect(12f, 12f, 230f, 170f), "EURO HAUL | INSTRUMENTS");
             GUI.Label(new Rect(24f, 36f, 210f, 20f), $"SPEED  {data.SpeedKmh:0} km/h");
             GUI.Label(new Rect(24f, 56f, 210f, 20f), $"ENGINE {data.EngineRpm:0} rpm");
             GUI.Label(new Rect(24f, 76f, 210f, 20f), $"GEAR   {data.GearLabel}");
             GUI.Label(new Rect(24f, 96f, 210f, 20f), $"CLUTCH {data.ClutchPercent:0}%");
             GUI.Label(new Rect(24f, 116f, 210f, 20f), $"SIGNAL {signals != null ? signals.State.ToString() : "N/A"}");
             GUI.Label(new Rect(24f, 136f, 210f, 20f), $"HORN   {(signals != null && signals.IsHornHeld ? "ON" : "OFF")}");
+            GUI.Label(new Rect(24f, 156f, 210f, 20f), $"DAMAGE {(collision != null ? collision.DamagePercent : 0f):0}%");
 
             if (sensors == null && safety == null) return;
-            GUI.Box(new Rect(12f, 170f, 270f, 220f), "TRAFFIC | MIRRORS | SAFETY");
-            GUI.Label(new Rect(24f, 194f, 250f, 20f), $"FRONT GAP {GapText(sensors != null ? sensors.FrontGapMeters : float.PositiveInfinity)}");
+            GUI.Box(new Rect(12f, 190f, 270f, 240f), "TRAFFIC | MIRRORS | SAFETY");
+            GUI.Label(new Rect(24f, 374f, 250f, 20f), $"FRONT GAP {GapText(sensors != null ? sensors.FrontGapMeters : float.PositiveInfinity)}");
             GUI.Label(new Rect(24f, 214f, 250f, 20f), $"REAR GAP  {GapText(sensors != null ? sensors.RearGapMeters : float.PositiveInfinity)}");
             GUI.Label(new Rect(24f, 234f, 250f, 20f), $"LEFT BLIND  {(sensors != null && sensors.LeftBlindSpotOccupied ? "OCCUPIED" : "CLEAR")}");
             GUI.Label(new Rect(24f, 254f, 250f, 20f), $"RIGHT BLIND {(sensors != null && sensors.RightBlindSpotOccupied ? "OCCUPIED" : "CLEAR")}");
