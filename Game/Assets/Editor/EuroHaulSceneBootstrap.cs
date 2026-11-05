@@ -71,7 +71,7 @@ namespace EuroHaul.Editor
 
             GameObject routeReverseObject = new GameObject("TrafficRouteOncoming");
             TrafficRoute routeReverse = routeReverseObject.AddComponent<TrafficRoute>();
-            Transform[] reversePoints = CreateRoutePoints(routeReverseObject.transform, -1.75f, new[] { 280f, 100f, -100f, -280f });
+            Transform[] reversePoints = CreateRoutePoints(routeReverseObject.transform, -1.75f, new[] { 100f, -100f, -280f });
             SetArrayReferences(routeReverse, "waypoints", reversePoints);
             SetBool(routeReverse, "loop", false);
 
@@ -84,7 +84,6 @@ namespace EuroHaul.Editor
             SetObjectReference(signals, "leftIndicator", leftLamp);
             SetObjectReference(signals, "rightIndicator", rightLamp);
 
-            ConfigureSensors(player, sensors);
             SetObjectReference(advisor, "truck", controller);
             SetObjectReference(advisor, "sensors", sensors);
 
@@ -206,6 +205,7 @@ namespace EuroHaul.Editor
                 sensor.transform.SetParent(root.transform, false);
                 sensor.transform.localPosition = new Vector3(0f, 0.8f, 4.5f);
                 SetObjectReference(ai, "frontSensorOrigin", sensor.transform);
+                SetLayerMask(ai, "vehicleMask", 1 << 8);
                 SetLayerRecursively(root, 8);
                 root.AddComponent<TrafficHornReceiver>();
             }
