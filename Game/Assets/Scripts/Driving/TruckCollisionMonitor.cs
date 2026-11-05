@@ -5,7 +5,7 @@ namespace EuroHaul.Driving
 {
     public enum ImpactSeverity { None, Minor, Moderate, Severe, Critical }
 
-    /// <summary>Records impacts and triggers hazard/brake response. Damage is a gameplay estimate, not crash reconstruction.</summary>
+    /// <summary>Records impacts and applies short emergency braking. Damage is a gameplay estimate.</summary>
     public sealed class TruckCollisionMonitor : MonoBehaviour
     {
         [SerializeField] private TruckController truck;
@@ -13,8 +13,11 @@ namespace EuroHaul.Driving
         [SerializeField, Min(1f)] private float minimumRecordedImpactKmh = 5f;
         [SerializeField, Min(1f)] private float hazardActivationImpactKmh = 20f;
         [SerializeField, Min(1f)] private float emergencyBrakeImpactKmh = 30f;
+        [SerializeField, Min(0.1f)] private float postImpactBrakeSeconds = 2f;
         [SerializeField] private UnityEvent onImpact;
         [SerializeField] private UnityEvent onSevereImpact;
+
+        private float emergencyBrakeUntil;
 
         public float LastImpactSpeedKmh { get; private set; }
         public float DamagePercent { get; private set; }
@@ -25,6 +28,12 @@ namespace EuroHaul.Driving
         {
             if (truck == null) truck = GetComponent<TruckController>();
             if (signals == null) signals = GetComponent<TruckSignals>();
+        }
+
+        private void Update()
+        {
+            if (truck != null && Time.time < emergencyBrakeUntil)
+                truck.SetInput(0f, 0f, 1f);
         }
 
         private void OnCollisionEnter(Collision collision)
@@ -42,6 +51,7 @@ namespace EuroHaul.Driving
 
             if (impactSpeed >= emergencyBrakeImpactKmh && truck != null)
             {
+                emergencyBrakeUntil = Time.time + postImpactBrakeSeconds;
                 truck.SetInput(0f, 0f, 1f);
                 if (impactSpeed >= 50f) truck.SetCrashLock(true);
                 onSevereImpact?.Invoke();
@@ -53,6 +63,7 @@ namespace EuroHaul.Driving
             DamagePercent = 0f;
             LastImpactSpeedKmh = 0f;
             LastImpactSeverity = ImpactSeverity.None;
+            emergencyBrakeUntil = 0f;
             if (truck != null) truck.ResetCrashLock();
             if (signals != null) signals.CancelSignal();
         }
