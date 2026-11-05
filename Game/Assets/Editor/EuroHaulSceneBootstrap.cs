@@ -28,6 +28,20 @@ namespace EuroHaul.Editor
             if (EditorApplication.isPlayingOrWillChangePlaymode) return;
             if (!File.Exists(ScenePath)) CreateScene();
             ConfigureBuildScenes();
+            ConfigurePlayerSettings();
+        }
+
+
+        private static void ConfigurePlayerSettings()
+        {
+            PlayerSettings.companyName = "Euro Haul Studio";
+            PlayerSettings.productName = "EURO HAUL";
+            PlayerSettings.bundleVersion = "0.1.0";
+            PlayerSettings.applicationIdentifier = "com.eurohaul.trucksim";
+            PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
+            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
+            PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
+            PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.IL2CPP);
         }
 
         private static void CreateScene()
