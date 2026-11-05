@@ -87,8 +87,9 @@ namespace EuroHaul.Driving
         public float GetWheelTorque(float deltaTime)
         {
             shiftTimer = Mathf.Max(0f, shiftTimer - deltaTime);
+            float clutchRate = clutchPedal >= 0.5f ? 5f : clutchEngagementRate;
             currentClutchEngagement = Mathf.MoveTowards(currentClutchEngagement,
-                1f - clutchPedal, clutchEngagementRate * deltaTime);
+                1f - clutchPedal, clutchRate * deltaTime);
 
             float ratio = CurrentRatio();
             float wheelRpm = Mathf.Abs(wheelSpeedKmh) / 3.6f /
