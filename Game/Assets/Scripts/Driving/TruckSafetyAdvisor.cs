@@ -30,8 +30,8 @@ namespace EuroHaul.Driving
         public bool CurveSpeedRisk { get; private set; }
         public bool FastRearApproachRisk { get; private set; }
         public bool SteeringLimitRisk { get; private set; }
-        public bool CanOvertakeLeft => sensors != null && sensors.CanSafelyChangeLeft && !FrontCollisionRisk;
-        public bool CanOvertakeRight => sensors != null && sensors.CanSafelyChangeRight && !FrontCollisionRisk;
+        public bool CanOvertakeLeft => sensors != null && sensors.CanSafelyChangeLeft;
+        public bool CanOvertakeRight => sensors != null && sensors.CanSafelyChangeRight;
 
         private void Awake()
         {
