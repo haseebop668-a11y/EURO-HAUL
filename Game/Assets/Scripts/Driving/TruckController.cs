@@ -70,6 +70,9 @@ namespace EuroHaul.Driving
             if (!WheelsAssigned()) return;
             if (crashLocked)
             {
+                frontLeft.steerAngle = 0f;
+                frontRight.steerAngle = 0f;
+                if (powertrain != null) powertrain.SetThrottle(0f);
                 rearLeft.motorTorque = 0f;
                 rearRight.motorTorque = 0f;
                 frontLeft.brakeTorque = serviceBrakeTorque;
