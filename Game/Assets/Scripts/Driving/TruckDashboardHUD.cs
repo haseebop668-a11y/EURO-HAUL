@@ -49,6 +49,7 @@ namespace EuroHaul.Driving
 
         private string SafetyText()
         {
+            if (collision != null && collision.IsVehicleDisabled) return "CRITICAL DAMAGE: SERVICE REQUIRED";
             if (safety == null) return "ADVISORY NOT CONNECTED";
             if (safety.FrontCollisionRisk) return "BRAKE WARNING: FRONT GAP";
             if (safety.CurveSpeedRisk) return $"SLOW FOR CURVE: {safety.RecommendedCurveSpeedKmh:0} km/h";
