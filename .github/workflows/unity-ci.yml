@@ -71,8 +71,9 @@ jobs:
           unityVersion: 6000.3.0f1
           targetPlatform: ${{ matrix.targetPlatform }}
           buildName: EURO-HAUL
-          buildPath: build/${{ matrix.targetPlatform }}
-          androidAppBundle: false
+          buildMethod: EuroHaul.Editor.EuroHaulBuild.Build
+          buildsPath: build
+          androidExportType: androidPackage
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
