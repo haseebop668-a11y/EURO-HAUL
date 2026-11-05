@@ -45,6 +45,9 @@ namespace EuroHaul.Driving
             if (powertrain == null) powertrain = GetComponent<TruckPowertrain>();
             body.centerOfMass = centerOfMassOffset;
             body.interpolation = RigidbodyInterpolation.Interpolate;
+            body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            body.solverIterations = 12;
+            body.solverVelocityIterations = 8;
         }
 
         public void SetInput(float steeringInput, float throttleInput, float brakeInput)
