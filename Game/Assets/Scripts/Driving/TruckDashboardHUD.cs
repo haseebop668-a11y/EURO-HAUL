@@ -55,6 +55,7 @@ namespace EuroHaul.Driving
             if (safety.SteeringLimitRisk) return "HIGH SPEED: STEERING LIMITED";
             if (safety.CurveSpeedRisk) return $"SLOW FOR CURVE: {safety.RecommendedCurveSpeedKmh:0} km/h";
             if (safety.FastRearApproachRisk) return "FAST VEHICLE APPROACHING REAR";
+            if (safety.RearVehicleClosingRisk) return "REAR TRUCK CLOSING - CHECK MIRRORS";
             if (safety.BlindSpotRisk) return "BLIND SPOT OCCUPIED";
             return "ROAD AWARENESS: CLEAR";
         }
