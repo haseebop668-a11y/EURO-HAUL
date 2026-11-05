@@ -25,7 +25,7 @@ namespace EuroHaul.Driving
             if (!showHud || truck == null) return;
             TruckDashboardTelemetry data = truck.Telemetry;
             GUI.Box(new Rect(12f, 12f, 230f, 170f), "EURO HAUL | INSTRUMENTS");
-            GUI.Label(new Rect(24f, 36f, 210f, 20f), $"SPEED  {data.SpeedKmh:0} km/h");
+            GUI.Label(new Rect(24f, 36f, 210f, 20f), $"SPEED  {truck.SpeedKmh:0} km/h");
             GUI.Label(new Rect(24f, 56f, 210f, 20f), $"ENGINE {data.EngineRpm:0} rpm");
             GUI.Label(new Rect(24f, 76f, 210f, 20f), $"GEAR   {data.GearLabel}");
             GUI.Label(new Rect(24f, 96f, 210f, 20f), $"CLUTCH {data.ClutchPercent:0}%");
