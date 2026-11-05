@@ -28,10 +28,12 @@ namespace EuroHaul.Driving
         private float brake;
         private float clutchPedal;
         private bool crashLocked;
+        private bool emergencyBrake;
 
         public TruckDashboardTelemetry Telemetry { get; } = new TruckDashboardTelemetry();
         public float SpeedKmh => body != null ? body.linearVelocity.magnitude * 3.6f : 0f;
         public int CurrentGear => powertrain != null ? powertrain.Gear : 0;
+        public bool IsCrashLocked => crashLocked;
         public bool SteeringLimitActive { get; private set; }
         public float AppliedSteeringAngle { get; private set; }
         public float SignedSpeedKmh => body != null
@@ -63,7 +65,8 @@ namespace EuroHaul.Driving
         public void SelectNeutral() { if (powertrain != null) powertrain.SelectNeutral(); }
         public bool SelectReverse() => powertrain != null && powertrain.SelectReverse();
         public void SetCrashLock(bool locked) => crashLocked = locked;
-        public void ResetCrashLock() => crashLocked = false;
+        public void SetEmergencyBrake(bool enabled) => emergencyBrake = enabled;
+        public void ResetCrashLock() { crashLocked = false; emergencyBrake = false; }
 
         private void FixedUpdate()
         {
@@ -72,6 +75,18 @@ namespace EuroHaul.Driving
             {
                 frontLeft.steerAngle = 0f;
                 frontRight.steerAngle = 0f;
+                if (powertrain != null) powertrain.SetThrottle(0f);
+                rearLeft.motorTorque = 0f;
+                rearRight.motorTorque = 0f;
+                frontLeft.brakeTorque = serviceBrakeTorque;
+                frontRight.brakeTorque = serviceBrakeTorque;
+                rearLeft.brakeTorque = serviceBrakeTorque;
+                rearRight.brakeTorque = serviceBrakeTorque;
+                return;
+            }
+
+            if (emergencyBrake)
+            {
                 if (powertrain != null) powertrain.SetThrottle(0f);
                 rearLeft.motorTorque = 0f;
                 rearRight.motorTorque = 0f;
