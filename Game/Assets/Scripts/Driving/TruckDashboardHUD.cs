@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace EuroHaul.Driving
 {
-    /// <summary>Temporary instrument and road-awareness panel for the Truck Lab prototype.</summary>
     public sealed class TruckDashboardHUD : MonoBehaviour
     {
         [SerializeField] private TruckController truck;
@@ -35,16 +34,17 @@ namespace EuroHaul.Driving
             GUI.Label(new Rect(24f, 156f, 210f, 20f), $"DAMAGE {(collision != null ? collision.DamagePercent : 0f):0}%");
 
             if (sensors == null && safety == null) return;
-            GUI.Box(new Rect(12f, 190f, 270f, 240f), "TRAFFIC | MIRRORS | SAFETY");
-            GUI.Label(new Rect(24f, 374f, 250f, 20f), $"FRONT GAP {GapText(sensors != null ? sensors.FrontGapMeters : float.PositiveInfinity)}");
-            GUI.Label(new Rect(24f, 214f, 250f, 20f), $"REAR GAP  {GapText(sensors != null ? sensors.RearGapMeters : float.PositiveInfinity)}");
-            GUI.Label(new Rect(24f, 234f, 250f, 20f), $"LEFT BLIND  {(sensors != null && sensors.LeftBlindSpotOccupied ? "OCCUPIED" : "CLEAR")}");
-            GUI.Label(new Rect(24f, 254f, 250f, 20f), $"RIGHT BLIND {(sensors != null && sensors.RightBlindSpotOccupied ? "OCCUPIED" : "CLEAR")}");
-            GUI.Label(new Rect(24f, 274f, 250f, 20f), $"LEFT LANE  {(safety != null && safety.CanOvertakeLeft ? "GAP CLEAR" : "WAIT / CHECK")}");
-            GUI.Label(new Rect(24f, 294f, 250f, 20f), $"RIGHT LANE {(safety != null && safety.CanOvertakeRight ? "GAP CLEAR" : "WAIT / CHECK")}");
-            GUI.Label(new Rect(24f, 314f, 250f, 20f), $"STOP DIST { (safety != null ? safety.RequiredStoppingDistanceMeters : 0f):0} m");
-            GUI.Label(new Rect(24f, 334f, 250f, 20f), SafetyText());
-            GUI.Label(new Rect(24f, 354f, 250f, 20f), "ADVISORY ONLY - DRIVER CONTROLS TRUCK");
+            GUI.Box(new Rect(12f, 190f, 285f, 250f), "TRAFFIC | MIRRORS | SAFETY");
+            GUI.Label(new Rect(24f, 214f, 270f, 20f), $"FRONT GAP {GapText(sensors != null ? sensors.FrontGapMeters : float.PositiveInfinity)}");
+            GUI.Label(new Rect(24f, 234f, 270f, 20f), $"REAR GAP  {GapText(sensors != null ? sensors.RearGapMeters : float.PositiveInfinity)}");
+            GUI.Label(new Rect(24f, 254f, 270f, 20f), $"LEFT BLIND  {(sensors != null && sensors.LeftBlindSpotOccupied ? "OCCUPIED" : "CLEAR")}");
+            GUI.Label(new Rect(24f, 274f, 270f, 20f), $"RIGHT BLIND {(sensors != null && sensors.RightBlindSpotOccupied ? "OCCUPIED" : "CLEAR")}");
+            GUI.Label(new Rect(24f, 294f, 270f, 20f), $"LEFT LANE  {(safety != null && safety.CanOvertakeLeft ? "GAP CLEAR" : "WAIT / CHECK")}");
+            GUI.Label(new Rect(24f, 314f, 270f, 20f), $"RIGHT LANE {(safety != null && safety.CanOvertakeRight ? "GAP CLEAR" : "WAIT / CHECK")}");
+            GUI.Label(new Rect(24f, 334f, 270f, 20f), $"STOP DIST {(safety != null ? safety.RequiredStoppingDistanceMeters : 0f):0} m");
+            GUI.Label(new Rect(24f, 354f, 270f, 20f), SafetyText());
+            GUI.Label(new Rect(24f, 374f, 270f, 20f), $"IMPACT {(collision != null ? collision.LastImpactSeverity.ToString() : "N/A")} {(collision != null ? collision.LastImpactSpeedKmh : 0f):0} km/h");
+            GUI.Label(new Rect(24f, 394f, 270f, 20f), "ADVISORY ONLY - DRIVER CONTROLS TRUCK");
         }
 
         private string SafetyText()
