@@ -1,0 +1,65 @@
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace EuroHaul.Driving
+{
+    /// <summary>Driver advisory only: warns about hazards but never silently takes steering control.</summary>
+    public sealed class TruckSafetyAdvisor : MonoBehaviour
+    {
+        [SerializeField] private TruckController truck;
+        [SerializeField] private TruckTrafficSensors sensors;
+        [SerializeField, Min(0.5f)] private float reactionTimeSeconds = 1.8f;
+        [SerializeField, Min(1f)] private float assumedDecelerationMps2 = 3.5f;
+        [SerializeField, Min(0f)] private float stoppingSafetyMarginMeters = 8f;
+        [SerializeField, Min(0f)] private float curveRadiusMeters = 0f;
+        [SerializeField, Range(0.5f, 4f)] private float safeLateralAcceleration = 1.5f;
+        [SerializeField] private UnityEvent onFrontCollisionWarning;
+        [SerializeField] private UnityEvent onBlindSpotWarning;
+        [SerializeField] private UnityEvent onUnsafeCurveWarning;
+
+        private bool frontWarned;
+        private bool blindWarned;
+        private bool curveWarned;
+
+        public float RequiredStoppingDistanceMeters { get; private set; }
+        public float RecommendedCurveSpeedKmh { get; private set; }
+        public bool FrontCollisionRisk { get; private set; }
+        public bool BlindSpotRisk { get; private set; }
+        public bool CurveSpeedRisk { get; private set; }
+
+        private void Awake()
+        {
+            if (truck == null) truck = GetComponentInParent<TruckController>();
+            if (sensors == null) sensors = GetComponentInParent<TruckTrafficSensors>();
+        }
+
+        private void Update()
+        {
+            if (truck == null) return;
+            float speedMps = VehicleSafetyMath.KmhToMps(truck.SpeedKmh);
+            RequiredStoppingDistanceMeters = VehicleSafetyMath.BrakingDistance(
+                speedMps, assumedDecelerationMps2, reactionTimeSeconds) + stoppingSafetyMarginMeters;
+
+            FrontCollisionRisk = sensors != null &&
+                sensors.FrontGapMeters < RequiredStoppingDistanceMeters;
+            if (FrontCollisionRisk && !frontWarned) onFrontCollisionWarning?.Invoke();
+            frontWarned = FrontCollisionRisk;
+
+            BlindSpotRisk = sensors != null &&
+                ((sensors.LeftBlindSpotOccupied && sensors.CanSafelyChangeLeft == false) ||
+                 (sensors.RightBlindSpotOccupied && sensors.CanSafelyChangeRight == false));
+            if (BlindSpotRisk && !blindWarned) onBlindSpotWarning?.Invoke();
+            blindWarned = BlindSpotRisk;
+
+            RecommendedCurveSpeedKmh = curveRadiusMeters > 0f
+                ? VehicleSafetyMath.SafeCurveSpeedKmh(curveRadiusMeters, safeLateralAcceleration)
+                : float.PositiveInfinity;
+            CurveSpeedRisk = !float.IsPositiveInfinity(RecommendedCurveSpeedKmh) &&
+                             truck.SpeedKmh > RecommendedCurveSpeedKmh;
+            if (CurveSpeedRisk && !curveWarned) onUnsafeCurveWarning?.Invoke();
+            curveWarned = CurveSpeedRisk;
+        }
+
+        public void SetCurveRadius(float radiusMeters) => curveRadiusMeters = Mathf.Max(0f, radiusMeters);
+    }
+}
