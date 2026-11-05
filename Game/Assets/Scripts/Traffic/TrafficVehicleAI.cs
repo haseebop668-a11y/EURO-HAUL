@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using EuroHaul.Audio;
 
 namespace EuroHaul.Traffic
 {
@@ -36,6 +37,10 @@ namespace EuroHaul.Traffic
         {
             body = GetComponent<Rigidbody>();
             body.interpolation = RigidbodyInterpolation.Interpolate;
+            if (hornAudio == null) hornAudio = GetComponent<AudioSource>();
+            if (hornAudio == null) hornAudio = gameObject.AddComponent<AudioSource>();
+            if (hornAudio.clip == null) hornAudio.clip = PrototypeHornAudio.CreateClip("Traffic Courtesy Horn");
+            hornAudio.spatialBlend = 1f;
             FindNearestWaypoint();
         }
 
