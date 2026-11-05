@@ -4,7 +4,7 @@ namespace EuroHaul.Driving
 {
     public enum TrafficAlertLevel { Clear, Caution, Warning, Critical }
 
-    /// <summary>Ray-based awareness sensors. Configure layers to include traffic vehicles and exclude the player's own truck.</summary>
+    /// <summary>Front, rear, blind-spot and rear-quarter awareness sensors.</summary>
     public sealed class TruckTrafficSensors : MonoBehaviour
     {
         [SerializeField] private Transform forwardOrigin;
@@ -33,8 +33,14 @@ namespace EuroHaul.Driving
         public float RightRearClosingSpeedMps { get; private set; }
         public TrafficAlertLevel FrontAlert { get; private set; }
         public TrafficAlertLevel RearAlert { get; private set; }
-        public bool CanSafelyChangeLeft => !LeftBlindSpotOccupied && RearGapMeters > 12f;
-        public bool CanSafelyChangeRight => !RightBlindSpotOccupied && RearGapMeters > 12f;
+
+        public bool CanSafelyChangeLeft =>
+            !LeftBlindSpotOccupied && LeftRearGapMeters > 18f &&
+            VehicleSafetyMath.TimeToCollision(LeftRearClosingSpeedMps, LeftRearGapMeters) > 5f;
+
+        public bool CanSafelyChangeRight =>
+            !RightBlindSpotOccupied && RightRearGapMeters > 18f &&
+            VehicleSafetyMath.TimeToCollision(RightRearClosingSpeedMps, RightRearGapMeters) > 5f;
 
         private void FixedUpdate()
         {
@@ -42,8 +48,12 @@ namespace EuroHaul.Driving
             RearGapMeters = SenseGap(rearOrigin, -transform.forward, rearRange, out RearClosingSpeedMps);
             LeftBlindSpotOccupied = SenseOccupied(leftBlindSpotOrigin, blindSpotRange);
             RightBlindSpotOccupied = SenseOccupied(rightBlindSpotOrigin, blindSpotRange);
-            LeftRearGapMeters = SenseGap(leftRearApproachOrigin, leftRearApproachOrigin != null ? leftRearApproachOrigin.forward : -transform.forward, rearRange, out LeftRearClosingSpeedMps);
-            RightRearGapMeters = SenseGap(rightRearApproachOrigin, rightRearApproachOrigin != null ? rightRearApproachOrigin.forward : -transform.forward, rearRange, out RightRearClosingSpeedMps);
+            LeftRearGapMeters = SenseGap(leftRearApproachOrigin,
+                leftRearApproachOrigin != null ? leftRearApproachOrigin.forward : -transform.forward,
+                rearRange, out LeftRearClosingSpeedMps);
+            RightRearGapMeters = SenseGap(rightRearApproachOrigin,
+                rightRearApproachOrigin != null ? rightRearApproachOrigin.forward : -transform.forward,
+                rearRange, out RightRearClosingSpeedMps);
             FrontAlert = Classify(FrontGapMeters, FrontClosingSpeedMps);
             RearAlert = Classify(RearGapMeters, RearClosingSpeedMps);
         }
