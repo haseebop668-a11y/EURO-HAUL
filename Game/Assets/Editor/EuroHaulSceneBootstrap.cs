@@ -42,6 +42,9 @@ namespace EuroHaul.Editor
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
             PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
             PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.IL2CPP);
+            var inputHandler = typeof(PlayerSettings).GetProperty("activeInputHandler");
+            if (inputHandler != null && inputHandler.CanWrite)
+                inputHandler.SetValue(null, Enum.Parse(inputHandler.PropertyType, "Both"));
         }
 
         private static void CreateScene()
