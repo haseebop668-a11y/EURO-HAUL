@@ -29,6 +29,7 @@ namespace EuroHaul.Driving
         public bool BlindSpotRisk { get; private set; }
         public bool CurveSpeedRisk { get; private set; }
         public bool FastRearApproachRisk { get; private set; }
+        public bool RearVehicleClosingRisk { get; private set; }
         public bool SteeringLimitRisk { get; private set; }
         public bool CanOvertakeLeft => sensors != null && sensors.CanSafelyChangeLeft;
         public bool CanOvertakeRight => sensors != null && sensors.CanSafelyChangeRight;
@@ -65,6 +66,7 @@ namespace EuroHaul.Driving
             if (CurveSpeedRisk && !curveWarned) onUnsafeCurveWarning?.Invoke();
             curveWarned = CurveSpeedRisk;
 
+            RearVehicleClosingRisk = sensors != null && sensors.RearGapMeters < 55f && sensors.RearClosingSpeedMps > 1.5f;
             FastRearApproachRisk = sensors != null && sensors.RearGapMeters < 35f &&
                 VehicleSafetyMath.TimeToCollision(sensors.RearClosingSpeedMps, sensors.RearGapMeters) < 4f;
             if (FastRearApproachRisk && !rearWarned) onFastRearApproachWarning?.Invoke();
