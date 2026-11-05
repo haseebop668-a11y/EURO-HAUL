@@ -19,7 +19,7 @@ namespace EuroHaul.Driving
         public void ClearSteering() => steering = 0f;
         public void AccelerateDown() { accelerate = true; reverse = false; }
         public void AccelerateUp() => accelerate = false;
-        public void ReverseDown() { reverse = true; accelerate = false; }
+        public void ReverseDown() { reverse = true; accelerate = false; if (truck != null) truck.SelectReverse(); }
         public void ReverseUp() => reverse = false;
         public void BrakeDown() => brake = true;
         public void BrakeUp() => brake = false;
