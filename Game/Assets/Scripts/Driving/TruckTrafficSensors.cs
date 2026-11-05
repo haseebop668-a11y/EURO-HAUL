@@ -12,7 +12,9 @@ namespace EuroHaul.Driving
         [SerializeField] private Transform leftBlindSpotOrigin;
         [SerializeField] private Transform rightBlindSpotOrigin;
         [SerializeField] private Transform leftRearApproachOrigin;
+        [SerializeField] private Transform leftFrontApproachOrigin;
         [SerializeField] private Transform rightRearApproachOrigin;
+        [SerializeField] private Transform rightFrontApproachOrigin;
         [SerializeField] private LayerMask trafficMask = ~0;
         [SerializeField, Min(5f)] private float forwardRange = 100f;
         [SerializeField, Min(5f)] private float rearRange = 60f;
@@ -30,17 +32,23 @@ namespace EuroHaul.Driving
         public float LeftRearGapMeters { get; private set; } = float.PositiveInfinity;
         public float RightRearGapMeters { get; private set; } = float.PositiveInfinity;
         public float LeftRearClosingSpeedMps { get; private set; }
+        public float LeftFrontGapMeters { get; private set; } = float.PositiveInfinity;
+        public float LeftFrontClosingSpeedMps { get; private set; }
         public float RightRearClosingSpeedMps { get; private set; }
+        public float RightFrontGapMeters { get; private set; } = float.PositiveInfinity;
+        public float RightFrontClosingSpeedMps { get; private set; }
         public TrafficAlertLevel FrontAlert { get; private set; }
         public TrafficAlertLevel RearAlert { get; private set; }
 
         public bool CanSafelyChangeLeft =>
-            !LeftBlindSpotOccupied && LeftRearGapMeters > 18f &&
-            VehicleSafetyMath.TimeToCollision(LeftRearClosingSpeedMps, LeftRearGapMeters) > 5f;
+            !LeftBlindSpotOccupied && LeftRearGapMeters > 18f && LeftFrontGapMeters > 45f &&
+            VehicleSafetyMath.TimeToCollision(LeftRearClosingSpeedMps, LeftRearGapMeters) > 5f &&
+            VehicleSafetyMath.TimeToCollision(LeftFrontClosingSpeedMps, LeftFrontGapMeters) > 8f;
 
         public bool CanSafelyChangeRight =>
-            !RightBlindSpotOccupied && RightRearGapMeters > 18f &&
-            VehicleSafetyMath.TimeToCollision(RightRearClosingSpeedMps, RightRearGapMeters) > 5f;
+            !RightBlindSpotOccupied && RightRearGapMeters > 18f && RightFrontGapMeters > 45f &&
+            VehicleSafetyMath.TimeToCollision(RightRearClosingSpeedMps, RightRearGapMeters) > 5f &&
+            VehicleSafetyMath.TimeToCollision(RightFrontClosingSpeedMps, RightFrontGapMeters) > 8f;
 
         private void FixedUpdate()
         {
@@ -54,6 +62,12 @@ namespace EuroHaul.Driving
             RightRearGapMeters = SenseGap(rightRearApproachOrigin,
                 rightRearApproachOrigin != null ? rightRearApproachOrigin.forward : -transform.forward,
                 rearRange, out RightRearClosingSpeedMps);
+            LeftFrontGapMeters = SenseGap(leftFrontApproachOrigin,
+                leftFrontApproachOrigin != null ? leftFrontApproachOrigin.forward : transform.forward,
+                forwardRange, out LeftFrontClosingSpeedMps);
+            RightFrontGapMeters = SenseGap(rightFrontApproachOrigin,
+                rightFrontApproachOrigin != null ? rightFrontApproachOrigin.forward : transform.forward,
+                forwardRange, out RightFrontClosingSpeedMps);
             FrontAlert = Classify(FrontGapMeters, FrontClosingSpeedMps);
             RearAlert = Classify(RearGapMeters, RearClosingSpeedMps);
         }
