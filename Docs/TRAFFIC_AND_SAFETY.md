@@ -41,3 +41,10 @@ Automatic overtaking is intentionally disabled. Passing requires a separate lane
 - Trailer articulation, off-tracking and rollover envelope.
 - Weather, wet/icy friction, road grade and tire temperature.
 - Perception/audio accessibility settings and event logs.
+
+
+## High-speed steering envelope
+The player truck and traffic AI limit wheel steering angle using a speed-dependent lateral-acceleration envelope. At higher speed, the same steering input produces a smaller wheel angle; the dashboard reports when the requested steering angle is being limited. This prevents abrupt high-speed steering cuts in the prototype. The configured lateral acceleration is a gameplay tuning value and must be validated with loaded/unloaded vehicle and trailer tests.
+
+## Collision and recovery
+`TruckCollisionMonitor` records impact speed and a gameplay damage estimate. Moderate impacts activate hazards; stronger impacts apply emergency braking; critical impacts lock the truck until `RepairAtService()` is called by a future service/repair interaction. This is not a physically accurate crash or injury model.
