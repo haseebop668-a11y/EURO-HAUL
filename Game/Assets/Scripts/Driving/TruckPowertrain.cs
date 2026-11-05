@@ -2,11 +2,7 @@ using UnityEngine;
 
 namespace EuroHaul.Driving
 {
-    /// <summary>
-    /// Lightweight manual powertrain model for the Truck Lab prototype.
-    /// Gear indices: 0 = reverse, 1 = neutral, 2+ = forward gears.
-    /// Torque values are prototype tuning values, not manufacturer specifications.
-    /// </summary>
+    /// <summary>Prototype diesel engine, manual clutch and gearbox. Ratios are game tuning values.</summary>
     public sealed class TruckPowertrain : MonoBehaviour
     {
         [Header("Engine")]
@@ -17,24 +13,26 @@ namespace EuroHaul.Driving
         [SerializeField, Min(0.1f)] private float engineBraking = 1.5f;
 
         [Header("Transmission")]
-        [SerializeField] private float[] forwardGearRatios = { 7.2f, 4.8f, 3.2f, 2.2f, 1.55f, 1.0f, 0.78f };
+        [SerializeField] private float[] forwardGearRatios = { 7.2f, 4.8f, 3.2f, 2.2f, 1.55f, 1f, 0.78f };
         [SerializeField, Min(1f)] private float reverseRatio = 6.5f;
         [SerializeField, Min(1f)] private float finalDriveRatio = 3.7f;
         [SerializeField, Range(0.5f, 1f)] private float drivetrainEfficiency = 0.88f;
-        [SerializeField, Range(0.05f, 1f)] private float clutchEngagementRate = 0.65f;
-        [SerializeField, Range(0f, 1f)] private float clutchPedal = 0f;
+        [SerializeField, Range(0.05f, 2f)] private float clutchEngagementRate = 0.65f;
+        [SerializeField, Range(0f, 1f)] private float clutchPedal;
         [SerializeField, Min(0f)] private float wheelRadiusMeters = 0.52f;
         [SerializeField, Min(0.1f)] private float shiftDelay = 0.25f;
+        [SerializeField, Min(0f)] private float reverseEngagementMaxSpeedKmh = 3f;
 
         private float engineRpm;
         private float throttle;
         private float wheelSpeedKmh;
         private float shiftTimer;
+        private float currentClutchEngagement = 1f;
         private int gearIndex = 2;
 
         public float EngineRpm => engineRpm;
         public float ClutchPedal => clutchPedal;
-        public float ClutchEngagement => 1f - clutchPedal;
+        public float ClutchEngagement => currentClutchEngagement;
         public int Gear => gearIndex == 0 ? -1 : gearIndex == 1 ? 0 : gearIndex - 1;
         public bool IsNeutral => gearIndex == 1;
         public bool IsShifting => shiftTimer > 0f;
@@ -43,6 +41,7 @@ namespace EuroHaul.Driving
         {
             engineRpm = idleRpm;
             gearIndex = Mathf.Clamp(gearIndex, 0, forwardGearRatios.Length + 1);
+            currentClutchEngagement = 1f - clutchPedal;
         }
 
         public void SetThrottle(float value) => throttle = Mathf.Clamp01(value);
@@ -60,8 +59,8 @@ namespace EuroHaul.Driving
 
         public bool ShiftDown()
         {
-            if (shiftTimer > 0f || clutchPedal < 0.65f) return false;
-            if (gearIndex <= 0) return false;
+            if (shiftTimer > 0f || clutchPedal < 0.65f || gearIndex <= 0) return false;
+            if (gearIndex == 1 && Mathf.Abs(wheelSpeedKmh) > reverseEngagementMaxSpeedKmh) return false;
             gearIndex--;
             shiftTimer = shiftDelay;
             return true;
@@ -69,7 +68,8 @@ namespace EuroHaul.Driving
 
         public bool SelectReverse()
         {
-            if (clutchPedal < 0.65f || shiftTimer > 0f) return false;
+            if (clutchPedal < 0.65f || shiftTimer > 0f ||
+                Mathf.Abs(wheelSpeedKmh) > reverseEngagementMaxSpeedKmh) return false;
             gearIndex = 0;
             shiftTimer = shiftDelay;
             return true;
@@ -77,38 +77,39 @@ namespace EuroHaul.Driving
 
         public void SelectNeutral()
         {
-            if (clutchPedal >= 0.65f)
+            if (clutchPedal >= 0.65f && shiftTimer <= 0f)
             {
                 gearIndex = 1;
                 shiftTimer = shiftDelay;
             }
         }
 
-        /// <summary>Returns engine torque multiplied by selected gear and final drive.</summary>
         public float GetWheelTorque(float deltaTime)
         {
             shiftTimer = Mathf.Max(0f, shiftTimer - deltaTime);
+            currentClutchEngagement = Mathf.MoveTowards(currentClutchEngagement,
+                1f - clutchPedal, clutchEngagementRate * deltaTime);
+
             float ratio = CurrentRatio();
-            float engagement = ClutchEngagement;
-            float wheelRpm = Mathf.Abs(wheelSpeedKmh) / 3.6f / (2f * Mathf.PI * Mathf.Max(0.1f, wheelRadiusMeters)) * 60f;
+            float wheelRpm = Mathf.Abs(wheelSpeedKmh) / 3.6f /
+                (2f * Mathf.PI * Mathf.Max(0.1f, wheelRadiusMeters)) * 60f;
             float coupledRpm = wheelRpm * Mathf.Abs(ratio * finalDriveRatio);
             float freeTargetRpm = Mathf.Lerp(idleRpm, redlineRpm, throttle);
-            float targetRpm = IsNeutral || engagement < 0.02f || shiftTimer > 0f
+            float targetRpm = IsNeutral || currentClutchEngagement < 0.02f || shiftTimer > 0f
                 ? freeTargetRpm
                 : Mathf.Clamp(Mathf.Max(idleRpm, coupledRpm), idleRpm, redlineRpm);
+
             engineRpm = Mathf.MoveTowards(engineRpm, targetRpm,
                 (throttle > 0.02f ? engineResponse : engineBraking) * redlineRpm * deltaTime);
             engineRpm = Mathf.Clamp(engineRpm, idleRpm, redlineRpm);
 
             if (IsNeutral || shiftTimer > 0f || ratio == 0f) return 0f;
-
             float normalizedRpm = Mathf.InverseLerp(idleRpm, redlineRpm, engineRpm);
-            // Broad diesel-like torque plateau with a gentle falloff near redline.
             float torqueFactor = normalizedRpm < 0.72f
                 ? Mathf.Lerp(0.72f, 1f, normalizedRpm / 0.72f)
                 : Mathf.Lerp(1f, 0.78f, (normalizedRpm - 0.72f) / 0.28f);
             float engineTorque = maxTorqueNm * torqueFactor * throttle;
-            return engineTorque * ratio * finalDriveRatio * drivetrainEfficiency * engagement;
+            return engineTorque * ratio * finalDriveRatio * drivetrainEfficiency * currentClutchEngagement;
         }
 
         private float CurrentRatio()
