@@ -10,7 +10,7 @@ namespace EuroHaul.Traffic
         [SerializeField] private float maxSteerAngle = 25f;
         [SerializeField] private float motorTorque = 1200f;
         [SerializeField] private float brakeTorque = 4500f;
-        [SerializeField] private float waypointDistance = 8f;
+        [SerializeField] private float waypointDistance = 8f;\n        [SerializeField] private LayerMask vehicleMask = ~0;\n        [SerializeField] private float sensorRange = 55f;\n        [SerializeField] private float standstillGap = 6f;\n        [SerializeField] private float timeHeadway = 2f;
         private Rigidbody body;
         private int index;
         public float SpeedKmh => body == null ? 0f : body.linearVelocity.magnitude * 3.6f;
@@ -24,7 +24,7 @@ namespace EuroHaul.Traffic
             point = route.GetWaypoint(index);
             Vector3 local = transform.InverseTransformPoint(point.position);
             float steer = Mathf.Clamp(local.x / Mathf.Max(4f, local.magnitude), -1f, 1f);
-            float speedError = targetSpeedKmh - SpeedKmh;
+            Vector3 sensorOrigin = transform.position + transform.forward * 2f + Vector3.up;\n            if (Physics.SphereCast(sensorOrigin, 0.85f, transform.forward, out RaycastHit hit, sensorRange, vehicleMask, QueryTriggerInteraction.Ignore) && hit.rigidbody != body)\n            {\n                float safeGap = standstillGap + (SpeedKmh / 3.6f) * timeHeadway;\n                if (hit.distance < safeGap) targetSpeedKmh = Mathf.Min(targetSpeedKmh, Mathf.Max(0f, SpeedKmh - (safeGap - hit.distance) * 3f));\n            }\n            float speedError = targetSpeedKmh - SpeedKmh;
             float throttle = Mathf.Clamp01(speedError * 0.08f);
             float brake = Mathf.Clamp01(-speedError * 0.12f);
             Drive(throttle, brake, steer);
