@@ -39,7 +39,7 @@ Early Unity project foundation. Vehicle, driver-signal, safety-advisory and traf
 
 ## Project and build
 - Unity editor baseline: 6000.3.0f1 (Unity 6.3 LTS).
-- Unity project root: `Game/`.
+- Unity project root: `Game/`. The Editor bootstrap creates a Truck Lab road, player truck, mobile control canvas, traffic routes and build-scene entry on first Editor open.
 - Setup: [Docs/TRUCK_LAB_SETUP.md](Docs/TRUCK_LAB_SETUP.md).
 - Powertrain: [Docs/VEHICLE_POWERTRAIN.md](Docs/VEHICLE_POWERTRAIN.md).
 - Traffic and safety: [Docs/TRAFFIC_AND_SAFETY.md](Docs/TRAFFIC_AND_SAFETY.md).
