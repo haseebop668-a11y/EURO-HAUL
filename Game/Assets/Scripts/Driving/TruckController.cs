@@ -24,7 +24,7 @@ namespace EuroHaul.Driving
         private float steering;
         private float throttle;
         private float brake;
-        private float clutchPedal = 1f;
+        private float clutchPedal = 0f;
 
         public TruckDashboardTelemetry Telemetry { get; } = new TruckDashboardTelemetry();
         public float SpeedKmh => body != null ? body.linearVelocity.magnitude * 3.6f : 0f;
