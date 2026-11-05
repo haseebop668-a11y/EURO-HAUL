@@ -11,7 +11,7 @@ namespace EuroHaul.Driving
         {
             if (truck == null) return;
             float steering = Input.GetAxisRaw("Horizontal");
-            float throttle = Input.GetAxisRaw("Vertical");
+            float throttle = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) ? 1f : 0f;
             float brake = Input.GetKey(KeyCode.Space) ? 1f : 0f;
             truck.SetInput(steering, throttle, brake);
             truck.SetClutchPedal(Input.GetKey(KeyCode.C) ? 1f : 0f);
