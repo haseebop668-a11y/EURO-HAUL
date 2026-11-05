@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.Events;
+using UnityEngine.Events;\nusing EuroHaul.Traffic;
 
 namespace EuroHaul.Driving
 {
@@ -10,7 +10,7 @@ namespace EuroHaul.Driving
     {
         [SerializeField] private Renderer leftIndicator;
         [SerializeField] private Renderer rightIndicator;
-        [SerializeField] private AudioSource hornAudio;
+        [SerializeField] private AudioSource hornAudio;\n        [SerializeField] private TrafficHornBroadcast hornBroadcast;
         [SerializeField, Min(0.1f)] private float blinkInterval = 0.45f;
         [SerializeField] private string emissionColorProperty = "_EmissionColor";
         [SerializeField] private Color activeColor = new Color(1f, 0.35f, 0.02f);
@@ -29,7 +29,7 @@ namespace EuroHaul.Driving
 
         private void Awake()
         {
-            leftBlock = new MaterialPropertyBlock();
+            if (hornBroadcast == null) hornBroadcast = GetComponent<TrafficHornBroadcast>();\n            leftBlock = new MaterialPropertyBlock();
             rightBlock = new MaterialPropertyBlock();
             ApplyLamps(false, false);
         }
@@ -64,7 +64,7 @@ namespace EuroHaul.Driving
             if (hornHeld) return;
             hornHeld = true;
             if (hornAudio != null && !hornAudio.isPlaying) hornAudio.Play();
-            onHorn?.Invoke();
+            onHorn?.Invoke();\n            if (hornBroadcast != null) hornBroadcast.BroadcastHorn();
         }
 
         public void HornUp()
