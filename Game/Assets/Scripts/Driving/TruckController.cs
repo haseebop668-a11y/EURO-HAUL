@@ -17,6 +17,8 @@ namespace EuroHaul.Driving
         [SerializeField, Min(100f)] private float serviceBrakeTorque = 4500f;
         [SerializeField, Min(5f)] private float maxForwardSpeedKmh = 90f;
         [SerializeField, Min(5f)] private float maxReverseSpeedKmh = 15f;
+        [SerializeField, Min(1f)] private float wheelbaseMeters = 4.2f;
+        [SerializeField, Min(0.5f)] private float maxLateralAccelerationMps2 = 2.2f;
         [SerializeField] private Vector3 centerOfMassOffset = new Vector3(0f, -0.65f, 0f);
         [SerializeField] private TruckPowertrain powertrain;
 
@@ -30,6 +32,8 @@ namespace EuroHaul.Driving
         public TruckDashboardTelemetry Telemetry { get; } = new TruckDashboardTelemetry();
         public float SpeedKmh => body != null ? body.linearVelocity.magnitude * 3.6f : 0f;
         public int CurrentGear => powertrain != null ? powertrain.Gear : 0;
+        public bool SteeringLimitActive { get; private set; }
+        public float AppliedSteeringAngle { get; private set; }
         public float SignedSpeedKmh => body != null
             ? Vector3.Dot(body.linearVelocity, transform.forward) * 3.6f : 0f;
 
@@ -74,8 +78,19 @@ namespace EuroHaul.Driving
                 rearRight.brakeTorque = serviceBrakeTorque;
                 return;
             }
-            frontLeft.steerAngle = steering * maxSteerAngle;
-            frontRight.steerAngle = steering * maxSteerAngle;
+            float speedMpsForSteering = Mathf.Abs(SignedSpeedKmh) / 3.6f;
+            float requestedSteerAngle = steering * maxSteerAngle;
+            float safeSteerAngle = maxSteerAngle;
+            if (speedMpsForSteering > 1f)
+            {
+                float safeAngleRadians = Mathf.Atan(maxLateralAccelerationMps2 * wheelbaseMeters /
+                    (speedMpsForSteering * speedMpsForSteering));
+                safeSteerAngle = Mathf.Min(maxSteerAngle, safeAngleRadians * Mathf.Rad2Deg);
+            }
+            AppliedSteeringAngle = Mathf.Clamp(requestedSteerAngle, -safeSteerAngle, safeSteerAngle);
+            SteeringLimitActive = Mathf.Abs(requestedSteerAngle) > safeSteerAngle + 0.1f;
+            frontLeft.steerAngle = AppliedSteeringAngle;
+            frontRight.steerAngle = AppliedSteeringAngle;
 
             float driveTorque = 0f;
             if (powertrain != null)
