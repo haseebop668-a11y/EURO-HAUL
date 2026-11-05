@@ -4,12 +4,14 @@
 - Unity 6.3 LTS, editor version 6000.3.0f1.
 - Unity project root: `Game/`.
 - Android output: APK (not Android App Bundle).
+- Android architecture: ARM64.
 - Windows output: Windows x64 player.
 - Automated validation: Unity EditMode tests before platform builds.
 
-Unity 6.3 is the current LTS line and is supported through December 2027. Check the official Unity release support page before upgrading the pinned editor.
+## Scene generation
+The Editor bootstrap in `Game/Assets/Editor/EuroHaulSceneBootstrap.cs` creates a basic Truck Lab test scene on first Unity Editor startup and registers it in Build Settings. The scene contains a player truck, two same-direction traffic trucks, one oncoming truck, indicators, horn, sensor origins, a camera, road markings and mobile touch buttons. It is a prototype test track, not the full European map.
 
-## Scene generation\nThe Editor bootstrap in `Game/Assets/Editor/EuroHaulSceneBootstrap.cs` creates a basic Truck Lab test scene on first Unity Editor startup and registers it in Build Settings. The scene contains a player truck, two same-direction traffic trucks, one oncoming truck, indicators, horn, sensor origins, a camera, road markings and mobile touch buttons. It is a prototype test track, not the full European map.\n\n## GitHub Actions
+## GitHub Actions
 Workflow: `.github/workflows/unity-ci.yml`
 
 It is manual-only (`workflow_dispatch`) so an unconfigured Unity license does not break ordinary source commits. It:
@@ -36,7 +38,7 @@ Never put license values in source files, workflow YAML, issues, or chat. Do not
 6. Download the Android and Windows artifacts from the completed workflow run.
 
 ## Important status
-The workflow definition is committed, but no CI run has been executed in this repository yet. No APK or Windows executable is currently verified. A valid Unity license secret, a valid project scene in Build Settings, and successful CI results are required before claiming a build.
+The workflow definition and automatic test scene generator are committed, but no CI run has been executed in this repository yet. No APK or Windows executable is currently verified. A valid Unity license secret and successful CI results are required before claiming a build.
 
 ## Release gates
 - All EditMode tests pass.
