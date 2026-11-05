@@ -13,6 +13,8 @@ namespace EuroHaul.Traffic
         [SerializeField] private LayerMask vehicleMask = ~0;
         [SerializeField] private float targetSpeedKmh = 60f;
         [SerializeField] private float maxSteerAngle = 25f;
+        [SerializeField] private float wheelbaseMeters = 4.2f;
+        [SerializeField] private float maxLateralAccelerationMps2 = 2.2f;
         [SerializeField] private float motorTorque = 1200f;
         [SerializeField] private float brakeTorque = 4500f;
         [SerializeField] private float waypointDistance = 8f;
@@ -151,8 +153,14 @@ namespace EuroHaul.Traffic
         private void Drive(float throttle, float brake, float steer)
         {
             if (!WheelsReady()) return;
-            frontLeft.steerAngle = steer * maxSteerAngle;
-            frontRight.steerAngle = steer * maxSteerAngle;
+            float speedMps = SpeedKmh / 3.6f;
+            float safeAngle = maxSteerAngle;
+            if (speedMps > 1f)
+                safeAngle = Mathf.Min(maxSteerAngle,
+                    Mathf.Atan(maxLateralAccelerationMps2 * wheelbaseMeters / (speedMps * speedMps)) * Mathf.Rad2Deg);
+            float appliedSteer = Mathf.Clamp(steer * maxSteerAngle, -safeAngle, safeAngle);
+            frontLeft.steerAngle = appliedSteer;
+            frontRight.steerAngle = appliedSteer;
             rearLeft.motorTorque = Mathf.Clamp01(throttle) * motorTorque;
             rearRight.motorTorque = Mathf.Clamp01(throttle) * motorTorque;
             float appliedBrake = Mathf.Clamp01(brake) * brakeTorque;
