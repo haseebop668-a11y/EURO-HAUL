@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace EuroHaul.Driving
 {
-    /// <summary>Truck dynamics adapter. Assign four WheelColliders and optionally TruckPowertrain.</summary>
+    /// <summary>Truck dynamics adapter. Assign four WheelColliders and a TruckPowertrain.</summary>
     [RequireComponent(typeof(Rigidbody))]
     public sealed class TruckController : MonoBehaviour
     {
@@ -24,7 +24,7 @@ namespace EuroHaul.Driving
         private float steering;
         private float throttle;
         private float brake;
-        private float clutchPedal = 0f;
+        private float clutchPedal;
 
         public TruckDashboardTelemetry Telemetry { get; } = new TruckDashboardTelemetry();
         public float SpeedKmh => body != null ? body.linearVelocity.magnitude * 3.6f : 0f;
@@ -64,26 +64,16 @@ namespace EuroHaul.Driving
             frontLeft.steerAngle = steering * maxSteerAngle;
             frontRight.steerAngle = steering * maxSteerAngle;
 
-            float driveTorque;
+            float driveTorque = 0f;
             if (powertrain != null)
             {
-                // Gear selection determines direction. A negative input is not used to force a gear change.
-                float selectedThrottle = Mathf.Clamp01(Mathf.Abs(throttle));
-                if (SignedSpeedKmh >= maxForwardSpeedKmh && !powertrain.IsNeutral && powertrain.Gear > 0)
-                    selectedThrottle = 0f;
-                if (SignedSpeedKmh <= -maxReverseSpeedKmh && powertrain.Gear < 0)
-                    selectedThrottle = 0f;
+                float selectedThrottle = Mathf.Clamp01(throttle);
+                if (powertrain.Gear > 0 && SignedSpeedKmh >= maxForwardSpeedKmh) selectedThrottle = 0f;
+                if (powertrain.Gear < 0 && SignedSpeedKmh <= -maxReverseSpeedKmh) selectedThrottle = 0f;
+                if (powertrain.IsNeutral) selectedThrottle = Mathf.Clamp01(throttle);
                 powertrain.SetThrottle(selectedThrottle);
                 powertrain.SetWheelSpeed(SignedSpeedKmh);
                 driveTorque = powertrain.GetWheelTorque(Time.fixedDeltaTime);
-            }
-            else
-            {
-                // Backward-compatible fallback until TruckPowertrain is added to the truck.
-                float requested = throttle;
-                if (requested > 0f && SignedSpeedKmh >= maxForwardSpeedKmh) requested = 0f;
-                if (requested < 0f && SignedSpeedKmh <= -maxReverseSpeedKmh) requested = 0f;
-                driveTorque = requested * 1800f;
             }
 
             rearLeft.motorTorque = driveTorque;
@@ -99,7 +89,7 @@ namespace EuroHaul.Driving
             Telemetry.EngineRpm = powertrain != null ? powertrain.EngineRpm : 0f;
             Telemetry.Gear = powertrain != null ? powertrain.Gear : 0;
             Telemetry.ClutchPercent = clutchPedal * 100f;
-            Telemetry.ThrottlePercent = Mathf.Abs(throttle) * 100f;
+            Telemetry.ThrottlePercent = throttle * 100f;
             Telemetry.BrakePercent = brake * 100f;
             Telemetry.SteeringPercent = steering * 100f;
             Telemetry.EngineRunning = powertrain != null;
