@@ -63,18 +63,15 @@ namespace EuroHaul.Traffic
             float desiredSpeed = Mathf.Min(targetSpeedKmh, CurveSpeedLimit());
             SenseFrontVehicle(out float gap, out float obstacleSpeed);
             ObstacleGapMeters = gap;
-            IsFollowingSlowTraffic = !float.IsPositiveInfinity(gap) && gap < standstillGap + SpeedKmh / 3.6f * timeHeadway;
-            float relativeClosingSpeed = Mathf.Max(0f, SpeedKmh / 3.6f - obstacleSpeed);
+            float speedMps = SpeedKmh / 3.6f;
+            float relativeClosingSpeed = Mathf.Max(0f, speedMps - obstacleSpeed);
+            float safeGap = standstillGap + speedMps * timeHeadway;
+            float dynamicGap = safeGap + relativeClosingSpeed * 1.2f;
+            IsFollowingSlowTraffic = !float.IsPositiveInfinity(gap) && gap < dynamicGap;
 
             if (IsFollowingSlowTraffic)
-            {
-                float speedMps = SpeedKmh / 3.6f;
-                float safeGap = standstillGap + speedMps * timeHeadway;
-                float dynamicGap = safeGap + relativeClosingSpeed * 1.2f;
-                if (gap < dynamicGap)
-                    desiredSpeed = Mathf.Min(desiredSpeed,
-                        Mathf.Max(0f, obstacleSpeed * 3.6f - (dynamicGap - gap) * 1.8f));
-            }
+                desiredSpeed = Mathf.Min(desiredSpeed,
+                    Mathf.Max(0f, obstacleSpeed * 3.6f - (dynamicGap - gap) * 1.8f));
 
             if (gap < hornGapMeters && relativeClosingSpeed > 1.5f && SpeedKmh > 8f && Time.time >= nextHornTime)
             {
