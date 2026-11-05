@@ -221,6 +221,7 @@ namespace EuroHaul.Editor
                 SetObjectReference(platformSwitch, "touchInput", touch);
                 SetObjectReference(platformSwitch, "mobileCanvas", mobileCanvas);
                 ConfigureSensors(root, sensors);
+                SetLayerRecursively(root, 8);
             }
             else
             {
