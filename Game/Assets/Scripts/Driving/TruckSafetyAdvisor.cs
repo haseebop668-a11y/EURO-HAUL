@@ -45,8 +45,7 @@ namespace EuroHaul.Driving
             RequiredStoppingDistanceMeters = VehicleSafetyMath.BrakingDistance(
                 speedMps, assumedDecelerationMps2, reactionTimeSeconds) + stoppingSafetyMarginMeters;
 
-            FrontCollisionRisk = sensors != null &&
-                sensors.FrontGapMeters < RequiredStoppingDistanceMeters;
+            FrontCollisionRisk = sensors != null && sensors.FrontGapMeters < RequiredStoppingDistanceMeters;
             if (FrontCollisionRisk && !frontWarned) onFrontCollisionWarning?.Invoke();
             frontWarned = FrontCollisionRisk;
 
@@ -70,6 +69,15 @@ namespace EuroHaul.Driving
             rearWarned = FastRearApproachRisk;
         }
 
-        public void SetCurveRadius(float radiusMeters) => curveRadiusMeters = Mathf.Max(0f, radiusMeters);\n\n        public void SetCurveRadius(float radiusMeters, float lateralAccelerationMps2)\n        {\n            curveRadiusMeters = Mathf.Max(0f, radiusMeters);\n            safeLateralAcceleration = Mathf.Clamp(lateralAccelerationMps2, 0.5f, 4f);\n        }
+        public void SetCurveRadius(float radiusMeters)
+        {
+            curveRadiusMeters = Mathf.Max(0f, radiusMeters);
+        }
+
+        public void SetCurveRadius(float radiusMeters, float lateralAccelerationMps2)
+        {
+            curveRadiusMeters = Mathf.Max(0f, radiusMeters);
+            safeLateralAcceleration = Mathf.Clamp(lateralAccelerationMps2, 0.5f, 4f);
+        }
     }
 }
