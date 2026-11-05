@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using EuroHaul.Audio;
+using EuroHaul.Driving;
 
 namespace EuroHaul.Traffic
 {
@@ -153,10 +154,8 @@ namespace EuroHaul.Traffic
         {
             if (!WheelsReady()) return;
             float speedMps = SpeedKmh / 3.6f;
-            float safeAngle = maxSteerAngle;
-            if (speedMps > 1f)
-                safeAngle = Mathf.Min(maxSteerAngle,
-                    Mathf.Atan(maxLateralAccelerationMps2 * wheelbaseMeters / (speedMps * speedMps)) * Mathf.Rad2Deg);
+            float safeAngle = VehicleSafetyMath.SafeSteeringAngleDegrees(
+                speedMps, wheelbaseMeters, maxLateralAccelerationMps2, maxSteerAngle);
             float appliedSteer = Mathf.Clamp(steer * maxSteerAngle, -safeAngle, safeAngle);
             frontLeft.steerAngle = appliedSteer;
             frontRight.steerAngle = appliedSteer;
