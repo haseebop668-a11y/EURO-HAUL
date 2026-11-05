@@ -29,6 +29,7 @@ namespace EuroHaul.Driving
         public bool BlindSpotRisk { get; private set; }
         public bool CurveSpeedRisk { get; private set; }
         public bool FastRearApproachRisk { get; private set; }
+        public bool SteeringLimitRisk { get; private set; }
         public bool CanOvertakeLeft => sensors != null && sensors.CanSafelyChangeLeft && !FrontCollisionRisk;
         public bool CanOvertakeRight => sensors != null && sensors.CanSafelyChangeRight && !FrontCollisionRisk;
 
@@ -41,6 +42,7 @@ namespace EuroHaul.Driving
         private void Update()
         {
             if (truck == null) return;
+            SteeringLimitRisk = truck.SteeringLimitActive;
             float speedMps = VehicleSafetyMath.KmhToMps(truck.SpeedKmh);
             RequiredStoppingDistanceMeters = VehicleSafetyMath.BrakingDistance(
                 speedMps, assumedDecelerationMps2, reactionTimeSeconds) + stoppingSafetyMarginMeters;
