@@ -33,6 +33,7 @@ namespace EuroHaul.Driving
         private void Update()
         {
             if (truck == null) return;
+            if (DamagePercent >= 100f) truck.SetCrashLock(true);
             truck.SetEmergencyBrake(Time.time < emergencyBrakeUntil);
         }
 
