@@ -83,13 +83,8 @@ namespace EuroHaul.Driving
             }
             float speedMpsForSteering = Mathf.Abs(SignedSpeedKmh) / 3.6f;
             float requestedSteerAngle = steering * maxSteerAngle;
-            float safeSteerAngle = maxSteerAngle;
-            if (speedMpsForSteering > 1f)
-            {
-                float safeAngleRadians = Mathf.Atan(maxLateralAccelerationMps2 * wheelbaseMeters /
-                    (speedMpsForSteering * speedMpsForSteering));
-                safeSteerAngle = Mathf.Min(maxSteerAngle, safeAngleRadians * Mathf.Rad2Deg);
-            }
+            float safeSteerAngle = VehicleSafetyMath.SafeSteeringAngleDegrees(
+                speedMpsForSteering, wheelbaseMeters, maxLateralAccelerationMps2, maxSteerAngle);
             AppliedSteeringAngle = Mathf.Clamp(requestedSteerAngle, -safeSteerAngle, safeSteerAngle);
             SteeringLimitActive = Mathf.Abs(requestedSteerAngle) > safeSteerAngle + 0.1f;
             frontLeft.steerAngle = AppliedSteeringAngle;
