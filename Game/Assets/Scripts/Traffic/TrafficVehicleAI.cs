@@ -21,7 +21,7 @@ namespace EuroHaul.Traffic
         [SerializeField] private float sensorRange = 55f;
         [SerializeField] private float standstillGap = 6f;
         [SerializeField] private float timeHeadway = 2f;
-        [SerializeField] private float hornGapMeters = 10f;
+        [SerializeField] private float hornGapMeters = 50f;
         [SerializeField] private float hornCooldownSeconds = 7f;
         [SerializeField] private AudioSource hornAudio;
         [SerializeField] private UnityEvent onHornWarning;
@@ -64,19 +64,19 @@ namespace EuroHaul.Traffic
             SenseFrontVehicle(out float gap, out float obstacleSpeed);
             ObstacleGapMeters = gap;
             IsFollowingSlowTraffic = !float.IsPositiveInfinity(gap) && gap < standstillGap + SpeedKmh / 3.6f * timeHeadway;
+            float relativeClosingSpeed = Mathf.Max(0f, SpeedKmh / 3.6f - obstacleSpeed);
 
             if (IsFollowingSlowTraffic)
             {
                 float speedMps = SpeedKmh / 3.6f;
                 float safeGap = standstillGap + speedMps * timeHeadway;
-                float closingSpeed = Mathf.Max(0f, speedMps - obstacleSpeed);
-                float dynamicGap = safeGap + speedMps * closingSpeed / 4f;
+                float dynamicGap = safeGap + relativeClosingSpeed * 1.2f;
                 if (gap < dynamicGap)
                     desiredSpeed = Mathf.Min(desiredSpeed,
                         Mathf.Max(0f, obstacleSpeed * 3.6f - (dynamicGap - gap) * 1.8f));
             }
 
-            if (gap < hornGapMeters && SpeedKmh > 8f && Time.time >= nextHornTime)
+            if (gap < hornGapMeters && relativeClosingSpeed > 1.5f && SpeedKmh > 8f && Time.time >= nextHornTime)
             {
                 nextHornTime = Time.time + hornCooldownSeconds;
                 if (hornAudio != null) hornAudio.Play();
