@@ -52,6 +52,7 @@ namespace EuroHaul.Driving
             if (collision != null && collision.IsVehicleDisabled) return "CRITICAL DAMAGE: SERVICE REQUIRED";
             if (safety == null) return "ADVISORY NOT CONNECTED";
             if (safety.FrontCollisionRisk) return "BRAKE WARNING: FRONT GAP";
+            if (safety.SteeringLimitRisk) return "HIGH SPEED: STEERING LIMITED";
             if (safety.CurveSpeedRisk) return $"SLOW FOR CURVE: {safety.RecommendedCurveSpeedKmh:0} km/h";
             if (safety.FastRearApproachRisk) return "FAST VEHICLE APPROACHING REAR";
             if (safety.BlindSpotRisk) return "BLIND SPOT OCCUPIED";
