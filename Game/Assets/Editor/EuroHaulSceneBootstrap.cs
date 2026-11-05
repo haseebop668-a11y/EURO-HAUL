@@ -249,10 +249,10 @@ namespace EuroHaul.Editor
             Transform rear = CreateSensorOrigin(player.transform, "RearSensor", new Vector3(0f, 0.8f, -4.2f), 0f);
             Transform left = CreateSensorOrigin(player.transform, "LeftBlindSpot", new Vector3(-1.4f, 0.8f, 0f), -90f);
             Transform right = CreateSensorOrigin(player.transform, "RightBlindSpot", new Vector3(1.4f, 0.8f, 0f), 90f);
-            Transform leftRear = CreateSensorOrigin(player.transform, "LeftRearApproach", new Vector3(-1.4f, 0.8f, -3f), -135f);
-            Transform rightRear = CreateSensorOrigin(player.transform, "RightRearApproach", new Vector3(1.4f, 0.8f, -3f), 135f);
-            Transform leftFront = CreateSensorOrigin(player.transform, "LeftFrontApproach", new Vector3(-1.4f, 0.8f, 3f), -45f);
-            Transform rightFront = CreateSensorOrigin(player.transform, "RightFrontApproach", new Vector3(1.4f, 0.8f, 3f), 45f);
+            Transform leftRear = CreateSensorOrigin(player.transform, "LeftRearApproach", new Vector3(-3.5f, 0.8f, -3f), 180f);
+            Transform rightRear = CreateSensorOrigin(player.transform, "RightRearApproach", new Vector3(3.5f, 0.8f, -3f), 180f);
+            Transform leftFront = CreateSensorOrigin(player.transform, "LeftFrontApproach", new Vector3(-3.5f, 0.8f, 3f), 0f);
+            Transform rightFront = CreateSensorOrigin(player.transform, "RightFrontApproach", new Vector3(3.5f, 0.8f, 3f), 0f);
             SetObjectReference(sensors, "forwardOrigin", front);
             SetObjectReference(sensors, "rearOrigin", rear);
             SetObjectReference(sensors, "leftBlindSpotOrigin", left);
