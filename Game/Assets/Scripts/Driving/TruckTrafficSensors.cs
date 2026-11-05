@@ -10,7 +10,7 @@ namespace EuroHaul.Driving
         [SerializeField] private Transform forwardOrigin;
         [SerializeField] private Transform rearOrigin;
         [SerializeField] private Transform leftBlindSpotOrigin;
-        [SerializeField] private Transform rightBlindSpotOrigin;
+        [SerializeField] private Transform rightBlindSpotOrigin;\n        [SerializeField] private Transform leftRearApproachOrigin;\n        [SerializeField] private Transform rightRearApproachOrigin;
         [SerializeField] private LayerMask trafficMask = ~0;
         [SerializeField, Min(5f)] private float forwardRange = 100f;
         [SerializeField, Min(5f)] private float rearRange = 60f;
@@ -22,7 +22,7 @@ namespace EuroHaul.Driving
         public float FrontClosingSpeedMps { get; private set; }
         public float RearClosingSpeedMps { get; private set; }
         public bool LeftBlindSpotOccupied { get; private set; }
-        public bool RightBlindSpotOccupied { get; private set; }
+        public bool RightBlindSpotOccupied { get; private set; }\n        public float LeftRearGapMeters { get; private set; } = float.PositiveInfinity;\n        public float RightRearGapMeters { get; private set; } = float.PositiveInfinity;\n        public float LeftRearClosingSpeedMps { get; private set; }\n        public float RightRearClosingSpeedMps { get; private set; }
         public TrafficAlertLevel FrontAlert { get; private set; }
         public TrafficAlertLevel RearAlert { get; private set; }
         public bool CanSafelyChangeLeft => !LeftBlindSpotOccupied && RearGapMeters > 12f;
@@ -33,7 +33,7 @@ namespace EuroHaul.Driving
             FrontGapMeters = SenseGap(forwardOrigin, transform.forward, forwardRange, out FrontClosingSpeedMps);
             RearGapMeters = SenseGap(rearOrigin, -transform.forward, rearRange, out RearClosingSpeedMps);
             LeftBlindSpotOccupied = SenseOccupied(leftBlindSpotOrigin, blindSpotRange);
-            RightBlindSpotOccupied = SenseOccupied(rightBlindSpotOrigin, blindSpotRange);
+            RightBlindSpotOccupied = SenseOccupied(rightBlindSpotOrigin, blindSpotRange);\n            LeftRearGapMeters = SenseGap(leftRearApproachOrigin, leftRearApproachOrigin != null ? leftRearApproachOrigin.forward : -transform.forward, rearRange, out LeftRearClosingSpeedMps);\n            RightRearGapMeters = SenseGap(rightRearApproachOrigin, rightRearApproachOrigin != null ? rightRearApproachOrigin.forward : -transform.forward, rearRange, out RightRearClosingSpeedMps);
             FrontAlert = Classify(FrontGapMeters, FrontClosingSpeedMps);
             RearAlert = Classify(RearGapMeters, RearClosingSpeedMps);
         }
