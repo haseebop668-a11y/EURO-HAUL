@@ -43,8 +43,18 @@ namespace EuroHaul.Driving
             if (impactSpeed >= emergencyBrakeImpactKmh && truck != null)
             {
                 truck.SetInput(0f, 0f, 1f);
+                if (impactSpeed >= 50f) truck.SetCrashLock(true);
                 onSevereImpact?.Invoke();
             }
+        }
+
+        public void RepairAtService()
+        {
+            DamagePercent = 0f;
+            LastImpactSpeedKmh = 0f;
+            LastImpactSeverity = ImpactSeverity.None;
+            if (truck != null) truck.ResetCrashLock();
+            if (signals != null) signals.CancelSignal();
         }
 
         private static ImpactSeverity Classify(float speedKmh)
