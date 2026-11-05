@@ -17,7 +17,7 @@ namespace EuroHaul.Driving
         [SerializeField, Min(1f)] private float blindSpotRange = 12f;
         [SerializeField, Min(0.1f)] private float sensorRadius = 1.2f;
 
-        public float FrontGapMeters { get; private set; } = float.PositiveInfinity;
+        private readonly RaycastHit[] hitBuffer = new RaycastHit[24];\n\n        public float FrontGapMeters { get; private set; } = float.PositiveInfinity;
         public float RearGapMeters { get; private set; } = float.PositiveInfinity;
         public float FrontClosingSpeedMps { get; private set; }
         public float RearClosingSpeedMps { get; private set; }
@@ -42,26 +42,39 @@ namespace EuroHaul.Driving
         {
             closingSpeed = 0f;
             if (origin == null) return float.PositiveInfinity;
-            if (!Physics.SphereCast(origin.position, sensorRadius, direction, out RaycastHit hit,
-                                    range, trafficMask, QueryTriggerInteraction.Ignore))
-                return float.PositiveInfinity;
-
-            Rigidbody other = hit.rigidbody;
+            int count = Physics.SphereCastNonAlloc(origin.position, sensorRadius, direction, hitBuffer,
+                range, trafficMask, QueryTriggerInteraction.Ignore);
             Rigidbody own = GetComponentInParent<Rigidbody>();
-            if (other != null && own != null && other == own) return float.PositiveInfinity;
-            if (other != null && own != null)
+            float nearest = float.PositiveInfinity;
+            for (int i = 0; i < count; i++)
             {
-                Vector3 relativeVelocity = other.linearVelocity - own.linearVelocity;
-                closingSpeed = Vector3.Dot(-relativeVelocity, direction);
+                RaycastHit hit = hitBuffer[i];
+                Rigidbody other = hit.rigidbody;
+                if (other != null && other == own) continue;
+                if (hit.distance >= nearest) continue;
+                nearest = hit.distance;
+                closingSpeed = 0f;
+                if (other != null && own != null)
+                {
+                    Vector3 relativeVelocity = other.linearVelocity - own.linearVelocity;
+                    closingSpeed = Vector3.Dot(-relativeVelocity, direction.normalized);
+                }
             }
-            return hit.distance;
+            return nearest;
         }
 
         private bool SenseOccupied(Transform origin, float range)
         {
             if (origin == null) return false;
-            return Physics.SphereCast(origin.position, sensorRadius, origin.forward, out RaycastHit hit,
-                                       range, trafficMask, QueryTriggerInteraction.Ignore);
+            int count = Physics.SphereCastNonAlloc(origin.position, sensorRadius, origin.forward,
+                hitBuffer, range, trafficMask, QueryTriggerInteraction.Ignore);
+            Rigidbody own = GetComponentInParent<Rigidbody>();
+            for (int i = 0; i < count; i++)
+            {
+                Rigidbody other = hitBuffer[i].rigidbody;
+                if (other == null || other != own) return true;
+            }
+            return false;
         }
 
         private static TrafficAlertLevel Classify(float gap, float closingSpeed)
