@@ -5,7 +5,7 @@ namespace EuroHaul.Driving
 {
     public enum ImpactSeverity { None, Minor, Moderate, Severe, Critical }
 
-    /// <summary>Records impacts and applies short emergency braking. Damage is a gameplay estimate.</summary>
+    /// <summary>Records impacts and applies physics-level emergency braking. Damage is a gameplay estimate.</summary>
     public sealed class TruckCollisionMonitor : MonoBehaviour
     {
         [SerializeField] private TruckController truck;
@@ -22,7 +22,7 @@ namespace EuroHaul.Driving
         public float LastImpactSpeedKmh { get; private set; }
         public float DamagePercent { get; private set; }
         public ImpactSeverity LastImpactSeverity { get; private set; }
-        public bool IsVehicleDisabled => DamagePercent >= 100f;
+        public bool IsVehicleDisabled => DamagePercent >= 100f || (truck != null && truck.IsCrashLocked);
 
         private void Awake()
         {
@@ -32,8 +32,8 @@ namespace EuroHaul.Driving
 
         private void Update()
         {
-            if (truck != null && Time.time < emergencyBrakeUntil)
-                truck.SetInput(0f, 0f, 1f);
+            if (truck == null) return;
+            truck.SetEmergencyBrake(Time.time < emergencyBrakeUntil);
         }
 
         private void OnCollisionEnter(Collision collision)
@@ -52,7 +52,7 @@ namespace EuroHaul.Driving
             if (impactSpeed >= emergencyBrakeImpactKmh && truck != null)
             {
                 emergencyBrakeUntil = Time.time + postImpactBrakeSeconds;
-                truck.SetInput(0f, 0f, 1f);
+                truck.SetEmergencyBrake(true);
                 if (impactSpeed >= 50f) truck.SetCrashLock(true);
                 onSevereImpact?.Invoke();
             }
