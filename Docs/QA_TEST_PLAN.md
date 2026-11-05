@@ -42,3 +42,28 @@ Only mark a checkbox complete after a real test run and recorded result. Reposit
 10. Verify steering input clamps to -1..1 and throttle/brake/clutch inputs remain within their documented ranges.
 
 These are planned checks only. They have not been run in Unity Editor, on a device, or in an automated test runner. A Unity project/scene and Android build pipeline are still required before APK validation.
+
+
+## Traffic and road-safety tests (not yet executed)
+1. Confirm forward and rear sensors ignore the player's own colliders.
+2. Place a slower vehicle ahead and verify following distance increases with player speed.
+3. Place a fast vehicle behind and verify rear-approach warning appears before it reaches the truck.
+4. Place a vehicle in each blind spot and verify lane-change clearance is denied.
+5. Place an oncoming vehicle in the passing lane and verify overtaking clearance is denied.
+6. Confirm right-lane changes are denied on the generated test road because the right side is a shoulder, not a traffic lane.
+7. Confirm indicator lamps blink and hazard mode flashes both sides.
+8. Hold the horn and verify nearby traffic receivers hear and acknowledge it; release the horn and verify audio stops.
+9. Verify a rear AI vehicle sounds its courtesy horn only when approaching a slow obstacle within the configured gap.
+10. Verify stopping-distance warnings respond to speed and front gap.
+11. Verify curve speed advice changes with authored road curvature markers.
+12. Verify a moderate impact activates hazards and emergency braking; a critical impact locks the truck until service repair.
+13. Verify mobile controls support simultaneous clutch and reverse press, and release safely when a pointer exits a button.
+14. Verify keyboard and touch adapters are mutually exclusive on the selected platform.
+
+## Build pipeline tests (not yet executed)
+- [ ] Unity EditMode test job succeeds on Unity 6000.3.0f1.
+- [ ] Android ARM64 APK build succeeds and artifact uploads.
+- [ ] Windows x64 build succeeds and artifact uploads.
+- [ ] APK installs and launches on a physical Android device.
+- [ ] Android touch buttons are tested on the target device.
+- [ ] Ten-minute traffic drive completes without console exceptions.
