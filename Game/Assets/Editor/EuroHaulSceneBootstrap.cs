@@ -200,11 +200,13 @@ namespace EuroHaul.Editor
                 SetObjectReference(root.GetComponent<TruckIndicatorInput>(), "signals", signals);
                 TruckTrafficSensors sensors = root.AddComponent<TruckTrafficSensors>();
                 TruckSafetyAdvisor advisor = root.AddComponent<TruckSafetyAdvisor>();
+                TruckCollisionMonitor collisionMonitor = root.AddComponent<TruckCollisionMonitor>();
                 TruckDashboardHUD hud = root.AddComponent<TruckDashboardHUD>();
                 SetObjectReference(hud, "truck", controller);
                 SetObjectReference(hud, "sensors", sensors);
                 SetObjectReference(hud, "safety", advisor);
                 SetObjectReference(hud, "signals", signals);
+                SetObjectReference(hud, "collision", collisionMonitor);
                 KeyboardTruckInput keyboard = root.AddComponent<KeyboardTruckInput>();
                 SetObjectReference(keyboard, "truck", controller);
                 SetObjectReference(keyboard, "signals", signals);
