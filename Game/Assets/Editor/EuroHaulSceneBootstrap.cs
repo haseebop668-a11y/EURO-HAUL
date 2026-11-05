@@ -100,10 +100,12 @@ namespace EuroHaul.Editor
             CreateTruck("TrafficTruckBehind", new Vector3(1.75f, 1.35f, -95f), Quaternion.identity, trafficMat, false, routeForward);
             CreateTruck("OncomingTruck", new Vector3(-1.75f, 1.35f, 190f), Quaternion.Euler(0f, 180f, 0f), trafficMat, false, routeReverse);
 
-            CreateIndicatorLamp(player.transform, new Vector3(-1.05f, 0.35f, 3.08f), lampMat, out Renderer leftLamp);
-            CreateIndicatorLamp(player.transform, new Vector3(1.05f, 0.35f, 3.08f), lampMat, out Renderer rightLamp);
-            SetObjectReference(signals, "leftIndicator", leftLamp);
-            SetObjectReference(signals, "rightIndicator", rightLamp);
+            CreateIndicatorLamp(player.transform, new Vector3(-1.05f, 0.35f, 3.08f), lampMat, out Renderer leftFrontLamp);
+            CreateIndicatorLamp(player.transform, new Vector3(-1.05f, 0.35f, -3.08f), lampMat, out Renderer leftRearLamp);
+            CreateIndicatorLamp(player.transform, new Vector3(1.05f, 0.35f, 3.08f), lampMat, out Renderer rightFrontLamp);
+            CreateIndicatorLamp(player.transform, new Vector3(1.05f, 0.35f, -3.08f), lampMat, out Renderer rightRearLamp);
+            SetArrayReferences(signals, "leftIndicators", new Object[] { leftFrontLamp, leftRearLamp });
+            SetArrayReferences(signals, "rightIndicators", new Object[] { rightFrontLamp, rightRearLamp });
 
             SetObjectReference(advisor, "truck", controller);
             SetObjectReference(advisor, "sensors", sensors);
