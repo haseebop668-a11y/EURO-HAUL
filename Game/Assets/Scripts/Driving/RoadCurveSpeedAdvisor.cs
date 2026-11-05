@@ -24,7 +24,7 @@ namespace EuroHaul.Driving
             float angleRadians = Vector3.Angle(a, b) * Mathf.Deg2Rad;
             float chord = Vector3.Distance(nearMarker.position, exitMarker.position);
             float radius = angleRadians < 0.02f ? 10000f : chord / (2f * Mathf.Sin(angleRadians * 0.5f));
-            safetyAdvisor.SetCurveRadius(radius);
+            safetyAdvisor.SetCurveRadius(radius, lateralAccelerationLimit);
         }
 
         private void OnDisable()
