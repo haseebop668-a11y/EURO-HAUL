@@ -9,7 +9,7 @@
 
 Unity 6.3 is the current LTS line and is supported through December 2027. Check the official Unity release support page before upgrading the pinned editor.
 
-## GitHub Actions
+## Scene generation\nThe Editor bootstrap in `Game/Assets/Editor/EuroHaulSceneBootstrap.cs` creates a basic Truck Lab test scene on first Unity Editor startup and registers it in Build Settings. The scene contains a player truck, two same-direction traffic trucks, one oncoming truck, indicators, horn, sensor origins, a camera, road markings and mobile touch buttons. It is a prototype test track, not the full European map.\n\n## GitHub Actions
 Workflow: `.github/workflows/unity-ci.yml`
 
 It is manual-only (`workflow_dispatch`) so an unconfigured Unity license does not break ordinary source commits. It:
