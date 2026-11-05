@@ -2,10 +2,7 @@ using UnityEngine;
 
 namespace EuroHaul.Driving
 {
-    /// <summary>
-    /// UI-friendly touch adapter. Wire Unity UI Button PointerDown/PointerUp events
-    /// or EventTrigger callbacks to the Press/Release methods.
-    /// </summary>
+    /// <summary>UI-friendly mobile control adapter. Connect press/release events from a touch UI.</summary>
     public sealed class TouchTruckInput : MonoBehaviour
     {
         [SerializeField] private TruckController truck;
@@ -19,7 +16,11 @@ namespace EuroHaul.Driving
         public void ClearSteering() => steering = 0f;
         public void AccelerateDown() { accelerate = true; reverse = false; }
         public void AccelerateUp() => accelerate = false;
-        public void ReverseDown() { reverse = true; accelerate = false; if (truck != null) truck.SelectReverse(); }
+        public void ReverseDown()
+        {
+            accelerate = false;
+            reverse = truck != null && truck.SelectReverse();
+        }
         public void ReverseUp() => reverse = false;
         public void BrakeDown() => brake = true;
         public void BrakeUp() => brake = false;
@@ -32,7 +33,7 @@ namespace EuroHaul.Driving
         private void Update()
         {
             if (truck == null) return;
-            float drive = accelerate ? 1f : (reverse && truck.CurrentGear < 0 ? 1f : 0f);
+            float drive = accelerate || reverse ? 1f : 0f;
             truck.SetInput(steering, drive, brake ? 1f : 0f);
             truck.SetClutchPedal(clutch ? 1f : 0f);
         }
