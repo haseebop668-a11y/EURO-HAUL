@@ -7,11 +7,11 @@ namespace EuroHaul.Driving
 {
     public enum TurnSignalState { Off, Left, Right, Hazard }
 
-    /// <summary>Driver-controlled exterior indicators, hazard lamps and horn.</summary>
+    /// <summary>Driver-controlled front/rear indicators, hazard lamps and horn.</summary>
     public sealed class TruckSignals : MonoBehaviour
     {
-        [SerializeField] private Renderer leftIndicator;
-        [SerializeField] private Renderer rightIndicator;
+        [SerializeField] private Renderer[] leftIndicators;
+        [SerializeField] private Renderer[] rightIndicators;
         [SerializeField] private AudioSource hornAudio;
         [SerializeField] private TrafficHornBroadcast hornBroadcast;
         [SerializeField, Min(0.1f)] private float blinkInterval = 0.45f;
@@ -84,16 +84,20 @@ namespace EuroHaul.Driving
 
         private void ApplyLamps(bool leftOn, bool rightOn)
         {
-            SetEmission(leftIndicator, leftBlock, leftOn);
-            SetEmission(rightIndicator, rightBlock, rightOn);
+            SetEmission(leftIndicators, leftBlock, leftOn);
+            SetEmission(rightIndicators, rightBlock, rightOn);
         }
 
-        private void SetEmission(Renderer target, MaterialPropertyBlock block, bool enabled)
+        private void SetEmission(Renderer[] targets, MaterialPropertyBlock block, bool enabled)
         {
-            if (target == null) return;
-            target.GetPropertyBlock(block);
-            block.SetColor(emissionColorProperty, enabled ? activeColor : inactiveColor);
-            target.SetPropertyBlock(block);
+            if (targets == null) return;
+            foreach (Renderer target in targets)
+            {
+                if (target == null) continue;
+                target.GetPropertyBlock(block);
+                block.SetColor(emissionColorProperty, enabled ? activeColor : inactiveColor);
+                target.SetPropertyBlock(block);
+            }
         }
 
         private void OnDisable()
