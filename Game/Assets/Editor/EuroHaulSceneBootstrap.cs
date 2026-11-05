@@ -1,4 +1,7 @@
 using System.IO;
+using System;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -191,6 +194,13 @@ namespace EuroHaul.Editor
                 KeyboardTruckInput keyboard = root.AddComponent<KeyboardTruckInput>();
                 SetObjectReference(keyboard, "truck", controller);
                 SetObjectReference(keyboard, "signals", signals);
+                TouchTruckInput touch = root.AddComponent<TouchTruckInput>();
+                SetObjectReference(touch, "truck", controller);
+                Canvas mobileCanvas = CreateMobileControls(touch, root.GetComponent<TruckIndicatorInput>());
+                EuroHaul.Platform.InputPlatformSwitch platformSwitch = root.AddComponent<EuroHaul.Platform.InputPlatformSwitch>();
+                SetObjectReference(platformSwitch, "keyboardInput", keyboard);
+                SetObjectReference(platformSwitch, "touchInput", touch);
+                SetObjectReference(platformSwitch, "mobileCanvas", mobileCanvas);
                 ConfigureSensors(root, sensors);
             }
             else
@@ -265,6 +275,92 @@ namespace EuroHaul.Editor
             obj.GetComponent<Renderer>().sharedMaterial = material;
             lamp = obj.GetComponent<Renderer>();
             Object.DestroyImmediate(obj.GetComponent<Collider>());
+        }
+
+
+        private static Canvas CreateMobileControls(TouchTruckInput touch, TruckIndicatorInput indicators)
+        {
+            if (EventSystem.current == null)
+                new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+
+            GameObject canvasObject = new GameObject("MobileControls", typeof(Canvas),
+                typeof(CanvasScaler), typeof(GraphicRaycaster));
+            Canvas canvas = canvasObject.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.enabled = false;
+            CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.matchWidthOrHeight = 0.5f;
+
+            CreateHoldButton(canvas.transform, "STEER LEFT", new Vector2(-790f, -390f), () => touch.SetSteering(-1f), touch.ClearSteering);
+            CreateHoldButton(canvas.transform, "STEER RIGHT", new Vector2(-630f, -390f), () => touch.SetSteering(1f), touch.ClearSteering);
+            CreateHoldButton(canvas.transform, "ACCEL", new Vector2(790f, -390f), touch.AccelerateDown, touch.AccelerateUp);
+            CreateHoldButton(canvas.transform, "BRAKE", new Vector2(630f, -390f), touch.BrakeDown, touch.BrakeUp);
+            CreateHoldButton(canvas.transform, "CLUTCH", new Vector2(630f, -255f), touch.ClutchDown, touch.ClutchUp);
+            CreateHoldButton(canvas.transform, "REVERSE", new Vector2(790f, -255f), touch.ReverseDown, touch.ReverseUp);
+            CreateHoldButton(canvas.transform, "HORN", new Vector2(430f, -390f), indicators.HornDown, indicators.HornUp);
+
+            CreateClickButton(canvas.transform, "GEAR +", new Vector2(430f, -255f), touch.GearUp);
+            CreateClickButton(canvas.transform, "GEAR -", new Vector2(270f, -255f), touch.GearDown);
+            CreateClickButton(canvas.transform, "NEUTRAL", new Vector2(270f, -390f), touch.Neutral);
+            CreateClickButton(canvas.transform, "LEFT SIG", new Vector2(-790f, -255f), indicators.LeftIndicator);
+            CreateClickButton(canvas.transform, "RIGHT SIG", new Vector2(-630f, -255f), indicators.RightIndicator);
+            CreateClickButton(canvas.transform, "HAZARD", new Vector2(-470f, -255f), indicators.HazardLights);
+            return canvas;
+        }
+
+        private static void CreateHoldButton(Transform parent, string label, Vector2 position,
+            Action onDown, Action onUp)
+        {
+            Button button = CreateButton(parent, label, position);
+            EventTrigger trigger = button.gameObject.AddComponent<EventTrigger>();
+            EventTrigger.Entry down = new EventTrigger.Entry { eventID = EventTriggerType.PointerDown };
+            down.callback.AddListener(_ => onDown?.Invoke());
+            trigger.triggers.Add(down);
+            EventTrigger.Entry up = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
+            up.callback.AddListener(_ => onUp?.Invoke());
+            trigger.triggers.Add(up);
+            EventTrigger.Entry exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+            exit.callback.AddListener(_ => onUp?.Invoke());
+            trigger.triggers.Add(exit);
+        }
+
+        private static void CreateClickButton(Transform parent, string label, Vector2 position, Action action)
+        {
+            Button button = CreateButton(parent, label, position);
+            button.onClick.AddListener(() => action?.Invoke());
+        }
+
+        private static Button CreateButton(Transform parent, string label, Vector2 position)
+        {
+            GameObject buttonObject = new GameObject(label.Replace(" ", "") + "Button",
+                typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
+            buttonObject.transform.SetParent(parent, false);
+            RectTransform rect = buttonObject.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.5f, 0.5f);
+            rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = position;
+            rect.sizeDelta = new Vector2(145f, 92f);
+            Image image = buttonObject.GetComponent<Image>();
+            image.color = new Color(0.08f, 0.12f, 0.17f, 0.78f);
+            Button button = buttonObject.GetComponent<Button>();
+            button.targetGraphic = image;
+
+            GameObject textObject = new GameObject("Label", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+            textObject.transform.SetParent(buttonObject.transform, false);
+            RectTransform textRect = textObject.GetComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = Vector2.zero;
+            textRect.offsetMax = Vector2.zero;
+            Text text = textObject.GetComponent<Text>();
+            text.text = label;
+            text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            text.fontSize = 20;
+            text.alignment = TextAnchor.MiddleCenter;
+            text.color = Color.white;
+            return button;
         }
 
         private static void SetWheelVisuals(WheelVisualSync sync, WheelCollider[] wheels, Transform[] visuals)
