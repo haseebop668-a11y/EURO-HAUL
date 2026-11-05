@@ -16,7 +16,7 @@ namespace EuroHaul.Traffic
         [SerializeField] private float maxSteerAngle = 25f;
         [SerializeField] private float wheelbaseMeters = 4.2f;
         [SerializeField] private float maxLateralAccelerationMps2 = 2.2f;
-        [SerializeField] private float motorTorque = 1200f;
+        [SerializeField] private float motorTorque = 5000f;
         [SerializeField] private float brakeTorque = 4500f;
         [SerializeField] private float waypointDistance = 8f;
         [SerializeField] private float sensorRange = 55f;
