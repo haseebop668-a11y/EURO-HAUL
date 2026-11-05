@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace EuroHaul.Driving
 {
-    /// <summary>Temporary PC keyboard adapter. Requires Active Input Handling = Both or Input Manager (Old).</summary>
+    /// <summary>PC keyboard adapter. Requires Active Input Handling = Both or Input Manager (Old).</summary>
     public sealed class KeyboardTruckInput : MonoBehaviour
     {
         [SerializeField] private TruckController truck;
@@ -14,11 +14,21 @@ namespace EuroHaul.Driving
             float throttle = Input.GetAxisRaw("Vertical");
             float brake = Input.GetKey(KeyCode.Space) ? 1f : 0f;
             truck.SetInput(steering, throttle, brake);
+            truck.SetClutchPedal(Input.GetKey(KeyCode.C) ? 1f : 0f);
+
+            if (Input.GetKeyDown(KeyCode.E)) truck.ShiftGearUp();
+            if (Input.GetKeyDown(KeyCode.Q)) truck.ShiftGearDown();
+            if (Input.GetKeyDown(KeyCode.N)) truck.SelectNeutral();
+            if (Input.GetKeyDown(KeyCode.R)) truck.SelectReverse();
         }
 
         private void OnDisable()
         {
-            if (truck != null) truck.SetInput(0f, 0f, 1f);
+            if (truck != null)
+            {
+                truck.SetInput(0f, 0f, 1f);
+                truck.SetClutchPedal(1f);
+            }
         }
     }
 }
