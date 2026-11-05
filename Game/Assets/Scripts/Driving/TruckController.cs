@@ -89,8 +89,9 @@ namespace EuroHaul.Driving
                 driveTorque = powertrain.GetWheelTorque(Time.fixedDeltaTime);
             }
 
-            rearLeft.motorTorque = driveTorque;
-            rearRight.motorTorque = driveTorque;
+            // Powertrain output is total axle torque; split it across the two driven rear wheels.
+            rearLeft.motorTorque = driveTorque * 0.5f;
+            rearRight.motorTorque = driveTorque * 0.5f;
 
             float appliedBrake = brake * serviceBrakeTorque;
             frontLeft.brakeTorque = appliedBrake;
