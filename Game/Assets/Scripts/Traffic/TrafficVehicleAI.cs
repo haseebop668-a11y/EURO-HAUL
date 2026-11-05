@@ -31,6 +31,7 @@ namespace EuroHaul.Traffic
         private Rigidbody body;
         private int index;
         private float nextHornTime;
+        private bool routeFinished;
 
         public float SpeedKmh => body == null ? 0f : body.linearVelocity.magnitude * 3.6f;
         public float ObstacleGapMeters { get; private set; } = float.PositiveInfinity;
@@ -56,6 +57,11 @@ namespace EuroHaul.Traffic
             }
 
             AdvanceWaypoint();
+            if (routeFinished)
+            {
+                Drive(0f, 1f, 0f);
+                return;
+            }
             Transform point = route.GetWaypoint(index);
             if (point == null) return;
 
@@ -108,7 +114,11 @@ namespace EuroHaul.Traffic
             Transform point = route.GetWaypoint(index);
             if (point == null || Vector3.Distance(transform.position, point.position) > waypointDistance) return;
             int next = index + 1;
-            if (next >= route.Count) next = route.Loop ? 0 : route.Count - 1;
+            if (next >= route.Count)
+            {
+                if (!route.Loop) { routeFinished = true; return; }
+                next = 0;
+            }
             index = next;
         }
 
