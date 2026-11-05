@@ -50,7 +50,7 @@ namespace EuroHaul.Editor
 
         private static void CreateScene()
         {
-            Directory.CreateDirectory("Assets/Scenes");
+            if (!AssetDatabase.IsValidFolder("Assets/Scenes")) AssetDatabase.CreateFolder("Assets", "Scenes");
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
             Material roadMat = CreateMaterial("Road", new Color(0.12f, 0.13f, 0.14f));
@@ -440,7 +440,7 @@ namespace EuroHaul.Editor
         private static Material CreateMaterial(string name, Color color)
         {
             string folder = "Assets/Materials";
-            Directory.CreateDirectory(folder);
+            if (!AssetDatabase.IsValidFolder(folder)) AssetDatabase.CreateFolder("Assets", "Materials");
             string path = folder + "/" + name + ".mat";
             Material existing = AssetDatabase.LoadAssetAtPath<Material>(path);
             if (existing != null) return existing;
