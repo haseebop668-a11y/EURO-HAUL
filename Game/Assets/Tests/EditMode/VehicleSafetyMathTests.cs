@@ -26,6 +26,15 @@ namespace EuroHaul.Tests
         }
 
         [Test]
+        public void SteeringAngleShrinksAsSpeedIncreases()
+        {
+            float slowAngle = VehicleSafetyMath.SafeSteeringAngleDegrees(5f, 4.2f, 2.2f, 28f);
+            float fastAngle = VehicleSafetyMath.SafeSteeringAngleDegrees(25f, 4.2f, 2.2f, 28f);
+            Assert.That(slowAngle, Is.GreaterThan(fastAngle));
+            Assert.That(fastAngle, Is.LessThan(2f));
+        }
+
+        [Test]
         public void SafeGapIncludesStoppingDistanceAndMargin()
         {
             Assert.That(VehicleSafetyMath.IsSafeGap(55f, 45f, 10f), Is.True);
