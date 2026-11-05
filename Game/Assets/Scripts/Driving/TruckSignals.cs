@@ -1,16 +1,18 @@
 using UnityEngine;
-using UnityEngine.Events;\nusing EuroHaul.Traffic;
+using UnityEngine.Events;
+using EuroHaul.Traffic;
 
 namespace EuroHaul.Driving
 {
     public enum TurnSignalState { Off, Left, Right, Hazard }
 
-    /// <summary>Driver-controlled exterior signals. Assign lamp renderers and optional horn AudioSource.</summary>
+    /// <summary>Driver-controlled exterior indicators, hazard lamps and horn.</summary>
     public sealed class TruckSignals : MonoBehaviour
     {
         [SerializeField] private Renderer leftIndicator;
         [SerializeField] private Renderer rightIndicator;
-        [SerializeField] private AudioSource hornAudio;\n        [SerializeField] private TrafficHornBroadcast hornBroadcast;
+        [SerializeField] private AudioSource hornAudio;
+        [SerializeField] private TrafficHornBroadcast hornBroadcast;
         [SerializeField, Min(0.1f)] private float blinkInterval = 0.45f;
         [SerializeField] private string emissionColorProperty = "_EmissionColor";
         [SerializeField] private Color activeColor = new Color(1f, 0.35f, 0.02f);
@@ -29,20 +31,20 @@ namespace EuroHaul.Driving
 
         private void Awake()
         {
-            if (hornBroadcast == null) hornBroadcast = GetComponent<TrafficHornBroadcast>();\n            leftBlock = new MaterialPropertyBlock();
+            if (hornBroadcast == null) hornBroadcast = GetComponent<TrafficHornBroadcast>();
+            leftBlock = new MaterialPropertyBlock();
             rightBlock = new MaterialPropertyBlock();
             ApplyLamps(false, false);
         }
 
         private void Update()
         {
-            if (State != TurnSignalState.Off && Time.time >= nextBlink)
-            {
-                blinkOn = !blinkOn;
-                nextBlink = Time.time + blinkInterval;
-                ApplyLamps(State == TurnSignalState.Left || State == TurnSignalState.Hazard ? blinkOn : false,
-                           State == TurnSignalState.Right || State == TurnSignalState.Hazard ? blinkOn : false);
-            }
+            if (State == TurnSignalState.Off || Time.time < nextBlink) return;
+            blinkOn = !blinkOn;
+            nextBlink = Time.time + blinkInterval;
+            ApplyLamps(
+                blinkOn && (State == TurnSignalState.Left || State == TurnSignalState.Hazard),
+                blinkOn && (State == TurnSignalState.Right || State == TurnSignalState.Hazard));
         }
 
         public void ToggleLeft() => SetState(State == TurnSignalState.Left ? TurnSignalState.Off : TurnSignalState.Left);
@@ -64,7 +66,8 @@ namespace EuroHaul.Driving
             if (hornHeld) return;
             hornHeld = true;
             if (hornAudio != null && !hornAudio.isPlaying) hornAudio.Play();
-            onHorn?.Invoke();\n            if (hornBroadcast != null) hornBroadcast.BroadcastHorn();
+            onHorn?.Invoke();
+            if (hornBroadcast != null) hornBroadcast.BroadcastHorn();
         }
 
         public void HornUp()
