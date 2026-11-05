@@ -67,6 +67,14 @@ namespace EuroHaul.Driving
             return true;
         }
 
+        public bool SelectReverse()
+        {
+            if (clutchPedal < 0.65f || shiftTimer > 0f) return false;
+            gearIndex = 0;
+            shiftTimer = shiftDelay;
+            return true;
+        }
+
         public void SelectNeutral()
         {
             if (clutchPedal >= 0.65f)
