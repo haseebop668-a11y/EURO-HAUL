@@ -55,6 +55,7 @@ namespace EuroHaul.Driving
         public bool ShiftGearUp() => powertrain != null && powertrain.ShiftUp();
         public bool ShiftGearDown() => powertrain != null && powertrain.ShiftDown();
         public void SelectNeutral() { if (powertrain != null) powertrain.SelectNeutral(); }
+        public bool SelectReverse() => powertrain != null && powertrain.SelectReverse();
 
         private void FixedUpdate()
         {
