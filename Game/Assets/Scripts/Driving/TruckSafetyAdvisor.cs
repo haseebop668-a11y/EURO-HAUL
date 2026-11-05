@@ -70,6 +70,6 @@ namespace EuroHaul.Driving
             rearWarned = FastRearApproachRisk;
         }
 
-        public void SetCurveRadius(float radiusMeters) => curveRadiusMeters = Mathf.Max(0f, radiusMeters);
+        public void SetCurveRadius(float radiusMeters) => curveRadiusMeters = Mathf.Max(0f, radiusMeters);\n\n        public void SetCurveRadius(float radiusMeters, float lateralAccelerationMps2)\n        {\n            curveRadiusMeters = Mathf.Max(0f, radiusMeters);\n            safeLateralAcceleration = Mathf.Clamp(lateralAccelerationMps2, 0.5f, 4f);\n        }
     }
 }
