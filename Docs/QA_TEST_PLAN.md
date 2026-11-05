@@ -67,3 +67,13 @@ These are planned checks only. They have not been run in Unity Editor, on a devi
 - [ ] APK installs and launches on a physical Android device.
 - [ ] Android touch buttons are tested on the target device.
 - [ ] Ten-minute traffic drive completes without console exceptions.
+
+
+## Additional physics and signal checks (not yet executed)
+15. Verify steering angle is clamped by the lateral-acceleration envelope as speed rises, and remains more responsive at low speed.
+16. Verify player horn broadcasts to traffic receivers within range and the horn stops on release.
+17. Verify a rear traffic AI sounds a courtesy horn when closing on slow traffic, then respects its cooldown.
+18. Verify front and rear indicator lamps blink together on the selected side and both sides flash in hazard mode.
+19. Verify emergency braking overrides keyboard/touch throttle after a severe impact.
+20. Verify a critical impact locks the truck and `RepairAtService()` restores driving controls.
+21. Verify traffic vehicles stop at the end of a non-looping route instead of driving beyond the test road.
