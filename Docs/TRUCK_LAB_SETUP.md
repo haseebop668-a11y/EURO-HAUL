@@ -31,3 +31,4 @@ Torque, brake, center-of-mass, mass, friction, suspension and wheelbase values m
 
 ## Known limitations
 No gearbox, clutch, engine RPM, air-brake pressure, retarder, trailer, ABS, traction control, mobile touch input, production truck mesh or road environment yet. The scene must be assembled and tested in Unity Editor.
+\n## Manual powertrain additions\n\nAdd `TruckPowertrain` and `TruckDashboardHUD` to the truck root. Add `KeyboardTruckInput` for desktop tests or `TouchTruckInput` for mobile UI tests. Follow [VEHICLE_POWERTRAIN.md](VEHICLE_POWERTRAIN.md) for gear/clutch controls and UI event wiring.\n
