@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using EuroHaul.Traffic;
+using EuroHaul.Audio;
 
 namespace EuroHaul.Driving
 {
@@ -34,7 +35,7 @@ namespace EuroHaul.Driving
             if (hornBroadcast == null) hornBroadcast = GetComponent<TrafficHornBroadcast>();
             if (hornAudio != null)
             {
-                if (hornAudio.clip == null) hornAudio.clip = CreatePrototypeHornClip();
+                if (hornAudio.clip == null) hornAudio.clip = PrototypeHornAudio.CreateClip();
                 hornAudio.loop = true;
             }
             leftBlock = new MaterialPropertyBlock();
