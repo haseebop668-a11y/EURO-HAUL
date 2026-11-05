@@ -228,6 +228,8 @@ namespace EuroHaul.Editor
             }
             else
             {
+                WheelVisualSync trafficWheelSync = root.AddComponent<WheelVisualSync>();
+                SetWheelVisuals(trafficWheelSync, wheels, visuals);
                 TrafficVehicleAI ai = root.AddComponent<TrafficVehicleAI>();
                 SetObjectReference(ai, "route", route);
                 SetObjectReference(ai, "frontLeft", wheels[0]);
