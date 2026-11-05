@@ -15,17 +15,22 @@ namespace EuroHaul.Driving
         [SerializeField, Range(0.5f, 4f)] private float safeLateralAcceleration = 1.5f;
         [SerializeField] private UnityEvent onFrontCollisionWarning;
         [SerializeField] private UnityEvent onBlindSpotWarning;
-        [SerializeField] private UnityEvent onUnsafeCurveWarning;\n        [SerializeField] private UnityEvent onFastRearApproachWarning;
+        [SerializeField] private UnityEvent onUnsafeCurveWarning;
+        [SerializeField] private UnityEvent onFastRearApproachWarning;
 
         private bool frontWarned;
         private bool blindWarned;
-        private bool curveWarned;\n        private bool rearWarned;
+        private bool curveWarned;
+        private bool rearWarned;
 
         public float RequiredStoppingDistanceMeters { get; private set; }
         public float RecommendedCurveSpeedKmh { get; private set; }
         public bool FrontCollisionRisk { get; private set; }
         public bool BlindSpotRisk { get; private set; }
-        public bool CurveSpeedRisk { get; private set; }\n        public bool FastRearApproachRisk { get; private set; }\n        public bool CanOvertakeLeft => sensors != null && sensors.CanSafelyChangeLeft && !FrontCollisionRisk;\n        public bool CanOvertakeRight => sensors != null && sensors.CanSafelyChangeRight && !FrontCollisionRisk;
+        public bool CurveSpeedRisk { get; private set; }
+        public bool FastRearApproachRisk { get; private set; }
+        public bool CanOvertakeLeft => sensors != null && sensors.CanSafelyChangeLeft && !FrontCollisionRisk;
+        public bool CanOvertakeRight => sensors != null && sensors.CanSafelyChangeRight && !FrontCollisionRisk;
 
         private void Awake()
         {
@@ -57,7 +62,12 @@ namespace EuroHaul.Driving
             CurveSpeedRisk = !float.IsPositiveInfinity(RecommendedCurveSpeedKmh) &&
                              truck.SpeedKmh > RecommendedCurveSpeedKmh;
             if (CurveSpeedRisk && !curveWarned) onUnsafeCurveWarning?.Invoke();
-            curveWarned = CurveSpeedRisk;\n\n            FastRearApproachRisk = sensors != null && sensors.RearGapMeters < 35f &&\n                VehicleSafetyMath.TimeToCollision(sensors.RearClosingSpeedMps, sensors.RearGapMeters) < 4f;\n            if (FastRearApproachRisk && !rearWarned) onFastRearApproachWarning?.Invoke();\n            rearWarned = FastRearApproachRisk;
+            curveWarned = CurveSpeedRisk;
+
+            FastRearApproachRisk = sensors != null && sensors.RearGapMeters < 35f &&
+                VehicleSafetyMath.TimeToCollision(sensors.RearClosingSpeedMps, sensors.RearGapMeters) < 4f;
+            if (FastRearApproachRisk && !rearWarned) onFastRearApproachWarning?.Invoke();
+            rearWarned = FastRearApproachRisk;
         }
 
         public void SetCurveRadius(float radiusMeters) => curveRadiusMeters = Mathf.Max(0f, radiusMeters);
