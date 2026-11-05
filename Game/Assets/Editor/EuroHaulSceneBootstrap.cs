@@ -179,7 +179,7 @@ namespace EuroHaul.Editor
                 visual.transform.SetParent(root.transform, false);
                 visual.transform.localPosition = positions[i];
                 visual.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
-                visual.transform.localScale = new Vector3(0.38f, 0.55f, 0.55f);
+                visual.transform.localScale = new Vector3(0.55f, 0.18f, 0.55f);
                 Object.DestroyImmediate(visual.GetComponent<Collider>());
                 visuals[i] = visual.transform;
             }
