@@ -43,14 +43,14 @@ namespace EuroHaul.Driving
         public TrafficAlertLevel RearAlert { get; private set; }
 
         public bool CanSafelyChangeLeft =>
-            leftLaneAvailable && !LeftBlindSpotOccupied && LeftRearGapMeters > 18f && LeftFrontGapMeters > 45f &&
+            leftLaneAvailable && !LeftBlindSpotOccupied && LeftRearGapMeters > 18f && LeftFrontGapMeters > 90f &&
             VehicleSafetyMath.TimeToCollision(LeftRearClosingSpeedMps, LeftRearGapMeters) > 5f &&
-            VehicleSafetyMath.TimeToCollision(LeftFrontClosingSpeedMps, LeftFrontGapMeters) > 8f;
+            VehicleSafetyMath.TimeToCollision(LeftFrontClosingSpeedMps, LeftFrontGapMeters) > 12f;
 
         public bool CanSafelyChangeRight =>
-            rightLaneAvailable && !RightBlindSpotOccupied && RightRearGapMeters > 18f && RightFrontGapMeters > 45f &&
+            rightLaneAvailable && !RightBlindSpotOccupied && RightRearGapMeters > 18f && RightFrontGapMeters > 90f &&
             VehicleSafetyMath.TimeToCollision(RightRearClosingSpeedMps, RightRearGapMeters) > 5f &&
-            VehicleSafetyMath.TimeToCollision(RightFrontClosingSpeedMps, RightFrontGapMeters) > 8f;
+            VehicleSafetyMath.TimeToCollision(RightFrontClosingSpeedMps, RightFrontGapMeters) > 12f;
 
         private void FixedUpdate()
         {
