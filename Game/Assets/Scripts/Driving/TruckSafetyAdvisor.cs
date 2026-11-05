@@ -11,7 +11,7 @@ namespace EuroHaul.Driving
         [SerializeField, Min(0.5f)] private float reactionTimeSeconds = 1.8f;
         [SerializeField, Min(1f)] private float assumedDecelerationMps2 = 3.5f;
         [SerializeField, Min(0f)] private float stoppingSafetyMarginMeters = 8f;
-        [SerializeField, Min(0f)] private float curveRadiusMeters = 0f;
+        [SerializeField, Min(0f)] private float curveRadiusMeters;
         [SerializeField, Range(0.5f, 4f)] private float safeLateralAcceleration = 1.5f;
         [SerializeField] private UnityEvent onFrontCollisionWarning;
         [SerializeField] private UnityEvent onBlindSpotWarning;
@@ -51,8 +51,8 @@ namespace EuroHaul.Driving
             frontWarned = FrontCollisionRisk;
 
             BlindSpotRisk = sensors != null &&
-                ((sensors.LeftBlindSpotOccupied && sensors.CanSafelyChangeLeft == false) ||
-                 (sensors.RightBlindSpotOccupied && sensors.CanSafelyChangeRight == false));
+                ((sensors.LeftBlindSpotOccupied && !sensors.CanSafelyChangeLeft) ||
+                 (sensors.RightBlindSpotOccupied && !sensors.CanSafelyChangeRight));
             if (BlindSpotRisk && !blindWarned) onBlindSpotWarning?.Invoke();
             blindWarned = BlindSpotRisk;
 
