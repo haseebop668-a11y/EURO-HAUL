@@ -24,8 +24,16 @@ namespace EuroHaul.Driving
         public void ReverseUp() => reverse = false;
         public void BrakeDown() => brake = true;
         public void BrakeUp() => brake = false;
-        public void ClutchDown() => clutch = true;
-        public void ClutchUp() => clutch = false;
+        public void ClutchDown()
+        {
+            clutch = true;
+            if (truck != null) truck.SetClutchPedal(1f);
+        }
+        public void ClutchUp()
+        {
+            clutch = false;
+            if (truck != null) truck.SetClutchPedal(0f);
+        }
         public void GearUp() { if (truck != null) truck.ShiftGearUp(); }
         public void GearDown() { if (truck != null) truck.ShiftGearDown(); }
         public void Neutral() { if (truck != null) truck.SelectNeutral(); }
