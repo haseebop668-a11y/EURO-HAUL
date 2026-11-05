@@ -35,7 +35,7 @@ Prototype 001 source foundation. These files are starter scripts and documentati
 | S / Down | Reverse |
 | A / Left | Steer left |
 | D / Right | Steer right |
-| Space | Service brake |
+| Space | Service brake |\n| C (hold) | Clutch |\n| E / Q | Shift up / down (hold clutch) |\n| N / R | Neutral / reverse (hold clutch) |
 
 ## Layout
 - Game/Assets/Scripts/Driving: vehicle control and input.
