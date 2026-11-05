@@ -220,12 +220,16 @@ namespace EuroHaul.Editor
             Transform right = CreateSensorOrigin(player.transform, "RightBlindSpot", new Vector3(1.4f, 0.8f, 0f), 90f);
             Transform leftRear = CreateSensorOrigin(player.transform, "LeftRearApproach", new Vector3(-1.4f, 0.8f, -3f), -135f);
             Transform rightRear = CreateSensorOrigin(player.transform, "RightRearApproach", new Vector3(1.4f, 0.8f, -3f), 135f);
+            Transform leftFront = CreateSensorOrigin(player.transform, "LeftFrontApproach", new Vector3(-1.4f, 0.8f, 3f), -45f);
+            Transform rightFront = CreateSensorOrigin(player.transform, "RightFrontApproach", new Vector3(1.4f, 0.8f, 3f), 45f);
             SetObjectReference(sensors, "forwardOrigin", front);
             SetObjectReference(sensors, "rearOrigin", rear);
             SetObjectReference(sensors, "leftBlindSpotOrigin", left);
             SetObjectReference(sensors, "rightBlindSpotOrigin", right);
             SetObjectReference(sensors, "leftRearApproachOrigin", leftRear);
             SetObjectReference(sensors, "rightRearApproachOrigin", rightRear);
+            SetObjectReference(sensors, "leftFrontApproachOrigin", leftFront);
+            SetObjectReference(sensors, "rightFrontApproachOrigin", rightFront);
             SetLayerMask(sensors, "trafficMask", 1 << 8);
         }
 
