@@ -74,6 +74,7 @@ jobs:
           buildMethod: EuroHaul.Editor.EuroHaulBuild.Build
           buildsPath: build
           androidExportType: androidPackage
+          allowDirtyBuild: true
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
