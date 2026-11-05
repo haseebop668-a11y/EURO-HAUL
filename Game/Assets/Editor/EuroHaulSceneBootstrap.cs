@@ -2,6 +2,7 @@ using System.IO;
 using System;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using Object = UnityEngine.Object;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
