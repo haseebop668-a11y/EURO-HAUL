@@ -70,8 +70,10 @@ namespace EuroHaul.Traffic
             IsFollowingSlowTraffic = !float.IsPositiveInfinity(gap) && gap < dynamicGap;
 
             if (IsFollowingSlowTraffic)
-                desiredSpeed = Mathf.Min(desiredSpeed,
-                    Mathf.Max(0f, obstacleSpeed * 3.6f - (dynamicGap - gap) * 1.8f));
+            {
+                float followingSpeedKmh = obstacleSpeed * 3.6f + Mathf.Max(0f, gap - safeGap) * 0.6f;
+                desiredSpeed = Mathf.Min(desiredSpeed, followingSpeedKmh);
+            }
 
             if (gap < hornGapMeters && relativeClosingSpeed > 1.5f && SpeedKmh > 8f && Time.time >= nextHornTime)
             {
