@@ -241,6 +241,8 @@ namespace EuroHaul.Editor
             SetObjectReference(sensors, "leftFrontApproachOrigin", leftFront);
             SetObjectReference(sensors, "rightFrontApproachOrigin", rightFront);
             SetLayerMask(sensors, "trafficMask", 1 << 8);
+            SetBool(sensors, "leftLaneAvailable", true);
+            SetBool(sensors, "rightLaneAvailable", false);
         }
 
         private static Transform CreateSensorOrigin(Transform parent, string name, Vector3 position, float yaw)
@@ -421,8 +423,8 @@ namespace EuroHaul.Editor
             string path = folder + "/" + name + ".mat";
             Material existing = AssetDatabase.LoadAssetAtPath<Material>(path);
             if (existing != null) return existing;
-            Shader shader = Shader.Find("Universal Render Pipeline/Lit");
-            if (shader == null) shader = Shader.Find("Standard");
+            Shader shader = Shader.Find("Standard");
+            if (shader == null) shader = Shader.Find("Universal Render Pipeline/Lit");
             Material material = new Material(shader);
             if (material.HasProperty("_BaseColor")) material.SetColor("_BaseColor", color);
             if (material.HasProperty("_Color")) material.SetColor("_Color", color);
