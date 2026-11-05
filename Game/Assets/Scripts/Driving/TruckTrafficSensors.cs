@@ -16,6 +16,8 @@ namespace EuroHaul.Driving
         [SerializeField] private Transform rightRearApproachOrigin;
         [SerializeField] private Transform rightFrontApproachOrigin;
         [SerializeField] private LayerMask trafficMask = ~0;
+        [SerializeField] private bool leftLaneAvailable = true;
+        [SerializeField] private bool rightLaneAvailable = true;
         [SerializeField, Min(5f)] private float forwardRange = 100f;
         [SerializeField, Min(5f)] private float rearRange = 60f;
         [SerializeField, Min(1f)] private float blindSpotRange = 12f;
@@ -41,12 +43,12 @@ namespace EuroHaul.Driving
         public TrafficAlertLevel RearAlert { get; private set; }
 
         public bool CanSafelyChangeLeft =>
-            !LeftBlindSpotOccupied && LeftRearGapMeters > 18f && LeftFrontGapMeters > 45f &&
+            leftLaneAvailable && !LeftBlindSpotOccupied && LeftRearGapMeters > 18f && LeftFrontGapMeters > 45f &&
             VehicleSafetyMath.TimeToCollision(LeftRearClosingSpeedMps, LeftRearGapMeters) > 5f &&
             VehicleSafetyMath.TimeToCollision(LeftFrontClosingSpeedMps, LeftFrontGapMeters) > 8f;
 
         public bool CanSafelyChangeRight =>
-            !RightBlindSpotOccupied && RightRearGapMeters > 18f && RightFrontGapMeters > 45f &&
+            rightLaneAvailable && !RightBlindSpotOccupied && RightRearGapMeters > 18f && RightFrontGapMeters > 45f &&
             VehicleSafetyMath.TimeToCollision(RightRearClosingSpeedMps, RightRearGapMeters) > 5f &&
             VehicleSafetyMath.TimeToCollision(RightFrontClosingSpeedMps, RightFrontGapMeters) > 8f;
 
