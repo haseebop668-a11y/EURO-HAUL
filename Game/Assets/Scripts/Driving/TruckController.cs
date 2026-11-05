@@ -25,6 +25,7 @@ namespace EuroHaul.Driving
         private float throttle;
         private float brake;
         private float clutchPedal;
+        private bool crashLocked;
 
         public TruckDashboardTelemetry Telemetry { get; } = new TruckDashboardTelemetry();
         public float SpeedKmh => body != null ? body.linearVelocity.magnitude * 3.6f : 0f;
@@ -57,10 +58,22 @@ namespace EuroHaul.Driving
         public bool ShiftGearDown() => powertrain != null && powertrain.ShiftDown();
         public void SelectNeutral() { if (powertrain != null) powertrain.SelectNeutral(); }
         public bool SelectReverse() => powertrain != null && powertrain.SelectReverse();
+        public void SetCrashLock(bool locked) => crashLocked = locked;
+        public void ResetCrashLock() => crashLocked = false;
 
         private void FixedUpdate()
         {
             if (!WheelsAssigned()) return;
+            if (crashLocked)
+            {
+                rearLeft.motorTorque = 0f;
+                rearRight.motorTorque = 0f;
+                frontLeft.brakeTorque = serviceBrakeTorque;
+                frontRight.brakeTorque = serviceBrakeTorque;
+                rearLeft.brakeTorque = serviceBrakeTorque;
+                rearRight.brakeTorque = serviceBrakeTorque;
+                return;
+            }
             frontLeft.steerAngle = steering * maxSteerAngle;
             frontRight.steerAngle = steering * maxSteerAngle;
 
