@@ -23,8 +23,8 @@ namespace EuroHaul.Driving
 
             if (signals != null)
             {
-                if (Input.GetKeyDown(KeyCode.LeftArrow)) signals.ToggleLeft();
-                if (Input.GetKeyDown(KeyCode.RightArrow)) signals.ToggleRight();
+                if (Input.GetKeyDown(KeyCode.Z)) signals.ToggleLeft();
+                if (Input.GetKeyDown(KeyCode.X)) signals.ToggleRight();
                 if (Input.GetKeyDown(KeyCode.H)) signals.ToggleHazard();
                 if (Input.GetKeyDown(KeyCode.B)) signals.HornDown();
                 if (Input.GetKeyUp(KeyCode.B)) signals.HornUp();
