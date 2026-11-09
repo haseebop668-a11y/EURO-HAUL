@@ -217,6 +217,18 @@ func _build_hud() -> void:
 	company_button.custom_minimum_size = Vector2(230, 52)
 	company_button.pressed.connect(_found_company)
 	layer.add_child(company_button)
+	var buy_truck_button := Button.new()
+	buy_truck_button.text = "BUY FLEET TRUCK • €85,000"
+	buy_truck_button.position = Vector2(20, 205)
+	buy_truck_button.custom_minimum_size = Vector2(230, 48)
+	buy_truck_button.pressed.connect(_buy_company_truck)
+	layer.add_child(buy_truck_button)
+	var hire_driver_button := Button.new()
+	hire_driver_button.text = "HIRE DRIVER • €5,000"
+	hire_driver_button.position = Vector2(260, 205)
+	hire_driver_button.custom_minimum_size = Vector2(210, 48)
+	hire_driver_button.pressed.connect(_hire_company_driver)
+	layer.add_child(hire_driver_button)
 	_update_hud()
 
 func _add_touch_button(parent: Control, caption: String, key: String) -> void:
@@ -242,6 +254,14 @@ func _add_shift_button(parent: Control, caption: String, up: bool) -> void:
 		truck.set_clutch(0.0)
 	)
 	parent.add_child(button)
+
+func _buy_company_truck() -> void:
+	if company != null and company.purchase_truck():
+		_update_hud()
+
+func _hire_company_driver() -> void:
+	if company != null and company.hire_driver():
+		_update_hud()
 
 func _found_company() -> void:
 	if company == null or career == null or not company.company_name.is_empty():
