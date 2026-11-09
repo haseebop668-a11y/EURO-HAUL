@@ -97,7 +97,7 @@ func _build_world() -> void:
 func _build_truck() -> void:
 	truck = EuroHaulTruck.new()
 	truck.name = "PlayerTruck"
-	truck.position = Vector3(0.0, 1.0, -8.0)
+	truck.position = Vector3(0.0, 0.15, -8.0)
 	var collision := CollisionShape3D.new()
 	var shape := BoxShape3D.new()
 	shape.size = Vector3(2.45, 2.7, 6.2)
@@ -139,8 +139,7 @@ func _build_truck() -> void:
 
 func _build_traffic() -> void:
 	for i in range(6):
-		var traffic := Node3D.new()
-		traffic.set_script(load("res://Scripts/traffic_vehicle.gd"))
+		var traffic := EuroHaulTrafficVehicle.new()
 		traffic.position = Vector3(-2.0, 0.0, -55.0 - float(i) * 85.0)
 		traffic.lane_x = -2.0 if i % 2 == 0 else 2.0
 		traffic.cruise_speed_kmh = 42.0 + float(i % 3) * 8.0
