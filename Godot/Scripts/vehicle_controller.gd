@@ -2,6 +2,8 @@ extends CharacterBody3D
 class_name EuroHaulTruck
 
 signal telemetry_changed(speed_kmh: float, rpm: int, gear: int)
+signal horn_pressed
+signal indicators_changed(value: int)
 
 @export var max_forward_kmh := 90.0
 @export var max_reverse_kmh := 15.0
@@ -57,6 +59,17 @@ func select_reverse() -> bool:
 		return false
 	gear = -1
 	return true
+
+func set_indicator(side: int) -> void:
+	indicators = clampi(side, -1, 1)
+	indicators_changed.emit(indicators)
+
+func toggle_hazards() -> void:
+	indicators = 2 if indicators != 2 else 0
+	indicators_changed.emit(indicators)
+
+func sound_horn() -> void:
+	horn_pressed.emit()
 
 func apply_damage(amount: float) -> void:
 	damage = clampf(damage + maxf(0.0, amount), 0.0, 100.0)
