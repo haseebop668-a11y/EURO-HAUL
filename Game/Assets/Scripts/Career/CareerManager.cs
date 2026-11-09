@@ -12,6 +12,7 @@ namespace EuroHaul.Career
         public string destination;
         public string cargo;
         public float requiredDistanceMeters;
+        public float totalDistanceMeters;
         public int rewardCash;
         public int rewardXp;
         public bool accepted;
@@ -148,7 +149,8 @@ namespace EuroHaul.Career
             if (Data == null || Data.activeContract != null || Data.offeredContract == null) return false;
             Data.activeContract = Data.offeredContract;
             Data.activeContract.accepted = true;
-            initialContractDistance = Mathf.Max(1f, Data.activeContract.requiredDistanceMeters);
+            initialContractDistance = Mathf.Max(1f, Data.activeContract.totalDistanceMeters > 0f
+                        ? Data.activeContract.totalDistanceMeters : Data.activeContract.requiredDistanceMeters);
             ActiveContractProgress01 = 0f;
             LastNotice = "Contract accepted: " + Data.activeContract.destination;
             Save();
@@ -198,6 +200,7 @@ namespace EuroHaul.Career
                 destination = cities[destination],
                 cargo = cargoes[UnityEngine.Random.Range(0, cargoes.Length)],
                 requiredDistanceMeters = distance,
+                totalDistanceMeters = distance,
                 rewardCash = Mathf.RoundToInt(distance * UnityEngine.Random.Range(1.2f, 1.8f)),
                 rewardXp = Mathf.RoundToInt(distance * 0.12f),
                 accepted = false
