@@ -42,7 +42,7 @@ Early Unity project foundation. Vehicle, driver-signal, safety-advisory and traf
 - Unity project root: `Game/`. The Editor bootstrap creates a Truck Lab road, player truck, mobile control canvas, traffic routes and build-scene entry on first Editor open.
 - Setup: [Docs/TRUCK_LAB_SETUP.md](Docs/TRUCK_LAB_SETUP.md).
 - Powertrain: [Docs/VEHICLE_POWERTRAIN.md](Docs/VEHICLE_POWERTRAIN.md).
-- Traffic and safety: [Docs/TRAFFIC_AND_SAFETY.md](Docs/TRAFFIC_AND_SAFETY.md).
+- Traffic and safety: [Docs/TRAFFIC_AND_SAFETY.md](Docs/TRAFFIC_AND_SAFETY.md).\n- Full gameplay/content roadmap: [Docs/GAME_DESIGN_AND_CONTENT.md](Docs/GAME_DESIGN_AND_CONTENT.md).\n- Android graphics and performance budgets: [Docs/ANDROID_GRAPHICS_PERFORMANCE.md](Docs/ANDROID_GRAPHICS_PERFORMANCE.md).
 - CI/APK: [Docs/BUILD_AND_RELEASE.md](Docs/BUILD_AND_RELEASE.md).
 
 ## Important limitations
