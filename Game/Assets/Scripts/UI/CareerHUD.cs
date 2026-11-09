@@ -57,18 +57,18 @@ namespace EuroHaul.UI
             panelRect.sizeDelta = new Vector2(480f, 250f);
             panel.GetComponent<Image>().color = Navy;
 
-            details = AddText(panel.transform, "", 20, White, new Vector2(0.5f, 0.76f),
+            details = AddText(panel.transform, "", 20, White, new Vector2(0.5f, 0.77f),
                 new Vector2(0f, 0f), new Vector2(440f, 110f));
-            balance = AddText(panel.transform, "", 18, Gold, new Vector2(0.5f, 0.30f),
+            balance = AddText(panel.transform, "", 18, Gold, new Vector2(0.5f, 0.36f),
                 Vector2.zero, new Vector2(440f, 36f));
-            status = AddText(panel.transform, "", 15, White, new Vector2(0.5f, 0.19f),
+            status = AddText(panel.transform, "", 15, White, new Vector2(0.5f, 0.22f),
                 Vector2.zero, new Vector2(440f, 30f));
 
             GameObject bar = new GameObject("ProgressBar", typeof(RectTransform), typeof(Image));
             bar.transform.SetParent(panel.transform, false);
             RectTransform barRect = bar.GetComponent<RectTransform>();
-            barRect.anchorMin = new Vector2(0.08f, 0.43f);
-            barRect.anchorMax = new Vector2(0.92f, 0.43f);
+            barRect.anchorMin = new Vector2(0.08f, 0.49f);
+            barRect.anchorMax = new Vector2(0.92f, 0.49f);
             barRect.sizeDelta = new Vector2(0f, 10f);
             bar.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.18f);
 
