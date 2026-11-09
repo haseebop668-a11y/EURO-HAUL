@@ -2,59 +2,42 @@
 European Trucking Career Simulator for Android and Windows.
 
 ## Current status
-Early Unity project foundation. Vehicle, driver-signal, safety-advisory and traffic-AI source modules are committed. The Unity scene and builds still require editor validation; this repository does not yet contain a verified playable release APK.
+**Engine migration in progress: Godot 4 is the active target.** Godot is open-source and does not require a Unity license. The original Unity source under `Game/` is intentionally preserved as a reference while each gameplay system is ported. The Godot project currently contains its project configuration, boot scene and original app icon; it is not yet a playable port and no verified APK exists yet.
 
 ## Engineering principles
 - Offline-first single-player gameplay.
-- Shared Unity project for Android and Windows.
+- Android-first, with Windows planned after the Android slice is stable.
 - Performance-scalable 3D; visual quality must be profiled on target devices.
 - Original or properly licensed assets only.
 - Fictional logistics operators and generated freight contracts.
 - Driver warnings assist the player; they do not secretly steer or override the player.
 - Safety calculations are game simulation approximations, not real-world driving instructions.
 
-## Implemented source modules
-- Four-wheel WheelCollider truck controller and prototype powertrain.
-- Engine RPM, clutch, manual gears and dashboard telemetry.
-- Keyboard and mobile touch input adapters.
-- Turn indicators, hazard lights and horn controls.
-- Forward/rear traffic sensing and left/right blind-spot sensing.
-- Stopping-distance, time-to-collision and curve-speed advisory calculations.
-- Waypoint-based traffic vehicle controller with conservative following and courtesy-horn event.
-- Unity EditMode tests for deterministic safety math.
-- Runtime-built main menu, pause screen and quality/FPS settings prototype.
-- Offline career vertical slice: local save/backup, driver XP/levels, Game Cash, generated freight offers and distance-based delivery rewards.
-- Original EURO HAUL vector app-icon source and documented navy/blue/gold UI system.
-- Manual Unity CI workflow for Android APK and Windows x64 artifacts.
+## Preserved gameplay scope
+- Truck handling: torque, RPM, clutch, manual gearbox, reverse, steering, braking, wheel response and camera.
+- Mobile touch controls and PC keyboard controls.
+- Indicators, hazards, horn and dashboard telemetry.
+- Front/rear traffic sensing, blind spots, following gaps and conservative AI traffic.
+- Braking-distance, time-to-collision and curve-speed advice, collision damage and emergency stop.
+- Offline career: local save/backup, driver XP/levels, Game Cash, freight contracts and delivery rewards.
+- Player-owned fictional logistics companies, fleets, garages, drivers, costs and simulated profits.
+- Premium navy/blue/gold menu and icon identity.
+- Monetization policy: genuine optional rewarded ads only; no hidden impressions or forced ads while driving. Premium digital goods must use compliant store billing.
 
-## Controls (PC prototype)
-| Key | Action |
-|---|---|
-| W / Up | Throttle |
-| A / D or Left / Right | Steering |
-| Space | Service brake |
-| C (hold) | Clutch |
-| E / Q | Gear up / down (clutch required) |
-| N / R | Neutral / reverse (clutch required) |
-| Z / X | Left / right indicator |
-| H | Hazard lights |
-| B (hold) | Horn |
+## Repository layout
+- `Godot/`: active Godot 4 project and future Android/Windows exports.
+- `Game/`: preserved Unity prototype/source reference; not the active build target.
+- `Docs/ENGINE_MIGRATION_GODOT.md`: migration decision, feature-preservation checklist and build gates.
+- `Docs/GAME_DESIGN_AND_CONTENT.md`: gameplay and content scope.
+- `Docs/TRAFFIC_AND_SAFETY.md`: traffic and driving safety design.
+- `Docs/VEHICLE_POWERTRAIN.md`: vehicle and gearbox design.
+- `Docs/BRAND_AND_UI_DESIGN.md`: app icon and visual system.
+- `Docs/ANDROID_GRAPHICS_PERFORMANCE.md`: mobile performance targets.
+- `Docs/MONETIZATION_AND_AD_INTEGRITY.md`: compliant advertising policy.
+- `Docs/ECONOMY_AND_PLAYER_BUSINESSES.md`: in-game economy and company simulation.
 
-## Project and build
-- Unity editor baseline: 6000.3.0f1 (Unity 6.3 LTS).
-- Unity project root: `Game/`. The Editor bootstrap creates a Truck Lab road, player truck, mobile control canvas, traffic routes and build-scene entry on first Editor open.
-- Setup: [Docs/TRUCK_LAB_SETUP.md](Docs/TRUCK_LAB_SETUP.md).
-- Powertrain: [Docs/VEHICLE_POWERTRAIN.md](Docs/VEHICLE_POWERTRAIN.md).
-- Traffic and safety: [Docs/TRAFFIC_AND_SAFETY.md](Docs/TRAFFIC_AND_SAFETY.md).
-- Full gameplay/content roadmap: [Docs/GAME_DESIGN_AND_CONTENT.md](Docs/GAME_DESIGN_AND_CONTENT.md).
-- Brand, app icon and UI design system: [Docs/BRAND_AND_UI_DESIGN.md](Docs/BRAND_AND_UI_DESIGN.md).
-- Android graphics and performance budgets: [Docs/ANDROID_GRAPHICS_PERFORMANCE.md](Docs/ANDROID_GRAPHICS_PERFORMANCE.md).
-- CI/APK: [Docs/BUILD_AND_RELEASE.md](Docs/BUILD_AND_RELEASE.md).
-- Monetization and rewarded ads: [Docs/MONETIZATION_AND_AD_INTEGRITY.md](Docs/MONETIZATION_AND_AD_INTEGRITY.md).
-- Economy, player companies and payment boundaries: [Docs/ECONOMY_AND_PLAYER_BUSINESSES.md](Docs/ECONOMY_AND_PLAYER_BUSINESSES.md).
-
-## Important limitations
-No full European map, finished licensed-quality truck art, trailer/cargo physics, company management, final driving HUD, sound library, or verified Android/Windows build is available yet. Career progress is currently a local test-track prototype, not a complete city-route career. The new menu/settings UI is a functional prototype overlay, not the final career interface. AI traffic requires authored lane routes and correctly configured vehicle layers/sensors. Sensor ranges, braking assumptions and cornering limits must be tuned and play-tested; they are not certified vehicle dynamics.
+## Build and test status
+No Godot Android APK has been exported, installed or device-tested yet. The migration checklist must be completed subsystem by subsystem; a project scaffold is not a completed game. Android debug builds will be produced through cloud CI once the Godot port and export configuration are ready. A signed Play Store release additionally requires a securely managed signing key.
 
 ## License
 All rights reserved by the project owner unless a file explicitly states otherwise. Third-party assets must retain their own licenses and attribution.
