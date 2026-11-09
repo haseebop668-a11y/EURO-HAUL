@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using EuroHaul.Career;
 
 namespace EuroHaul.UI
 {
@@ -101,12 +102,14 @@ namespace EuroHaul.UI
             CreateText(homePanel.transform, "TRUCK LAB  /  EARLY ACCESS PROTOTYPE", 17, Muted,
                 new Vector2(0.5f, 0.22f), Vector2.zero, new Vector2(900f, 42f), FontStyle.Normal);
 
-            CreateButton(homePanel.transform, "START DRIVING", new Vector2(0.5f, 0.51f),
-                new Vector2(0f, 0f), new Vector2(430f, 82f), Blue, BeginDrive);
-            CreateButton(homePanel.transform, "SETTINGS", new Vector2(0.5f, 0.40f),
-                new Vector2(0f, 0f), new Vector2(430f, 70f), Panel, ShowSettings);
-            CreateButton(homePanel.transform, "EXIT", new Vector2(0.5f, 0.30f),
-                new Vector2(0f, 0f), new Vector2(430f, 64f), new Color(0.22f, 0.12f, 0.12f, 1f), Quit);
+            CreateButton(homePanel.transform, "CONTINUE CAREER", new Vector2(0.5f, 0.54f),
+                Vector2.zero, new Vector2(430f, 76f), Blue, BeginDrive);
+            CreateButton(homePanel.transform, "NEW CAREER", new Vector2(0.5f, 0.43f),
+                Vector2.zero, new Vector2(430f, 68f), new Color(0.12f, 0.27f, 0.38f, 1f), StartNewCareer);
+            CreateButton(homePanel.transform, "SETTINGS", new Vector2(0.5f, 0.32f),
+                Vector2.zero, new Vector2(430f, 64f), Panel, ShowSettings);
+            CreateButton(homePanel.transform, "EXIT", new Vector2(0.5f, 0.22f),
+                Vector2.zero, new Vector2(430f, 60f), new Color(0.22f, 0.12f, 0.12f, 1f), Quit);
         }
 
         private void BuildSettings()
@@ -138,6 +141,13 @@ namespace EuroHaul.UI
                 Vector2.zero, new Vector2(400f, 68f), Panel, ShowSettingsFromPause);
             CreateButton(pausePanel.transform, "MAIN MENU", new Vector2(0.5f, 0.29f),
                 Vector2.zero, new Vector2(400f, 68f), Panel, ReturnToHome);
+        }
+
+        private void StartNewCareer()
+        {
+            if (CareerManager.Instance != null)
+                CareerManager.Instance.StartNewCareer("Driver");
+            BeginDrive();
         }
 
         private void BeginDrive()
