@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#102b45"/><stop offset="1" stop-color="#06111f"/></linearGradient>
+ <linearGradient id="blue" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#2379d8"/><stop offset="1" stop-color="#104a92"/></linearGradient>
+ <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffe3a0"/><stop offset="1" stop-color="#c68b2b"/></linearGradient>
+ <radialGradient id="glow"><stop stop-color="#24669c" stop-opacity=".42"/><stop offset="1" stop-color="#06111f" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1600" height="900" fill="url(#bg)"/><ellipse cx="1180" cy="440" rx="600" ry="430" fill="url(#glow)"/>
+<path d="M0 730 Q400 620 800 730 T1600 700 V900 H0Z" fill="#081827"/><path d="M0 770 Q450 650 800 770 T1600 750" stroke="#1d5d91" stroke-width="5" fill="none" opacity=".65"/>
+<g transform="translate(210 225) scale(.78)">
+ <rect x="0" y="0" width="512" height="512" rx="112" fill="#071725" stroke="#e8b85b" stroke-width="8"/>
+ <path d="M70 365h372" stroke="#1d5d91" stroke-width="14" stroke-linecap="round"/>
+ <path d="M115 352l58-104h166l58 104" fill="none" stroke="url(#gold)" stroke-width="17" stroke-linejoin="round"/>
+ <path d="M178 245l78-105 78 105" fill="none" stroke="url(#gold)" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/>
+ <path d="M256 106l18 27h-36z" fill="#ffe3a0"/>
+ <path d="M185 284h142l35 68H150z" fill="#0b1b2c" stroke="#e8b85b" stroke-width="12" stroke-linejoin="round"/>
+ <path d="M205 294h102v42H205z" fill="#1d5d91"/><path d="M219 305h74" stroke="#b9d9ee" stroke-width="8" stroke-linecap="round"/>
+ <circle cx="194" cy="366" r="25" fill="#07111d" stroke="#e8b85b" stroke-width="12"/><circle cx="318" cy="366" r="25" fill="#07111d" stroke="#e8b85b" stroke-width="12"/>
+ <path d="M105 410h302" stroke="#e8b85b" stroke-width="9" stroke-linecap="round"/>
+</g>
+<g font-family="DejaVu Sans, sans-serif">
+ <text x="680" y="250" fill="#e8b85b" font-size="78" font-weight="700" letter-spacing="4">EURO HAUL</text>
+ <text x="685" y="305" fill="#9eb5c9" font-size="26" letter-spacing="5">EUROPEAN TRUCKING SIMULATOR</text>
+ <text x="685" y="370" fill="#eef4fa" font-size="32">Drive. Deliver. Build your fleet.</text>
+ <rect x="680" y="445" width="550" height="88" rx="18" fill="url(#blue)"/><text x="955" y="501" text-anchor="middle" fill="#ffffff" font-size="30" font-weight="700">START DRIVING</text>
+ <rect x="680" y="560" width="550" height="76" rx="16" fill="#0e1b2b" stroke="#31516c" stroke-width="2"/><text x="955" y="608" text-anchor="middle" fill="#eef4fa" font-size="26">SETTINGS</text>
+ <rect x="680" y="662" width="550" height="70" rx="16" fill="#25191a" stroke="#69413e" stroke-width="2"/><text x="955" y="707" text-anchor="middle" fill="#d9c9c8" font-size="24">EXIT</text>
+ <text x="800" y="820" text-anchor="middle" fill="#9eb5c9" font-size="18" letter-spacing="3">TRUCK LAB • EARLY ACCESS PROTOTYPE</text>
+</g></svg>
