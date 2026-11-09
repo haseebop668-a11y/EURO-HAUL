@@ -78,3 +78,13 @@ EURO HAUL is an offline-first, single-player European heavy-haul trucking career
 - 30-minute thermal/performance run on target hardware with frame-time, memory and temperature evidence.
 - Driving, traffic, cargo, tolls, repair, career, offline mode and settings pass documented QA.
 - All third-party licenses, attributions, privacy disclosures and store requirements are checked.
+
+
+## Implemented career prototype (offline)
+- Local JSON career save in `Application.persistentDataPath`, with a previous-save backup.
+- Driver level, XP, Game Cash, completed-delivery count and driven distance.
+- Generated fictional freight offers with cargo, origin/destination labels and reward values.
+- Accept contract from the in-game career HUD; delivery progress is measured from player-truck movement in the Truck Lab prototype.
+- Delivery reward is credited locally and a new offer is generated.
+- The menu exposes Continue Career and New Career.
+- This is a first vertical-slice career loop, not the final route/network simulation. The current destination is distance-based on the test track; city-to-city navigation, cargo attachment/loading, fuel, damage, company management, and server/cloud save are not yet implemented.
