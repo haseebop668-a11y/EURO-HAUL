@@ -50,15 +50,19 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			KEY_E:
 				truck.set_clutch(1.0)
 				truck.shift_up()
+				truck.set_clutch(0.0)
 			KEY_Q:
 				truck.set_clutch(1.0)
 				truck.shift_down()
+				truck.set_clutch(0.0)
 			KEY_N:
 				truck.set_clutch(1.0)
 				truck.select_neutral()
+				truck.set_clutch(0.0)
 			KEY_R:
 				truck.set_clutch(1.0)
 				truck.select_reverse()
+				truck.set_clutch(0.0)
 			KEY_H:
 				status_label.text = "HORN"
 			KEY_ESCAPE:
@@ -194,6 +198,8 @@ func _build_hud() -> void:
 	_add_touch_button(buttons, "BRAKE", "brake")
 	_add_touch_button(buttons, "GAS", "throttle")
 	_add_touch_button(buttons, "▶", "right")
+	_add_shift_button(buttons, "GEAR −", false)
+	_add_shift_button(buttons, "GEAR +", true)
 	var accept := Button.new()
 	accept.text = "ACCEPT FREIGHT"
 	accept.position = Vector2(20, 145)
@@ -209,6 +215,21 @@ func _add_touch_button(parent: Control, caption: String, key: String) -> void:
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.button_down.connect(func(): touch_state[key] = true)
 	button.button_up.connect(func(): touch_state[key] = false)
+	parent.add_child(button)
+
+func _add_shift_button(parent: Control, caption: String, up: bool) -> void:
+	var button := Button.new()
+	button.text = caption
+	button.custom_minimum_size = Vector2(100, 82)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.pressed.connect(func():
+		truck.set_clutch(1.0)
+		if up:
+			truck.shift_up()
+		else:
+			truck.shift_down()
+		truck.set_clutch(0.0)
+	)
 	parent.add_child(button)
 
 func _update_hud() -> void:
