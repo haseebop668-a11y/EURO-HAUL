@@ -34,7 +34,7 @@ func add_xp(amount: int) -> void:
 func generate_offer() -> void:
 	var from_index := randi_range(0, CITY_NAMES.size() - 1)
 	var to_index := (from_index + randi_range(1, CITY_NAMES.size() - 1)) % CITY_NAMES.size()
-	var distance := randi_range(180, 250)
+	var distance := randf_range(0.18, 0.25)
 	offered_contract = {
 		"id": "EH-%06d" % randi_range(100000, 999999),
 		"origin": CITY_NAMES[from_index],
@@ -42,8 +42,8 @@ func generate_offer() -> void:
 		"cargo": CARGO_NAMES.pick_random(),
 		"distance_km": distance,
 		"progress_km": 0.0,
-		"reward": int(distance * randf_range(1.2, 1.8)),
-		"xp": int(distance * 0.12)
+		"reward": int(distance * 1000.0 * randf_range(1.2, 1.8)),
+		"xp": maxi(20, int(distance * 100.0))
 	}
 	changed.emit()
 
