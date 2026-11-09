@@ -7,6 +7,7 @@ const ROAD_LENGTH := 900.0
 
 var truck: EuroHaulTruck
 var career: EuroHaulCareer
+var company: EuroHaulCompanyManager
 var hud: Label
 var status_label: Label
 var speed_label: Label
@@ -157,6 +158,10 @@ func _build_career() -> void:
 	career.name = "CareerManager"
 	add_child(career)
 	career.changed.connect(_update_hud)
+	company = EuroHaulCompanyManager.new()
+	company.name = "CompanyManager"
+	add_child(company)
+	company.company_changed.connect(_update_hud)
 
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()
@@ -206,6 +211,12 @@ func _build_hud() -> void:
 	accept.custom_minimum_size = Vector2(190, 52)
 	accept.pressed.connect(func(): career.accept_offer(); _update_hud())
 	layer.add_child(accept)
+	var company_button := Button.new()
+	company_button.text = "FOUND COMPANY • €50,000"
+	company_button.position = Vector2(220, 145)
+	company_button.custom_minimum_size = Vector2(230, 52)
+	company_button.pressed.connect(_found_company)
+	layer.add_child(company_button)
 	_update_hud()
 
 func _add_touch_button(parent: Control, caption: String, key: String) -> void:
@@ -231,6 +242,13 @@ func _add_shift_button(parent: Control, caption: String, up: bool) -> void:
 		truck.set_clutch(0.0)
 	)
 	parent.add_child(button)
+
+func _found_company() -> void:
+	if company == null or career == null or not company.company_name.is_empty():
+		return
+	if career.spend_cash(EuroHaulCompanyManager.FOUNDING_COST):
+		company.found_company("EURO HAUL LOGISTICS", EuroHaulCompanyManager.FOUNDING_COST)
+		_update_hud()
 
 func _update_hud() -> void:
 	if hud == null or career == null:
