@@ -76,7 +76,7 @@ func _physics_process(delta: float) -> void:
 	var torque_factor := 1.0 - 0.22 * pow(clampf((engine_rpm - idle_rpm) / maxf(1.0, redline_rpm - idle_rpm), 0.0, 1.0), 2.0)
 	var drive_accel := 0.0
 	if gear != 0 and clutch_input < 0.95 and damage < 80.0:
-		drive_accel = throttle_input * engine_load * torque_factor * absf(ratio) * final_drive * 0.012 * (1.0 - clutch_input)
+		drive_accel = throttle_input * engine_load * torque_factor * (engine_max_torque_nm / 1100.0) * absf(ratio) * final_drive * 0.045 * (1.0 - clutch_input)
 		if gear < 0:
 			drive_accel = -absf(drive_accel)
 		elif throttle_input < 0.0:
