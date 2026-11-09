@@ -11,6 +11,10 @@ on:
       - ".github/workflows/godot-check.yml"
   workflow_dispatch:
 
+concurrency:
+  group: euro-haul-godot-build-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
