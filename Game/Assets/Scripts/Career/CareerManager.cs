@@ -192,7 +192,7 @@ namespace EuroHaul.Career
             int seed = UnityEngine.Random.Range(100000, 999999);
             int origin = UnityEngine.Random.Range(0, cities.Length);
             int destination = (origin + UnityEngine.Random.Range(1, cities.Length)) % cities.Length;
-            int distance = UnityEngine.Random.Range(420, 561);
+            int distance = UnityEngine.Random.Range(180, 251);
             return new FreightContract
             {
                 id = "EH-" + seed,
