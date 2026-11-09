@@ -1,11 +1,68 @@
 extends Node3D
 
 const SKY_COLOR := Color("#07111f")
-const GROUND_COLOR := Color("#101d2c")
+const GOLD := Color("#d5ad62")
+const BLUE := Color("#16334e")
+const ROAD_LENGTH := 900.0
+
+var truck: EuroHaulTruck
+var career: EuroHaulCareer
+var hud: Label
+var status_label: Label
+var speed_label: Label
+var touch_state := {"throttle": false, "brake": false, "left": false, "right": false}
+var _last_position := Vector3.ZERO
+var _last_distance_save := 0.0
 
 func _ready() -> void:
 	_setup_environment()
-	print("EURO HAUL Godot runtime initialized")
+	_build_world()
+	_build_truck()
+	_build_traffic()
+	_build_career()
+	_build_hud()
+	print("EURO HAUL Godot vertical-slice booted")
+
+func _process(delta: float) -> void:
+	if truck == null:
+		return
+	var throttle := 1.0 if touch_state.throttle else 0.0
+	var brake := 1.0 if touch_state.brake else 0.0
+	var steer := float(touch_state.right) - float(touch_state.left)
+	if not OS.has_feature("mobile"):
+		throttle = Input.get_action_strength("accelerate") - Input.get_action_strength("reverse")
+		brake = Input.get_action_strength("brake")
+		steer = Input.get_action_strength("steer_right") - Input.get_action_strength("steer_left")
+	truck.set_controls(throttle, steer, brake)
+	var distance := truck.global_position.distance_to(_last_position)
+	if distance > 0.0 and distance < 2.0:
+		career.record_distance(distance / 1000.0)
+		_last_position = truck.global_position
+		_last_distance_save += distance
+	if _last_distance_save >= 100.0:
+		career.save()
+		_last_distance_save = 0.0
+	_update_hud()
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		match event.keycode:
+			KEY_E:
+				truck.set_clutch(1.0)
+				truck.shift_up()
+			KEY_Q:
+				truck.set_clutch(1.0)
+				truck.shift_down()
+			KEY_N:
+				truck.set_clutch(1.0)
+				truck.select_neutral()
+			KEY_R:
+				truck.set_clutch(1.0)
+				truck.select_reverse()
+			KEY_H:
+				status_label.text = "HORN"
+			KEY_ESCAPE:
+				get_tree().paused = not get_tree().paused
 
 func _setup_environment() -> void:
 	var environment := Environment.new()
@@ -13,7 +70,195 @@ func _setup_environment() -> void:
 	environment.background_color = SKY_COLOR
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	environment.ambient_light_color = Color("#9db4ca")
-	environment.ambient_light_energy = 0.55
+	environment.ambient_light_energy = 0.7
+	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	var world := get_node_or_null("WorldEnvironment") as WorldEnvironment
 	if world:
 		world.environment = environment
+
+func _build_world() -> void:
+	_add_box("Ground", Vector3(0, -0.65, -ROAD_LENGTH * 0.5), Vector3(100, 1, ROAD_LENGTH), Color("#172b2d"), true)
+	_add_box("European motorway", Vector3(0, -0.05, -ROAD_LENGTH * 0.5), Vector3(12, 0.2, ROAD_LENGTH), Color("#303a43"), true)
+	for x in [-3.0, 3.0]:
+		_add_box("Road edge", Vector3(x, 0.07, -ROAD_LENGTH * 0.5), Vector3(0.12, 0.025, ROAD_LENGTH), GOLD, false)
+	for z in range(0, -int(ROAD_LENGTH), -12):
+		_add_box("Lane dash", Vector3(0, 0.075, float(z)), Vector3(0.14, 0.025, 5.5), Color("#e7e5d7"), false)
+	for side in [-1.0, 1.0]:
+		for i in range(45):
+			var z := -float(i) * 19.0 - 12.0
+			_add_box("Roadside barrier", Vector3(side * 7.0, 0.45, z), Vector3(0.18, 0.8, 9.0), Color("#8b969e"), true)
+			if i % 3 == 0:
+				_add_box("Roadside marker", Vector3(side * 8.0, 0.9, z), Vector3(0.16, 1.8, 0.16), Color("#d8dce0"), false)
+	for i in range(18):
+		var z := -float(i) * 45.0 - 30.0
+		_add_box("Distant warehouse", Vector3(-18.0, 3.0, z), Vector3(10, 6, 18), Color("#34495b"), true)
+		_add_box("Warehouse roof", Vector3(-18.0, 6.2, z), Vector3(10.5, 0.4, 18.5), BLUE, false)
+
+func _build_truck() -> void:
+	truck = EuroHaulTruck.new()
+	truck.name = "PlayerTruck"
+	truck.position = Vector3(0.0, 1.0, -8.0)
+	var collision := CollisionShape3D.new()
+	var shape := BoxShape3D.new()
+	shape.size = Vector3(2.45, 2.7, 6.2)
+	collision.shape = shape
+	collision.position = Vector3(0, 1.35, 0)
+	truck.add_child(collision)
+	var chassis := _make_box_mesh(Vector3(2.5, 1.05, 6.0), Color("#d5ad62"))
+	chassis.position = Vector3(0, 1.35, 0)
+	truck.add_child(chassis)
+	var cab := _make_box_mesh(Vector3(2.35, 2.3, 2.2), Color("#173d5c"))
+	cab.position = Vector3(0, 2.8, -1.45)
+	truck.add_child(cab)
+	var windshield := _make_box_mesh(Vector3(2.0, 0.85, 0.08), Color("#7fa6ba"))
+	windshield.position = Vector3(0, 3.2, -2.58)
+	truck.add_child(windshield)
+	for x in [-1.3, 1.3]:
+		for z in [-2.0, 2.0]:
+			var wheel := _make_cylinder_mesh(0.62, 0.42, Color("#101419"))
+			wheel.position = Vector3(x, 0.65, z)
+			wheel.rotation.z = PI / 2.0
+			truck.add_child(wheel)
+	var nameplate := Label3D.new()
+	nameplate.text = "EURO HAUL"
+	nameplate.position = Vector3(0, 4.2, -1.6)
+	nameplate.font_size = 48
+	nameplate.modulate = GOLD
+	truck.add_child(nameplate)
+	add_child(truck)
+	var camera_rig := SpringArm3D.new()
+	camera_rig.spring_length = 9.0
+	camera_rig.position = Vector3(0, 4.3, 1.0)
+	camera_rig.rotation.x = deg_to_rad(-12.0)
+	truck.add_child(camera_rig)
+	var camera := Camera3D.new()
+	camera.position = Vector3.ZERO
+	camera.current = true
+	camera_rig.add_child(camera)
+	_last_position = truck.global_position
+
+func _build_traffic() -> void:
+	for i in range(6):
+		var traffic := Node3D.new()
+		traffic.set_script(load("res://Scripts/traffic_vehicle.gd"))
+		traffic.position = Vector3(-2.0, 0.0, -55.0 - float(i) * 85.0)
+		traffic.lane_x = -2.0 if i % 2 == 0 else 2.0
+		traffic.cruise_speed_kmh = 42.0 + float(i % 3) * 8.0
+		var body := _make_box_mesh(Vector3(1.9, 1.5, 4.8), Color("#7892a2") if i % 2 == 0 else Color("#9a624e"))
+		body.position.y = 0.9
+		traffic.add_child(body)
+		add_child(traffic)
+
+func _build_career() -> void:
+	career = EuroHaulCareer.new()
+	career.name = "CareerManager"
+	add_child(career)
+	career.changed.connect(_update_hud)
+
+func _build_hud() -> void:
+	var layer := CanvasLayer.new()
+	layer.name = "HUD"
+	add_child(layer)
+	var panel := PanelContainer.new()
+	panel.position = Vector2(20, 18)
+	panel.custom_minimum_size = Vector2(360, 112)
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.025, 0.055, 0.09, 0.92)
+	style.border_color = GOLD
+	style.set_border_width_all(2)
+	style.set_corner_radius_all(12)
+	panel.add_theme_stylebox_override("panel", style)
+	layer.add_child(panel)
+	var column := VBoxContainer.new()
+	panel.add_child(column)
+	hud = Label.new()
+	hud.add_theme_color_override("font_color", Color("#f2f4f6"))
+	column.add_child(hud)
+	status_label = Label.new()
+	status_label.text = "FREIGHT • BERLIN REGION"
+	status_label.add_theme_color_override("font_color", GOLD)
+	column.add_child(status_label)
+	speed_label = Label.new()
+	speed_label.add_theme_color_override("font_color", Color("#dce7f0"))
+	column.add_child(speed_label)
+	var buttons := HBoxContainer.new()
+	buttons.anchor_left = 0.0
+	buttons.anchor_top = 1.0
+	buttons.anchor_right = 1.0
+	buttons.anchor_bottom = 1.0
+	buttons.offset_left = 18
+	buttons.offset_top = -118
+	buttons.offset_right = -18
+	buttons.offset_bottom = -18
+	layer.add_child(buttons)
+	_add_touch_button(buttons, "◀", "left")
+	_add_touch_button(buttons, "BRAKE", "brake")
+	_add_touch_button(buttons, "GAS", "throttle")
+	_add_touch_button(buttons, "▶", "right")
+	var accept := Button.new()
+	accept.text = "ACCEPT FREIGHT"
+	accept.position = Vector2(20, 145)
+	accept.custom_minimum_size = Vector2(190, 52)
+	accept.pressed.connect(func(): career.accept_offer(); _update_hud())
+	layer.add_child(accept)
+	_update_hud()
+
+func _add_touch_button(parent: Control, caption: String, key: String) -> void:
+	var button := Button.new()
+	button.text = caption
+	button.custom_minimum_size = Vector2(120, 82)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.button_down.connect(func(): touch_state[key] = true)
+	button.button_up.connect(func(): touch_state[key] = false)
+	parent.add_child(button)
+
+func _update_hud() -> void:
+	if hud == null or career == null:
+		return
+	var contract_text := "No active contract"
+	if not career.active_contract.is_empty():
+		var c: Dictionary = career.active_contract
+		contract_text = "%s → %s | %s | %d/%d km" % [c.origin, c.destination, c.cargo, int(c.progress_km), int(c.distance_km)]
+	elif not career.offered_contract.is_empty():
+		var o: Dictionary = career.offered_contract
+		contract_text = "Offer: %s → %s | %s | %d km | €%d" % [o.origin, o.destination, o.cargo, int(o.distance_km), int(o.reward)]
+	hud.text = "DRIVER  %s  •  LVL %d  •  €%d\n%s" % [career.driver_name, career.level, career.game_cash, contract_text]
+	if truck != null and speed_label != null:
+		speed_label.text = "%03d km/h     RPM %04d     GEAR %s     DAMAGE %d%%" % [int(absf(truck.speed_kmh)), int(truck.engine_rpm), "R" if truck.gear == -1 else ("N" if truck.gear == 0 else str(truck.gear)), int(truck.damage)]
+
+func _add_box(label: String, position_value: Vector3, size_value: Vector3, color: Color, solid: bool) -> void:
+	var node := StaticBody3D.new() if solid else Node3D.new()
+	node.name = label
+	node.position = position_value
+	var mesh := _make_box_mesh(size_value, color)
+	node.add_child(mesh)
+	if solid:
+		var collision := CollisionShape3D.new()
+		var shape := BoxShape3D.new()
+		shape.size = size_value
+		collision.shape = shape
+		node.add_child(collision)
+	add_child(node)
+
+func _make_box_mesh(size_value: Vector3, color: Color) -> MeshInstance3D:
+	var mesh := MeshInstance3D.new()
+	var box := BoxMesh.new()
+	box.size = size_value
+	mesh.mesh = box
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	material.roughness = 0.82
+	mesh.material_override = material
+	return mesh
+
+func _make_cylinder_mesh(height: float, radius: float, color: Color) -> MeshInstance3D:
+	var mesh := MeshInstance3D.new()
+	var cylinder := CylinderMesh.new()
+	cylinder.height = height
+	cylinder.top_radius = radius
+	cylinder.bottom_radius = radius
+	mesh.mesh = cylinder
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	mesh.material_override = material
+	return mesh
