@@ -54,14 +54,14 @@ namespace EuroHaul.UI
             panelRect.anchorMax = new Vector2(0f, 1f);
             panelRect.pivot = new Vector2(0f, 1f);
             panelRect.anchoredPosition = new Vector2(28f, -28f);
-            panelRect.sizeDelta = new Vector2(480f, 220f);
+            panelRect.sizeDelta = new Vector2(480f, 250f);
             panel.GetComponent<Image>().color = Navy;
 
-            details = AddText(panel.transform, "", 20, White, new Vector2(0.5f, 0.72f),
-                new Vector2(0f, 0f), new Vector2(440f, 105f));
-            balance = AddText(panel.transform, "", 18, Gold, new Vector2(0.5f, 0.28f),
+            details = AddText(panel.transform, "", 20, White, new Vector2(0.5f, 0.76f),
+                new Vector2(0f, 0f), new Vector2(440f, 110f));
+            balance = AddText(panel.transform, "", 18, Gold, new Vector2(0.5f, 0.30f),
                 Vector2.zero, new Vector2(440f, 36f));
-            status = AddText(panel.transform, "", 15, White, new Vector2(0.5f, 0.13f),
+            status = AddText(panel.transform, "", 15, White, new Vector2(0.5f, 0.19f),
                 Vector2.zero, new Vector2(440f, 30f));
 
             GameObject bar = new GameObject("ProgressBar", typeof(RectTransform), typeof(Image));
@@ -87,7 +87,7 @@ namespace EuroHaul.UI
             progressFill.fillAmount = 0f;
 
             actionButton = AddButton(panel.transform, new Vector2(0.5f, 0.08f),
-                new Vector2(0f, -4f), new Vector2(250f, 42f), AcceptContract);
+                new Vector2(0f, -2f), new Vector2(250f, 40f), AcceptContract);
             actionLabel = actionButton.GetComponentInChildren<Text>();
         }
 
