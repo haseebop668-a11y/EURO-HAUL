@@ -65,7 +65,12 @@ func _unhandled_key_input(event: InputEvent) -> void:
 				truck.select_reverse()
 				truck.set_clutch(0.0)
 			KEY_H:
+				truck.sound_horn()
 				status_label.text = "HORN"
+			KEY_Z:
+				truck.set_indicator(-1 if truck.indicators != -1 else 0)
+			KEY_X:
+				truck.set_indicator(1 if truck.indicators != 1 else 0)
 			KEY_ESCAPE:
 				get_tree().paused = not get_tree().paused
 
@@ -154,6 +159,8 @@ func _build_traffic() -> void:
 		add_child(traffic)
 
 func _build_career() -> void:
+	truck.horn_pressed.connect(func(): status_label.text = "HORN • SIGNAL")
+	truck.indicators_changed.connect(func(value: int): status_label.text = "HAZARD LIGHTS" if value == 2 else ("LEFT INDICATOR" if value == -1 else ("RIGHT INDICATOR" if value == 1 else "SIGNALS OFF")))
 	career = EuroHaulCareer.new()
 	career.name = "CareerManager"
 	add_child(career)
@@ -205,6 +212,20 @@ func _build_hud() -> void:
 	_add_touch_button(buttons, "▶", "right")
 	_add_shift_button(buttons, "GEAR −", false)
 	_add_shift_button(buttons, "GEAR +", true)
+	var signal_row := HBoxContainer.new()
+	signal_row.position = Vector2(20, 265)
+	signal_row.custom_minimum_size = Vector2(500, 44)
+	layer.add_child(signal_row)
+	_add_signal_button(signal_row, "LEFT SIGNAL", -1)
+	_add_signal_button(signal_row, "RIGHT SIGNAL", 1)
+	var hazard := Button.new()
+	hazard.text = "HAZARDS"
+	hazard.pressed.connect(func(): truck.toggle_hazards())
+	signal_row.add_child(hazard)
+	var horn := Button.new()
+	horn.text = "HORN"
+	horn.pressed.connect(func(): truck.sound_horn())
+	signal_row.add_child(horn)
 	var accept := Button.new()
 	accept.text = "ACCEPT FREIGHT"
 	accept.position = Vector2(20, 145)
@@ -238,6 +259,12 @@ func _add_touch_button(parent: Control, caption: String, key: String) -> void:
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.button_down.connect(func(): touch_state[key] = true)
 	button.button_up.connect(func(): touch_state[key] = false)
+	parent.add_child(button)
+
+func _add_signal_button(parent: Control, caption: String, side: int) -> void:
+	var button := Button.new()
+	button.text = caption
+	button.pressed.connect(func(): truck.set_indicator(side if truck.indicators != side else 0))
 	parent.add_child(button)
 
 func _add_shift_button(parent: Control, caption: String, up: bool) -> void:
