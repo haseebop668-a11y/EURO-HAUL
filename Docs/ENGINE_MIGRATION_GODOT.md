@@ -48,9 +48,9 @@ GitHub Actions minutes and artifact retention are subject to the repository/acco
 - [x] Select an engine that does not require Unity licensing.
 - [x] Add Godot project entry point and preserve the existing icon.
 - [x] Preserve the original Unity source tree as a migration reference.
-- [ ] Port vehicle physics and touch controls.
-- [ ] Port traffic AI and safety systems.
-- [ ] Port career, economy and company simulation.
+- [x] Add first Godot greybox truck controller and on-screen steering/throttle/brake controls (needs runtime validation).
+- [x] Add first ambient lane traffic prototype (needs collision-aware AI and runtime validation).
+- [x] Add offline driver profile, contract offers, XP, Game Cash and local JSON save foundation (company simulation remains).
 - [ ] Rebuild the final menu, dashboard and settings in Godot.
 - [ ] Add automated Godot validation and Android export workflow.
 - [ ] Produce a debug APK and install/test it on the target Android device.
