@@ -24,6 +24,8 @@ namespace EuroHaul.UI
         private GameObject pausePanel;
         private Text qualityValue;
         private Text fpsValue;
+        private Button pauseButton;
+        private bool settingsReturnToPause;
         private int qualityIndex;
         private readonly int[] fpsOptions = { 30, 60, 90, 120 };
         private int fpsIndex = 1;
@@ -71,9 +73,10 @@ namespace EuroHaul.UI
             BuildSettings();
             BuildPause();
 
-            Button pause = CreateButton(root.transform, "Ⅱ", new Vector2(1f, 1f),
+            pauseButton = CreateButton(root.transform, "Ⅱ", new Vector2(1f, 1f),
                 new Vector2(-78f, -58f), new Vector2(92f, 68f), Blue, Pause);
-            pause.gameObject.name = "PauseButton";
+            pauseButton.gameObject.name = "PauseButton";
+            pauseButton.gameObject.SetActive(false);
         }
 
         private GameObject CreatePanel(Transform parent, string name)
@@ -141,6 +144,7 @@ namespace EuroHaul.UI
         {
             started = true;
             Time.timeScale = 1f;
+            pauseButton.gameObject.SetActive(true);
             homePanel.SetActive(false);
             settingsPanel.SetActive(false);
             pausePanel.SetActive(false);
@@ -150,6 +154,7 @@ namespace EuroHaul.UI
         {
             if (!started) return;
             Time.timeScale = 0f;
+            pauseButton.gameObject.SetActive(false);
             pausePanel.SetActive(true);
             settingsPanel.SetActive(false);
             homePanel.SetActive(false);
@@ -159,6 +164,7 @@ namespace EuroHaul.UI
         {
             started = true;
             Time.timeScale = 1f;
+            pauseButton.gameObject.SetActive(true);
             pausePanel.SetActive(false);
             settingsPanel.SetActive(false);
         }
@@ -167,11 +173,20 @@ namespace EuroHaul.UI
         {
             started = false;
             Time.timeScale = 0f;
+            pauseButton.gameObject.SetActive(false);
             ShowHome();
         }
 
         private void ShowHome()
         {
+            if (settingsReturnToPause && started)
+            {
+                settingsReturnToPause = false;
+                pausePanel.SetActive(true);
+                settingsPanel.SetActive(false);
+                homePanel.SetActive(false);
+                return;
+            }
             homePanel.SetActive(true);
             settingsPanel.SetActive(false);
             pausePanel.SetActive(false);
@@ -179,6 +194,7 @@ namespace EuroHaul.UI
 
         private void ShowSettings()
         {
+            settingsReturnToPause = false;
             homePanel.SetActive(false);
             settingsPanel.SetActive(true);
             pausePanel.SetActive(false);
@@ -186,6 +202,7 @@ namespace EuroHaul.UI
 
         private void ShowSettingsFromPause()
         {
+            settingsReturnToPause = true;
             pausePanel.SetActive(false);
             settingsPanel.SetActive(true);
         }
