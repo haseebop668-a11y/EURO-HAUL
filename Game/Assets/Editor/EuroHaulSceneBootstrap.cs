@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 using EuroHaul.Driving;
 using EuroHaul.CameraSystem;
 using EuroHaul.Traffic;
+using EuroHaul.UI;
 
 namespace EuroHaul.Editor
 {
@@ -126,6 +127,9 @@ namespace EuroHaul.Editor
             light.intensity = 1.1f;
             sun.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
             RenderSettings.ambientLight = new Color(0.45f, 0.45f, 0.48f);
+
+            GameObject menuRoot = new GameObject("EuroHaulMenuSystem");
+            menuRoot.AddComponent<EuroHaulMenuUI>();
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             AssetDatabase.SaveAssets();
