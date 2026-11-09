@@ -5,6 +5,7 @@ A premium, calm European logistics identity: midnight navy surfaces, steel blue 
 
 ## Identity assets
 - Source icon: `Game/Assets/Branding/euro-haul-icon.svg`.
+- Main-menu design preview: `Game/Assets/Branding/main-menu-preview.svg` (static reference, not a runtime screenshot).
 - Working title: EURO HAUL.
 - Tagline: Drive. Deliver. Build your fleet.
 - Vehicle branding: original fictional designs only until real manufacturer marks and cab designs are licensed.
