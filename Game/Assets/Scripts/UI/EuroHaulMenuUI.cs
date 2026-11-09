@@ -242,7 +242,9 @@ namespace EuroHaul.UI
         private void RefreshSettingsLabels()
         {
             if (qualityValue != null)
-                qualityValue.text = "QUALITY  •  " + QualitySettings.names[qualityIndex];
+                qualityValue.text = QualitySettings.names.Length == 0
+                    ? "QUALITY  •  DEFAULT"
+                    : "QUALITY  •  " + QualitySettings.names[qualityIndex];
             if (fpsValue != null)
                 fpsValue.text = "FRAME LIMIT  •  " + fpsOptions[fpsIndex] + " FPS";
         }
