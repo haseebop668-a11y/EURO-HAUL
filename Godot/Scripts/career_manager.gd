@@ -25,6 +25,14 @@ func _ready() -> void:
 func xp_for_next_level() -> int:
 	return 100 + (level - 1) * 75
 
+func spend_cash(amount: int) -> bool:
+	if amount < 0 or game_cash < amount:
+		return false
+	game_cash -= amount
+	save()
+	changed.emit()
+	return true
+
 func add_xp(amount: int) -> void:
 	xp += maxi(0, amount)
 	while xp >= xp_for_next_level():
