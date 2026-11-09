@@ -1,4 +1,4 @@
-name: Godot validation
+name: Godot validation and Android APK
 
 on:
   push:
@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 jobs:
-  validate:
+  validate-and-export:
     runs-on: ubuntu-latest
     container:
       image: barichello/godot-ci:4.4.1
@@ -23,10 +23,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate Godot project and import assets
+      - name: Import and validate project
         working-directory: Godot
         run: godot --headless --editor --path . --quit
 
-      - name: Run project headless smoke start
+      - name: Headless runtime smoke test
         working-directory: Godot
-        run: timeout 20s godot --headless --path . --quit-after 3
+        run: godot --headless --path . --quit-after 5
+
+      - name: Export Android debug APK
+        working-directory: Godot
+        run: |
+          mkdir -p ../build/Android
+          godot --headless --path . --export-debug Android ../build/Android/EURO-HAUL-debug.apk
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: EURO-HAUL-Android-debug
+          path: build/Android/EURO-HAUL-debug.apk
+          if-no-files-found: error
+          retention-days: 14
