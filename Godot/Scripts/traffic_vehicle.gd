@@ -9,6 +9,7 @@ var _phase := 0.0
 
 func _ready() -> void:
 	speed_kmh = cruise_speed_kmh
+	_phase = absf(global_position.z) * 3.6 / maxf(1.0, cruise_speed_kmh)
 
 func _process(delta: float) -> void:
 	_phase += delta
