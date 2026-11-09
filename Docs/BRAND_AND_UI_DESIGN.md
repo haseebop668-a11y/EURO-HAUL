@@ -19,7 +19,7 @@ A premium, calm European logistics identity: midnight navy surfaces, steel blue 
 | Steel Blue | `#1461C7` | Primary actions and focus |
 | Brass Gold | `#E8B85B` | Brand accent, key values |
 | White | `#EEF4FA` | Main text |
-| Muted | `#9E B5 C9` | Secondary text (use `#9EB5C9`) |
+| Muted | `#9EB5C9` | Secondary text |
 | Success | `#3D9B78` | Delivery success only |
 | Warning | `#D79B3D` | Caution and alerts |
 | Danger | `#C65A55` | Critical warnings |
