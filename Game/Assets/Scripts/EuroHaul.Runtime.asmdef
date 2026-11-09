@@ -1,7 +1,9 @@
 {
   "name": "EuroHaul.Runtime",
   "rootNamespace": "EuroHaul",
-  "references": [],
+  "references": [
+    "Unity.ugui"
+  ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
