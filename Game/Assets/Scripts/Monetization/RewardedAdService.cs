@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace EuroHaul.Monetization
@@ -47,7 +48,7 @@ namespace EuroHaul.Monetization
         private IRewardedAdProvider provider;
         private int rewardedAdsThisSession;
         private float lastRewardedAdTime = -999999f;
-        private string lastGrantedTransactionId;
+        private readonly HashSet<string> grantedTransactionIds = new HashSet<string>(StringComparer.Ordinal);
 
         public event Action<RewardKind, int> RewardGranted;
         public event Action<string> StatusChanged;
@@ -85,9 +86,15 @@ namespace EuroHaul.Monetization
         /// <summary>Player must explicitly request an ad. No automatic playback.</summary>
         public bool TryShowRewarded(RewardKind rewardKind, int rewardAmount)
         {
-            if (rewardAmount <= 0 || !CanShowRewarded(out string reason))
+            if (rewardAmount <= 0)
             {
-                StatusChanged?.Invoke(string.IsNullOrEmpty(reason) ? "Invalid reward amount" : reason);
+                StatusChanged?.Invoke("Invalid reward amount");
+                return false;
+            }
+
+            if (!CanShowRewarded(out string reason))
+            {
+                StatusChanged?.Invoke(reason);
                 return false;
             }
 
@@ -102,13 +109,11 @@ namespace EuroHaul.Monetization
                     return;
                 }
 
-                if (string.Equals(lastGrantedTransactionId, result.TransactionId, StringComparison.Ordinal))
+                if (!grantedTransactionIds.Add(result.TransactionId))
                 {
                     StatusChanged?.Invoke("Duplicate reward callback ignored");
                     return;
                 }
-
-                lastGrantedTransactionId = result.TransactionId;
                 RewardGranted?.Invoke(rewardKind, rewardAmount);
                 StatusChanged?.Invoke("Reward granted");
             });
