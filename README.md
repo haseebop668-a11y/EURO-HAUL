@@ -23,6 +23,7 @@ Early Unity project foundation. Vehicle, driver-signal, safety-advisory and traf
 - Waypoint-based traffic vehicle controller with conservative following and courtesy-horn event.
 - Unity EditMode tests for deterministic safety math.
 - Runtime-built main menu, pause screen and quality/FPS settings prototype.
+- Offline career vertical slice: local save/backup, driver XP/levels, Game Cash, generated freight offers and distance-based delivery rewards.
 - Original EURO HAUL vector app-icon source and documented navy/blue/gold UI system.
 - Manual Unity CI workflow for Android APK and Windows x64 artifacts.
 
@@ -53,7 +54,7 @@ Early Unity project foundation. Vehicle, driver-signal, safety-advisory and traf
 - Economy, player companies and payment boundaries: [Docs/ECONOMY_AND_PLAYER_BUSINESSES.md](Docs/ECONOMY_AND_PLAYER_BUSINESSES.md).
 
 ## Important limitations
-No full European map, finished licensed-quality truck art, trailer/cargo physics, career economy, final driving HUD, sound library, or verified Android/Windows build is available yet. The new menu/settings UI is a functional prototype overlay, not the final career interface. AI traffic requires authored lane routes and correctly configured vehicle layers/sensors. Sensor ranges, braking assumptions and cornering limits must be tuned and play-tested; they are not certified vehicle dynamics.
+No full European map, finished licensed-quality truck art, trailer/cargo physics, company management, final driving HUD, sound library, or verified Android/Windows build is available yet. Career progress is currently a local test-track prototype, not a complete city-route career. The new menu/settings UI is a functional prototype overlay, not the final career interface. AI traffic requires authored lane routes and correctly configured vehicle layers/sensors. Sensor ranges, braking assumptions and cornering limits must be tuned and play-tested; they are not certified vehicle dynamics.
 
 ## License
 All rights reserved by the project owner unless a file explicitly states otherwise. Third-party assets must retain their own licenses and attribution.
