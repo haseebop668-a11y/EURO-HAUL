@@ -11,6 +11,7 @@ using EuroHaul.Driving;
 using EuroHaul.CameraSystem;
 using EuroHaul.Traffic;
 using EuroHaul.UI;
+using EuroHaul.Career;
 
 namespace EuroHaul.Editor
 {
@@ -127,6 +128,11 @@ namespace EuroHaul.Editor
             light.intensity = 1.1f;
             sun.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
             RenderSettings.ambientLight = new Color(0.45f, 0.45f, 0.48f);
+
+            GameObject careerRoot = new GameObject("EuroHaulCareerSystem");
+            CareerManager careerManager = careerRoot.AddComponent<CareerManager>();
+            SetObjectReference(careerManager, "trackedTruck", player.transform);
+            careerRoot.AddComponent<CareerHUD>();
 
             GameObject menuRoot = new GameObject("EuroHaulMenuSystem");
             menuRoot.AddComponent<EuroHaulMenuUI>();
