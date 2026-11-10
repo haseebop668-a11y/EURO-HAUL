@@ -10,6 +10,8 @@ var truck: EuroHaulTruck
 var articulation_degrees := 0.0
 
 func _ready() -> void:
+	collision_layer = 4
+	collision_mask = 1
 	_build_trailer_visuals()
 
 func _physics_process(delta: float) -> void:
