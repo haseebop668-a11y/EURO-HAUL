@@ -53,8 +53,16 @@ func _run_tests() -> void:
 	_expect(rear_report.get("zone", "") == "REAR", "rear sensor must identify a faster approaching vehicle")
 	traffic.position.z = -10.0
 	traffic.speed_kmh = 40.0
+	var lane_blocker = TrafficScript.new()
+	root.add_child(lane_blocker)
+	lane_blocker.position = Vector3(2.0, 0.0, -10.0)
+	traffic.traffic_neighbors.append(lane_blocker)
 	traffic._update_player_avoidance(0.1)
-	_expect(is_equal_approx(traffic.lane_x, 2.0), "slower traffic ahead must move away from a closing player")
+	_expect(is_equal_approx(traffic.lane_x, -2.0), "traffic must not change into an occupied lane")
+	_expect(traffic.speed_kmh > 40.0, "traffic must adjust speed when the safe lane is blocked")
+	traffic.traffic_neighbors.clear()
+	traffic._update_player_avoidance(0.1)
+	_expect(is_equal_approx(traffic.lane_x, 2.0), "slower traffic ahead must move away from a closing player when the lane clears")
 	traffic.position.z = -100.0
 	traffic._update_player_avoidance(2.1)
 	_expect(is_equal_approx(traffic.lane_x, -2.0), "traffic must return to its lane after the gap clears")
