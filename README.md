@@ -2,11 +2,11 @@
 European Trucking Career Simulator for Android and Windows.
 
 ## Current status
-**Engine migration in progress: Godot 4 is the active target.** Godot is open-source and does not require a Unity license. The original Unity source under `Game/` is preserved as a reference. The Godot branch now has its first procedural greybox Truck Lab: a drivable truck controller, third-person chase camera, road/roadside geometry, ambient traffic vehicles, touch steering/throttle/brake controls, dashboard telemetry and an offline career/contract save foundation. These scripts have been committed but have **not yet been run in the Godot editor or validated on a phone**. No verified APK exists yet.
+**Godot 4 is the active build target.** Godot is open-source and does not require a Unity license. The original Unity source under `Game/` is preserved as a reference. The active project has grown into a playable greybox simulation prototype with manual truck controls, AI traffic, freight contracts, cargo mass/damage, deadlines, company economy, tolls, fuel/service, day/night and weather systems. The project is still a prototype: the connected European road network, production vehicle assets, full fifth-wheel physics and device acceptance remain incomplete. No successful CI build or verified APK/Windows executable has been confirmed yet.
 
 ## Engineering principles
 - Offline-first single-player gameplay.
-- Android-first, Windows after the Android slice is stable.
+- Android and Windows x64 debug exports are configured in CI; real-device/PC acceptance is still required.
 - Performance-scalable 3D; profile on target hardware before setting frame-rate guarantees.
 - Original or properly licensed assets only.
 - Fictional logistics operators and generated freight contracts.
@@ -14,17 +14,19 @@ European Trucking Career Simulator for Android and Windows.
 - Safety calculations are game simulation approximations, not real-world driving instructions.
 
 ## Godot vertical slice foundation
-- Custom arcade truck controller with diesel-style RPM, clutch state, manual gears, reverse, steering and braking.
+- Truck controller with diesel-style RPM, clutch, manual gears, reverse, speed-sensitive steering, engine braking, retarder, fuel, cargo-mass handling and collision damage.
 - Third-person chase camera.
-- Procedurally generated motorway greybox with road markings, barriers and warehouse silhouettes.
-- Ambient traffic vehicle movement.
-- Touch steering, throttle and brake buttons.
-- Dashboard speed/RPM/gear/damage display.
-- Offline driver profile, freight offer, accept contract, delivery progress, XP/levels and Game Cash JSON save.
+- Procedural 900m looping motorway greybox with road markings, barriers, depot triggers, a paid toll gate and a fuel/service station.
+- Six AI traffic vehicles with wrap-aware front/rear proximity, safe-gap lane changes, speed adjustment and collision bodies.
+- Android touch controls plus desktop keyboard controls, including retarder, clutch/gear actions, indicators, hazards and horn.
+- Dashboard telemetry for speed, RPM, gear, fuel, truck damage, cargo mass/fragility/damage and delivery time remaining.
+- Offline freight offers, pickup/delivery, forward-only route progress, cargo mass/fragility, trailer impact damage, timed deadlines, reward/XP penalties and recoverable local saves.
+- Player logistics company with fleet/driver purchases, daily costs/revenue, reputation/jobs and a share of player delivery revenue.
+- Accelerated day/night and clear/cloudy/fog weather cycle; fuel, refuelling, repairs and roadside recovery.
 - Original EURO HAUL icon and navy/blue/gold visual identity.
 
 ## Preserved gameplay scope
-The migration will retain the original requirements: richer truck physics and wheel response, traffic AI and collision sensing, blind spots and warnings, indicators/hazards/horn, camera modes, full offline career, player-owned fictional logistics companies, fleet/garage/driver management, economy, scalable Android graphics and later Windows support. The current greybox is only the first playable foundation, not the full game.
+The current implementation covers a functional gameplay loop, not the complete game. Remaining major scope includes a connected European road network with junctions/GPS, full suspension and fifth-wheel dynamics, trailer selection and loading animation, real depot yards/weigh stations, deeper company dispatch management, production truck/interior assets, rain and richer engine/air-brake audio, and real Android/Windows acceptance testing.
 
 ## Research and engineering references
 See [Docs/OPEN_SOURCE_ENGINEERING_NOTES.md](Docs/OPEN_SOURCE_ENGINEERING_NOTES.md) for reviewed open-source Godot vehicle projects, architecture patterns and license boundaries.
@@ -41,9 +43,12 @@ See [Docs/OPEN_SOURCE_ENGINEERING_NOTES.md](Docs/OPEN_SOURCE_ENGINEERING_NOTES.m
 - `Docs/ANDROID_GRAPHICS_PERFORMANCE.md`: mobile performance budgets.
 - `Docs/MONETIZATION_AND_AD_INTEGRITY.md`: compliant ad policy.
 - `Docs/ECONOMY_AND_PLAYER_BUSINESSES.md`: economy and player companies.
+- `Docs/FEATURE_AUDIT.md`: existing vs implemented vs remaining feature inventory.
+- `Docs/QA_TEST_PLAN.md`: automated and physical acceptance checklist.
+- `Docs/BUILD_AND_RELEASE.md`: Android and Windows CI build instructions.
 
 ## Build and test status
-No Godot Android APK has been exported, installed or device-tested yet. A cloud validation workflow is configured; it must pass before a debug APK pipeline is treated as ready. Android exports require matching Godot export templates and Android tooling. A signed Play Store release additionally requires a securely managed signing key.
+The GitHub Actions workflow is configured to import/test the project and export Android ARM64 and Windows x64 debug artifacts. Until a successful workflow run and artifacts are verified, no APK or Windows executable should be treated as built. Physical Android install/performance testing and a Windows PC launch test are separate release gates. A Play Store release additionally requires a securely managed signing key.
 
 ## License
 All rights reserved by the project owner unless a file explicitly states otherwise. Third-party assets must retain their own licenses and attribution.
