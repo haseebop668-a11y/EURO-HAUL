@@ -73,6 +73,7 @@ func _process(delta: float) -> void:
 	_update_hud()
 	_update_traffic_warnings()
 	_update_freight_action()
+	_update_service_button()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
