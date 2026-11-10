@@ -54,7 +54,7 @@ jobs:
           destination="$HOME/.local/share/godot/export_templates/${version}.stable"
           command -v wget >/dev/null
           command -v unzip >/dev/null
-          if [ ! -s "$destination/android_debug.apk" ] || [ ! -s "$destination/windows_debug_x86_64.exe" ]; then
+          if [ ! -s "$destination/android_debug.apk" ] || [ ! -s "$destination/android_release.apk" ] || [ ! -s "$destination/windows_debug_x86_64.exe" ] || [ ! -s "$destination/windows_release_x86_64.exe" ]; then
             archive="/tmp/Godot_v${version}-stable_export_templates.tpz"
             mkdir -p "$destination" /tmp/godot-export-templates
             wget -q --tries=3 -O "$archive" "https://github.com/godotengine/godot-builds/releases/download/${version}-stable/Godot_v${version}-stable_export_templates.tpz"
