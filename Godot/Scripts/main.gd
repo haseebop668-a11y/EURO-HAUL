@@ -12,6 +12,9 @@ var company: EuroHaulCompanyManager
 var hud: Label
 var status_label: Label
 var speed_label: Label
+var freight_action_button: Button
+var near_pickup_depot := false
+var near_delivery_depot := false
 var touch_state := {"throttle": false, "brake": false, "left": false, "right": false}
 var traffic_vehicles: Array[EuroHaulTrafficVehicle] = []
 var _last_position := Vector3.ZERO
@@ -56,6 +59,7 @@ func _process(delta: float) -> void:
 		_last_distance_save = 0.0
 	_update_hud()
 	_update_traffic_warnings()
+	_update_freight_action()
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and truck != null:
@@ -115,6 +119,39 @@ func _build_world() -> void:
 		var z := -float(i) * 45.0 - 30.0
 		_add_box("Distant warehouse", Vector3(-18.0, 3.0, z), Vector3(10, 6, 18), Color("#34495b"), true)
 		_add_box("Warehouse roof", Vector3(-18.0, 6.2, z), Vector3(10.5, 0.4, 18.5), BLUE, false)
+	_create_depot_area("PickupDepot", -50.0, true)
+	_create_depot_area("DeliveryDepot", -820.0, false)
+
+func _create_depot_area(depot_name: String, road_z: float, is_pickup: bool) -> void:
+	var depot := Area3D.new()
+	depot.name = depot_name
+	depot.position = Vector3(0.0, 1.0, road_z)
+	depot.collision_layer = 0
+	depot.collision_mask = 1
+	var trigger := CollisionShape3D.new()
+	var trigger_shape := SphereShape3D.new()
+	trigger_shape.radius = 10.0
+	trigger.shape = trigger_shape
+	depot.add_child(trigger)
+	depot.body_entered.connect(func(body: Node3D):
+		if body != truck:
+			return
+		if is_pickup:
+			near_pickup_depot = true
+		else:
+			near_delivery_depot = true
+		_update_freight_action()
+	)
+	depot.body_exited.connect(func(body: Node3D):
+		if body != truck:
+			return
+		if is_pickup:
+			near_pickup_depot = false
+		else:
+			near_delivery_depot = false
+		_update_freight_action()
+	)
+	add_child(depot)
 
 func _build_truck() -> void:
 	truck = EuroHaulTruck.new()
@@ -257,6 +294,12 @@ func _build_hud() -> void:
 	accept.custom_minimum_size = Vector2(190, 52)
 	accept.pressed.connect(func(): career.accept_offer(); _update_hud())
 	layer.add_child(accept)
+	freight_action_button = Button.new()
+	freight_action_button.text = "DRIVE TO PICKUP"
+	freight_action_button.position = Vector2(500, 145)
+	freight_action_button.custom_minimum_size = Vector2(210, 52)
+	freight_action_button.pressed.connect(_handle_freight_interaction)
+	layer.add_child(freight_action_button)
 	var company_button := Button.new()
 	company_button.text = "FOUND COMPANY • €50,000"
 	company_button.position = Vector2(220, 145)
@@ -276,6 +319,7 @@ func _build_hud() -> void:
 	hire_driver_button.pressed.connect(_hire_company_driver)
 	layer.add_child(hire_driver_button)
 	_update_hud()
+	_update_freight_action()
 
 func _add_touch_button(parent: Control, caption: String, key: String) -> void:
 	var button := Button.new()
@@ -322,6 +366,37 @@ func _found_company() -> void:
 		company.found_company("EURO HAUL LOGISTICS", EuroHaulCompanyManager.FOUNDING_COST)
 		_update_hud()
 
+func _handle_freight_interaction() -> void:
+	if career == null or career.active_contract.is_empty():
+		return
+	if not career.cargo_loaded and near_pickup_depot:
+		if career.load_cargo():
+			status_label.text = "CARGO LOADED • DELIVERY STARTED"
+	elif career.cargo_loaded and near_delivery_depot:
+		if career.unload_cargo():
+			status_label.text = "DELIVERY COMPLETED • REWARD PAID"
+		else:
+			status_label.text = "DELIVERY DEPOT • ROUTE DISTANCE NOT COMPLETE"
+	_update_hud()
+	_update_freight_action()
+
+func _update_freight_action() -> void:
+	if freight_action_button == null or career == null:
+		return
+	if career.active_contract.is_empty():
+		freight_action_button.text = "ACCEPT FREIGHT FIRST"
+		freight_action_button.disabled = true
+	elif not career.cargo_loaded:
+		freight_action_button.disabled = not near_pickup_depot
+		freight_action_button.text = "LOAD CARGO" if near_pickup_depot else "DRIVE TO PICKUP DEPOT"
+	elif near_delivery_depot:
+		freight_action_button.disabled = false
+		freight_action_button.text = "UNLOAD CARGO"
+	else:
+		freight_action_button.disabled = true
+		var remaining := maxf(0.0, float(career.active_contract.get("distance_km", 0.0)) - float(career.active_contract.get("progress_km", 0.0)))
+		freight_action_button.text = "DELIVER • %.2f KM LEFT" % remaining
+
 func _update_traffic_warnings() -> void:
 	if status_label == null or truck == null:
 		return
@@ -355,7 +430,7 @@ func _update_hud() -> void:
 	var contract_text := "No active contract"
 	if not career.active_contract.is_empty():
 		var c: Dictionary = career.active_contract
-		contract_text = "%s → %s | %s | %.2f/%.2f km" % [c.origin, c.destination, c.cargo, c.progress_km, c.distance_km]
+		contract_text = "%s → %s | %s | %s | %.2f/%.2f km" % [c.origin, c.destination, c.cargo, "LOADED" if career.cargo_loaded else "PICKUP REQUIRED", c.progress_km, c.distance_km]
 	elif not career.offered_contract.is_empty():
 		var o: Dictionary = career.offered_contract
 		contract_text = "Offer: %s → %s | %s | %.2f km | €%d" % [o.origin, o.destination, o.cargo, o.distance_km, int(o.reward)]
