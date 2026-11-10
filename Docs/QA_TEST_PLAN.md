@@ -27,6 +27,7 @@
 - [ ] Neutral and reverse selection obey speed/clutch constraints on keyboard and touch controls.
 - [ ] Forward and reverse speed limits are respected.
 - [ ] Braking stops the truck without unintended acceleration.
+- [ ] Engine braking and retarder reduce speed smoothly without adding throttle.
 - [ ] Steering response is reduced at high speed to respect the lateral-acceleration limit.
 - [ ] Collision damage increases only on actual blocking collisions and cannot exceed 100%.
 
