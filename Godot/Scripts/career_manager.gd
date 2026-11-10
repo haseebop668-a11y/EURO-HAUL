@@ -46,12 +46,16 @@ func generate_offer() -> void:
 	var from_index := randi_range(0, CITY_NAMES.size() - 1)
 	var to_index := (from_index + randi_range(1, CITY_NAMES.size() - 1)) % CITY_NAMES.size()
 	var distance := randf_range(2.0, 5.0)
+	var fragility := ["STANDARD", "FRAGILE", "HIGH VALUE"].pick_random()
 	cargo_loaded = false
 	offered_contract = {
 		"id": "EH-%06d" % randi_range(100000, 999999),
 		"origin": CITY_NAMES[from_index],
 		"destination": CITY_NAMES[to_index],
 		"cargo": CARGO_NAMES.pick_random(),
+		"mass_tons": randf_range(4.0, 25.0),
+		"fragility": fragility,
+		"damage_percent": 0.0,
 		"distance_km": distance,
 		"progress_km": 0.0,
 		"reward": int(distance * 1000.0 * randf_range(1.2, 1.8)),
@@ -77,13 +81,29 @@ func load_cargo() -> bool:
 	changed.emit()
 	return true
 
+func apply_cargo_damage(amount: float) -> void:
+	if active_contract.is_empty() or not cargo_loaded or amount <= 0.0:
+		return
+	var fragility := str(active_contract.get("fragility", "STANDARD"))
+	var multiplier := 1.0
+	if fragility == "FRAGILE":
+		multiplier = 1.5
+	elif fragility == "HIGH VALUE":
+		multiplier = 2.0
+	var current_damage := float(active_contract.get("damage_percent", 0.0))
+	active_contract["damage_percent"] = clampf(current_damage + amount * multiplier, 0.0, 100.0)
+
 func unload_cargo() -> bool:
 	if active_contract.is_empty() or not cargo_loaded:
 		return false
 	if float(active_contract.get("progress_km", 0.0)) < float(active_contract.get("distance_km", INF)):
 		return false
-	game_cash += int(active_contract.get("reward", 0))
-	add_xp(int(active_contract.get("xp", 0)))
+	var base_reward := int(active_contract.get("reward", 0))
+	var cargo_damage := clampf(float(active_contract.get("damage_percent", 0.0)), 0.0, 100.0)
+	var damage_penalty := cargo_damage / 100.0 * 0.65
+	var final_reward := maxi(0, int(round(float(base_reward) * (1.0 - damage_penalty))))
+	game_cash += final_reward
+	add_xp(int(round(float(active_contract.get("xp", 0)) * (1.0 - cargo_damage / 100.0 * 0.5))))
 	deliveries += 1
 	active_contract.clear()
 	cargo_loaded = false
@@ -121,11 +141,21 @@ func _sanitize_contract(value: Variant) -> Dictionary:
 	var cargo := str(value.get("cargo", ""))
 	if contract_id.is_empty() or origin.is_empty() or destination.is_empty() or cargo.is_empty():
 		return {}
+	var mass_value: Variant = value.get("mass_tons", 0.0)
+	var damage_value: Variant = value.get("damage_percent", 0.0)
+	var mass := float(mass_value) if typeof(mass_value) == TYPE_FLOAT or typeof(mass_value) == TYPE_INT else 0.0
+	var cargo_damage := float(damage_value) if typeof(damage_value) == TYPE_FLOAT or typeof(damage_value) == TYPE_INT else 0.0
+	var fragility := str(value.get("fragility", "STANDARD"))
+	if fragility not in ["STANDARD", "FRAGILE", "HIGH VALUE"]:
+		fragility = "STANDARD"
 	return {
 		"id": contract_id,
 		"origin": origin,
 		"destination": destination,
 		"cargo": cargo,
+		"mass_tons": clampf(mass, 0.0, 30.0),
+		"fragility": fragility,
+		"damage_percent": clampf(cargo_damage, 0.0, 100.0),
 		"distance_km": distance,
 		"progress_km": clampf(progress, 0.0, distance),
 		"reward": maxi(0, int(reward_value)),
