@@ -24,7 +24,7 @@ func _ready() -> void:
 	_build_hud()
 	print("EURO HAUL Godot vertical-slice booted")
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if truck == null:
 		return
 	var throttle := 1.0 if touch_state.throttle else 0.0
@@ -35,18 +35,20 @@ func _process(delta: float) -> void:
 		brake = Input.get_action_strength("brake")
 		steer = Input.get_action_strength("steer_right") - Input.get_action_strength("steer_left")
 	truck.set_controls(throttle, steer, brake)
-	var distance := truck.global_position.distance_to(_last_position)
-	if distance > 0.0 and distance < 2.0:
+	var current_position := truck.global_position
+	var distance := current_position.distance_to(_last_position)
+	_last_position = current_position
+	if distance > 0.0 and distance < 5.0 and career != null:
 		career.record_distance(distance / 1000.0)
-		_last_position = truck.global_position
 		_last_distance_save += distance
 	if _last_distance_save >= 100.0:
-		career.save()
+		if career != null:
+			career.save()
 		_last_distance_save = 0.0
 	_update_hud()
 
 func _unhandled_key_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo:
+	if event is InputEventKey and event.pressed and not event.echo and truck != null:
 		match event.keycode:
 			KEY_E:
 				truck.set_clutch(1.0)
