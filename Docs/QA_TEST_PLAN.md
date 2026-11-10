@@ -11,7 +11,7 @@
 
 ## Runtime and scene
 - [ ] Main scene creates world, truck, camera, traffic, career manager, company manager and HUD without runtime errors.
-- [ ] Camera remains behind/above the truck and does not lose its target.
+- [ ] Chase, close and high camera modes switch from touch and keyboard and remain attached to the truck.
 - [ ] Truck remains on the motorway and does not fall through the road.
 - [ ] Roadside barriers and scenery do not create unintended blocking collisions.
 - [ ] App pause/resume does not leave the simulation in a broken state.
