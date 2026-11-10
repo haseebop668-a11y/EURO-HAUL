@@ -99,6 +99,38 @@ func record_distance(distance_km: float) -> void:
 	active_contract.progress_km = minf(active_contract.distance_km, active_contract.progress_km + distance_km)
 	changed.emit()
 
+func _sanitize_contract(value: Variant) -> Dictionary:
+	if typeof(value) != TYPE_DICTIONARY:
+		return {}
+	var distance_value: Variant = value.get("distance_km", null)
+	var progress_value: Variant = value.get("progress_km", 0.0)
+	var reward_value: Variant = value.get("reward", null)
+	var xp_value: Variant = value.get("xp", null)
+	if (typeof(distance_value) != TYPE_FLOAT and typeof(distance_value) != TYPE_INT) or (typeof(progress_value) != TYPE_FLOAT and typeof(progress_value) != TYPE_INT):
+		return {}
+	if (typeof(reward_value) != TYPE_INT and typeof(reward_value) != TYPE_FLOAT) or (typeof(xp_value) != TYPE_INT and typeof(xp_value) != TYPE_FLOAT):
+		return {}
+	var distance := float(distance_value)
+	var progress := float(progress_value)
+	if not is_finite(distance) or not is_finite(progress) or distance <= 0.0:
+		return {}
+	var contract_id := str(value.get("id", ""))
+	var origin := str(value.get("origin", ""))
+	var destination := str(value.get("destination", ""))
+	var cargo := str(value.get("cargo", ""))
+	if contract_id.is_empty() or origin.is_empty() or destination.is_empty() or cargo.is_empty():
+		return {}
+	return {
+		"id": contract_id,
+		"origin": origin,
+		"destination": destination,
+		"cargo": cargo,
+		"distance_km": distance,
+		"progress_km": clampf(progress, 0.0, distance),
+		"reward": maxi(0, int(reward_value)),
+		"xp": maxi(0, int(xp_value))
+	}
+
 func save() -> void:
 	var data := {
 		"schema": 1, "driver_name": driver_name, "level": level, "xp": xp,
@@ -157,6 +189,6 @@ func load_save() -> void:
 	total_distance_km = maxf(0.0, float(parsed.get("total_distance_km", 0.0)))
 	var active_value: Variant = parsed.get("active_contract", {})
 	var offered_value: Variant = parsed.get("offered_contract", {})
-	active_contract = active_value if typeof(active_value) == TYPE_DICTIONARY else {}
-	offered_contract = offered_value if typeof(offered_value) == TYPE_DICTIONARY else {}
+	active_contract = _sanitize_contract(active_value)
+	offered_contract = _sanitize_contract(offered_value)
 	cargo_loaded = bool(parsed.get("cargo_loaded", false)) and not active_contract.is_empty()
