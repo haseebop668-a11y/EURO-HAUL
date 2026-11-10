@@ -657,6 +657,16 @@ func _handle_service_interaction() -> void:
 	if total_cost <= 0:
 		status_label.text = "TRUCK ALREADY SERVICED"
 		return
+	if total_cost > career.game_cash and (truck.fuel_percent <= 0.0 or truck.damage >= 80.0):
+		var emergency_cost := mini(250, career.game_cash)
+		if emergency_cost > 0:
+			career.spend_cash(emergency_cost)
+		truck.refuel()
+		truck.repair()
+		_save_progress()
+		status_label.text = "EMERGENCY SERVICE • €%d" % emergency_cost
+		_update_service_button()
+		return
 	if career.spend_cash(total_cost):
 		truck.refuel()
 		truck.repair()
@@ -682,6 +692,9 @@ func _update_service_button() -> void:
 	elif total_cost <= 0:
 		service_button.text = "TRUCK FULLY SERVICED"
 		service_button.disabled = true
+	elif total_cost > career.game_cash and (truck.fuel_percent <= 0.0 or truck.damage >= 80.0):
+		service_button.text = "EMERGENCY SERVICE • €%d" % mini(250, career.game_cash)
+		service_button.disabled = false
 	else:
 		service_button.text = "REFUEL / REPAIR • €%d" % total_cost
 		service_button.disabled = career.game_cash < total_cost
