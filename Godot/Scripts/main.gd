@@ -74,6 +74,8 @@ func _process(delta: float) -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		get_tree().paused = not get_tree().paused
+		if pause_button != null:
+			pause_button.text = "RESUME" if get_tree().paused else "PAUSE"
 		if status_label != null:
 			status_label.text = "PAUSED" if get_tree().paused else "RESUMED"
 		return
