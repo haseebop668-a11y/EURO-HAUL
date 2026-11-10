@@ -4,7 +4,7 @@
 - Driving: manual gearbox/clutch, reverse, speed-sensitive steering, engine braking, retarder, cargo-mass-dependent acceleration/braking/speed/fuel, collision damage and touch/keyboard input.
 - Trailer: independent AnimatableBody3D with cargo collision body, impact sensor, truck-damage/cargo-damage propagation and capped load-dependent articulation; no physical fifth-wheel joint, axle or suspension dynamics.
 - Camera: three selectable chase presets (chase, close and high); cockpit camera remains a later extension.
-- World: 900m looping greybox motorway, depot triggers, toll barrier, weigh station, service/refuelling stop, roadside scenery, accelerated day/night and clear/cloudy/fog states; six traffic actors use wrap-aware proximity, safe-gap lane changes and speed adjustment.
+- World: 900m looping greybox motorway, three T-junction access roads to depot/service yards, toll barrier, weigh station, service/refuelling stop, roadside scenery, accelerated day/night and clear/cloudy/fog states; six traffic actors use wrap-aware proximity, safe-gap lane changes and speed adjustment.
 - Logistics: freight offers, cargo pickup/delivery, forward-only progress, mass/fragility, trailer-impact cargo damage, delivery deadlines and damage/late-adjusted reward/XP; fuel, repair, toll and weigh-station loops.
 - Career: driver profile, XP, levels and Game Cash.
 - Company: founding, balance, truck purchases, one-driver-per-truck hiring, daily simulated revenue/operating costs, player-delivery revenue share, completed jobs and reputation.
@@ -22,7 +22,7 @@
 7. Never commit credentials, signing keys or private user data.
 
 ## Initial Godot vertical slice
-The active project is in `Godot/`. It builds a procedural greybox motorway, custom CharacterBody3D truck, independent kinematic trailer, AI traffic, three chase-camera presets, Android touch/desktop keyboard controls, freight/cargo economy, toll/weigh/service stops, day/night/weather and offline career/company systems. This is still a prototype rather than a full commercial truck simulator. A connected European road network, production assets, physical fifth-wheel/suspension dynamics, loading animation and device acceptance remain outstanding.
+The active project is in `Godot/`. It builds a procedural greybox motorway, custom CharacterBody3D truck, independent kinematic trailer, AI traffic, three chase-camera presets, Android touch/desktop keyboard controls, freight/cargo economy, toll/weigh/service stops, day/night/weather and offline career/company systems. This is still a prototype rather than a full commercial truck simulator. A connected European city-to-city road network with GPS routing, production assets, physical fifth-wheel/suspension dynamics, loading animation and device acceptance remain outstanding.
 
 ## Future vehicle model
 Evolve the current arcade controller in testable increments: calibrated diesel torque curve, differential, tire friction, ABS/traction, suspension, wheel response and physical fifth-wheel/axle dynamics. Profile each change on the target Android device.
