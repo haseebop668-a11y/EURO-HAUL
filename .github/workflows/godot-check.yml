@@ -62,7 +62,8 @@ jobs:
             fi
           fi
           curl --version
-          unzip -v | head -n 1
+          unzip -v > /tmp/unzip-version.txt
+          head -n 1 /tmp/unzip-version.txt
 
       - name: Install matching Godot 4.4.1 export templates
         shell: bash
