@@ -70,7 +70,7 @@ func _process(delta: float) -> void:
 	_last_position = current_position
 	var expected_step := (absf(truck.speed_kmh) / 3.6) * delta * 3.0 + 1.0
 	if distance > 0.0 and distance <= maxf(10.0, expected_step) and career != null:
-		career.record_distance(distance / 1000.0)
+		career.record_distance(distance / 1000.0, truck.speed_kmh >= 0.0)
 		truck.consume_fuel(distance / 1000.0)
 		_last_distance_save += distance
 	if _last_distance_save >= 100.0:
