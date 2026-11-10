@@ -14,7 +14,7 @@ This inventory distinguishes code that exists from code that has passed runtime/
 | 3D world | Procedural looping motorway, pickup/delivery depot triggers and signs, toll barrier, fuel/service station, lane markings, roadside barriers and warehouse greyboxes | Implemented as a greybox prototype; visual/performance QA pending |
 | Player truck | Custom `CharacterBody3D`, engine RPM/torque approximation, gearbox, clutch, reverse, brake, speed limits, engine braking, retarder, fuel use, cargo-mass-dependent acceleration/braking/speed, service refuelling and repair | Logic smoke tests authored; CI not yet green |
 | Steering safety | Speed-sensitive steering angle using a lateral-acceleration limit | Source implemented; handling not tuned on device |
-| Camera | Third-person SpringArm chase camera | Source implemented; device QA pending |
+| Camera | Three SpringArm chase presets (chase, close and high) | Source implemented; device QA pending |
 | Trailer | Independent kinematic trailer body with cargo collision shape, cargo-mass articulation, impact sensor that damages truck and fragile cargo, wheels and capped forward/reverse articulation | Prototype implemented; physical hitch and load dynamics not yet implemented |
 | Inputs and feedback | Keyboard/touch controls, gear controls, blinking rear indicators/hazards and a generated dual-tone horn audio effect | Source implemented; device/audio QA pending |
 | Traffic | Six kinematic traffic bodies with cruise speed, lane assignment, wrap-aware proximity sensing and neighbor-aware lane changes/speed adjustment | Prototype and logic tests authored; CI/device QA pending |
