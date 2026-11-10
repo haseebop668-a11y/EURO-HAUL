@@ -194,6 +194,12 @@ func _build_truck() -> void:
 	nameplate.modulate = GOLD
 	truck.add_child(nameplate)
 	add_child(truck)
+	var horn_audio := AudioStreamPlayer3D.new()
+	horn_audio.name = "HornAudio"
+	horn_audio.stream = _create_horn_stream()
+	horn_audio.volume_db = -4.0
+	truck.add_child(horn_audio)
+	truck.horn_pressed.connect(func(): horn_audio.play())
 	trailer = EuroHaulTrailer.new()
 	trailer.name = "ArticulatedTrailer"
 	trailer.truck = truck
@@ -228,6 +234,25 @@ func _build_traffic() -> void:
 		traffic.add_child(traffic_collision)
 		add_child(traffic)
 		traffic_vehicles.append(traffic)
+
+func _create_horn_stream() -> AudioStreamWAV:
+	var sample_rate := 22050
+	var sample_count := int(sample_rate * 0.38)
+	var samples := PackedByteArray()
+	samples.resize(sample_count * 2)
+	for i in range(sample_count):
+		var time := float(i) / float(sample_rate)
+		var attack := minf(1.0, float(i) / 350.0)
+		var release := maxf(0.0, 1.0 - float(i) / float(sample_count))
+		var wave := sin(TAU * 392.0 * time) * 0.62 + sin(TAU * 494.0 * time) * 0.38
+		var sample := clampi(int(wave * attack * release * 14000.0), -32768, 32767)
+		samples.encode_s16(i * 2, sample)
+	var stream := AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = sample_rate
+	stream.stereo = false
+	stream.data = samples
+	return stream
 
 func _build_career() -> void:
 	truck.horn_pressed.connect(func(): status_label.text = "HORN • SIGNAL")
