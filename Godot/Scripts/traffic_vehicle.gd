@@ -16,6 +16,8 @@ var _clear_timer := 0.0
 var traffic_neighbors: Array[EuroHaulTrafficVehicle] = []
 
 func _ready() -> void:
+	collision_layer = 1
+	collision_mask = 7
 	speed_kmh = cruise_speed_kmh
 	_base_lane_x = lane_x
 	_phase = absf(global_position.z)
@@ -23,14 +25,17 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	_phase += maxf(20.0, speed_kmh) / 3.6 * delta
 	var target_z := -fmod(_phase, route_length)
-	global_position.z = target_z
 	_update_player_avoidance(delta)
-	global_position.x = move_toward(global_position.x, lane_x, lane_change_speed * delta)
+	var next_position := global_position
+	next_position.z = target_z
+	next_position.x = move_toward(next_position.x, lane_x, lane_change_speed * delta)
+	global_position = next_position
 
 func _update_player_avoidance(delta: float) -> void:
 	if not is_instance_valid(player_target):
 		lane_x = _base_lane_x
 		_avoidance_active = false
+		speed_kmh = move_toward(speed_kmh, cruise_speed_kmh, 8.0 * delta)
 		return
 
 	var gap_ahead := _signed_loop_gap(player_target.global_position.z, global_position.z)
