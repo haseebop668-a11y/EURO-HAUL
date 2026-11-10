@@ -79,6 +79,7 @@ func _process(delta: float) -> void:
 		truck.global_position = current_position
 		_reset_toll_gate()
 		weigh_checked_this_loop = false
+		near_weigh_station = false
 		_update_weigh_button()
 	elif current_position.z > 20.0:
 		current_position.z -= ROAD_LENGTH
