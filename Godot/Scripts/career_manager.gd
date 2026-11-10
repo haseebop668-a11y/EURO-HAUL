@@ -97,7 +97,6 @@ func record_distance(distance_km: float) -> void:
 	if active_contract.is_empty() or not cargo_loaded:
 		return
 	active_contract.progress_km = minf(active_contract.distance_km, active_contract.progress_km + distance_km)
-	changed.emit()
 
 func _sanitize_contract(value: Variant) -> Dictionary:
 	if typeof(value) != TYPE_DICTIONARY:
