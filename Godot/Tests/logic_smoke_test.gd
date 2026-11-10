@@ -89,7 +89,7 @@ func _run_tests() -> void:
 	truck.gear = 1
 	truck.speed_kmh = 50.0
 	truck.steer_input = 1.0
-	trailer._process(0.1)
+	trailer._physics_process(0.1)
 	var forward_articulation := trailer.articulation_degrees
 	truck.gear = -1
 	trailer._process(0.1)
