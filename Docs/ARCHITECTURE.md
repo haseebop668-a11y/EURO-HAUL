@@ -2,11 +2,12 @@
 
 ## Active runtime boundaries (Godot 4)
 - Driving: truck controller, powertrain state, steering/braking, collision damage and touch/keyboard input.
+- Trailer: visual kinematic trailer prototype with capped steering articulation; no physical fifth-wheel joint or trailer collision model yet.
 - Camera: third-person follow camera; cockpit and alternate cameras are later extensions.
-- World: procedural motorway, roadside scenery and traffic actors.
-- Logistics: freight offers, contract acceptance, route progress, delivery and reward.
+- World: procedural motorway loop, roadside scenery and physics-collidable traffic actors with player-aware lane avoidance and forward/rear proximity reporting.
+- Logistics: regional freight offers, contract acceptance, route progress, delivery and reward; the current road recycles as a short regional-drive prototype.
 - Career: driver profile, XP, levels and Game Cash.
-- Company: company founding, company balance, fleet purchases, hiring, operating costs and reputation.
+- Company: company founding, company balance, fleet purchases, one-driver-per-truck hiring, simulated hired-driver deliveries, operating costs and reputation.
 - Persistence: versioned offline JSON saves under Godot `user://`.
 - Platform: Android touch and export settings; Windows input/build after Android stability.
 - Monetization: isolated optional rewarded-ad adapter; core gameplay must remain functional without ads or network access.
