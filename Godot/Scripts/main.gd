@@ -208,14 +208,14 @@ func _build_truck() -> void:
 	left_indicator_light.light_color = Color("#ffad45")
 	left_indicator_light.light_energy = 1.4
 	left_indicator_light.omni_range = 4.0
-	left_indicator_light.position = Vector3(-1.15, 1.85, -3.0)
+	left_indicator_light.position = Vector3(-1.15, 1.85, 3.0)
 	left_indicator_light.visible = false
 	truck.add_child(left_indicator_light)
 	right_indicator_light = OmniLight3D.new()
 	right_indicator_light.light_color = Color("#ffad45")
 	right_indicator_light.light_energy = 1.4
 	right_indicator_light.omni_range = 4.0
-	right_indicator_light.position = Vector3(1.15, 1.85, -3.0)
+	right_indicator_light.position = Vector3(1.15, 1.85, 3.0)
 	right_indicator_light.visible = false
 	truck.add_child(right_indicator_light)
 	trailer = EuroHaulTrailer.new()
