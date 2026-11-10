@@ -14,6 +14,7 @@
 - [ ] Chase, close and high camera modes switch from touch and keyboard and remain attached to the truck.
 - [ ] Truck remains on the motorway and does not fall through the road.
 - [ ] Roadside barriers and scenery do not create unintended blocking collisions.
+- [ ] Depot and service access T-junctions have clear guardrail openings and connect to their yard surfaces.
 - [ ] App pause/resume does not leave the simulation in a broken state.
 - [ ] Android Back and the pause button pause/resume the simulation while keeping HUD controls responsive.
 - [ ] App focus loss clears held touch inputs and saves career/company progress.
@@ -71,7 +72,8 @@
 - [ ] Career save survives app restart.
 - [ ] Fuel and vehicle damage persist across save/restart.
 - [ ] Fuel depletes with distance and throttle and prevents powered driving when empty.
-- [ ] Service station refuels and repairs only when nearby and affordable.
+- [ ] Normal refuelling/repair requires a stop inside the service yard and sufficient funds.
+- [ ] Emergency roadside recovery prevents a softlock when fuel or engine damage prevents movement.
 - [ ] Roadside recovery prevents a softlock if fuel is empty or engine damage prevents movement.
 - [ ] Toll barrier blocks the road until paid, then resets once per road loop.
 - [ ] Weigh station requires a stop, applies one overweight fine per loop and resets after road recycling.
