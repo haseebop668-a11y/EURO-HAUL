@@ -26,6 +26,7 @@ var engine_rpm := 650.0
 var speed_kmh := 0.0
 var damage := 0.0
 var fuel_percent := 100.0
+var cargo_mass_tons := 0.0
 var _yaw_rate := 0.0
 var _horn_cooldown := 0.0
 var _impact_cooldown := 0.0
@@ -35,6 +36,9 @@ func set_controls(throttle: float, steering: float, braking: float) -> void:
 	throttle_input = clampf(throttle, -1.0, 1.0)
 	steer_input = clampf(steering, -1.0, 1.0)
 	brake_input = clampf(braking, 0.0, 1.0)
+
+func set_cargo_mass(mass_tons: float) -> void:
+	cargo_mass_tons = clampf(mass_tons, 0.0, 30.0)
 
 func set_retarder(value: float) -> void:
 	retarder_input = clampf(value, 0.0, 1.0)
@@ -79,7 +83,7 @@ func sound_horn() -> void:
 
 func consume_fuel(distance_km: float) -> void:
 	if distance_km > 0.0:
-		var consumption := distance_km * 0.45 * (1.0 + absf(throttle_input) * 0.8)
+		var consumption := distance_km * 0.45 * (1.0 + absf(throttle_input) * 0.8 + cargo_mass_tons / 60.0)
 		fuel_percent = maxf(0.0, fuel_percent - consumption)
 
 func refuel() -> void:
@@ -107,18 +111,22 @@ func _physics_process(delta: float) -> void:
 	var drive_command := maxf(0.0, throttle_input) if gear > 0 else (maxf(0.0, -throttle_input) if gear < 0 else 0.0)
 	var drive_accel := 0.0
 	if gear != 0 and clutch_input < 0.95 and damage < 80.0 and fuel_percent > 0.0:
-		drive_accel = drive_command * engine_load * torque_factor * (engine_max_torque_nm / 1100.0) * absf(ratio) * final_drive * 0.045 * (1.0 - clutch_input)
+		var load_acceleration_factor := clampf(1.0 - cargo_mass_tons / 60.0, 0.62, 1.0)
+		drive_accel = drive_command * engine_load * torque_factor * (engine_max_torque_nm / 1100.0) * absf(ratio) * final_drive * 0.045 * (1.0 - clutch_input) * load_acceleration_factor
 		if gear < 0:
 			drive_accel = -drive_accel
 	var longitudinal := signed_speed
 	longitudinal += drive_accel * delta
 	if brake_input > 0.0:
-		longitudinal = move_toward(longitudinal, 0.0, 14.0 * brake_input * delta)
+		var brake_load_factor := 1.0 / (1.0 + cargo_mass_tons / 40.0)
+		longitudinal = move_toward(longitudinal, 0.0, 14.0 * brake_load_factor * brake_input * delta)
 	else:
-		var engine_brake := 0.75 if gear != 0 and clutch_input < 0.6 and drive_command <= 0.05 else 0.0
-		var retarder_deceleration := 5.0 * retarder_input
+		var brake_load_factor := 1.0 / (1.0 + cargo_mass_tons / 40.0)
+		var engine_brake := 0.75 * brake_load_factor if gear != 0 and clutch_input < 0.6 and drive_command <= 0.05 else 0.0
+		var retarder_deceleration := 5.0 * brake_load_factor * retarder_input
 		longitudinal = move_toward(longitudinal, 0.0, (0.18 + absf(longitudinal) * 0.025 + engine_brake + retarder_deceleration) * delta)
-	longitudinal = clampf(longitudinal, -max_reverse_kmh / 3.6, max_forward_kmh / 3.6)
+	var load_speed_limit := maxf(65.0, max_forward_kmh - cargo_mass_tons * 0.7)
+	longitudinal = clampf(longitudinal, -max_reverse_kmh / 3.6, load_speed_limit / 3.6)
 	var safe_angle := rad_to_deg(atan((max_lateral_accel * wheelbase_m) / maxf(0.1, longitudinal * longitudinal)))
 	var steer_angle := deg_to_rad(clampf(steer_input * max_steer_degrees, -minf(max_steer_degrees, safe_angle), minf(max_steer_degrees, safe_angle)))
 	var yaw_rate := 0.0 if absf(longitudinal) < 0.15 else longitudinal / wheelbase_m * tan(steer_angle)
