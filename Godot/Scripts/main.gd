@@ -35,6 +35,8 @@ var touch_state := {"throttle": false, "brake": false, "left": false, "right": f
 var traffic_vehicles: Array[EuroHaulTrafficVehicle] = []
 var _last_position := Vector3.ZERO
 var _last_distance_save := 0.0
+var event_message := ""
+var event_message_timer := 0.0
 
 func _ready() -> void:
 	_setup_environment()
@@ -48,6 +50,10 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if truck == null:
 		return
+	if career != null and career.cargo_loaded:
+		career.advance_contract_time(delta)
+	if event_message_timer > 0.0:
+		event_message_timer = maxf(0.0, event_message_timer - delta)
 	var throttle := (-1.0 if truck.gear == -1 else 1.0) if touch_state.throttle else 0.0
 	var brake := 1.0 if touch_state.brake else 0.0
 	var retarder := 1.0 if touch_state.retarder else 0.0
@@ -88,12 +94,17 @@ func _process(delta: float) -> void:
 	_update_service_button()
 	_update_toll_button()
 
+func _show_message(message: String, duration: float = 3.0) -> void:
+	event_message = message
+	event_message_timer = maxf(0.0, duration)
+	if status_label != null:
+		status_label.text = message
+
 func _toggle_pause() -> void:
 	get_tree().paused = not get_tree().paused
 	if pause_button != null:
 		pause_button.text = "RESUME" if get_tree().paused else "PAUSE"
-	if status_label != null:
-		status_label.text = "PAUSED" if get_tree().paused else "RESUMED"
+	_show_message("PAUSED" if get_tree().paused else "RESUMED")
 	_save_progress()
 
 func _notification(what: int) -> void:
@@ -132,7 +143,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 				truck.set_clutch(0.0)
 			KEY_H:
 				truck.sound_horn()
-				status_label.text = "HORN"
+				_show_message("HORN")
 			KEY_Z:
 				truck.set_indicator(-1 if truck.indicators != -1 else 0)
 			KEY_X:
@@ -280,7 +291,7 @@ func _pay_toll() -> void:
 		toll_barrier_collision.set_deferred("disabled", true)
 	if toll_barrier_mesh != null:
 		toll_barrier_mesh.visible = false
-	status_label.text = "MOTORWAY TOLL PAID • €%d" % payment
+	_show_message("MOTORWAY TOLL PAID • €%d" % payment)
 	_update_toll_button()
 
 func _update_toll_button() -> void:
@@ -459,8 +470,8 @@ func _save_progress() -> void:
 		company.save_company()
 
 func _build_career() -> void:
-	truck.horn_pressed.connect(func(): status_label.text = "HORN • SIGNAL")
-	truck.indicators_changed.connect(func(value: int): status_label.text = "HAZARD LIGHTS" if value == 2 else ("LEFT INDICATOR" if value == -1 else ("RIGHT INDICATOR" if value == 1 else "SIGNALS OFF")))
+	truck.horn_pressed.connect(func(): _show_message("HORN • SIGNAL"))
+	truck.indicators_changed.connect(func(value: int): _show_message("HAZARD LIGHTS" if value == 2 else ("LEFT INDICATOR" if value == -1 else ("RIGHT INDICATOR" if value == 1 else "SIGNALS OFF"))))
 	career = EuroHaulCareer.new()
 	career.name = "CareerManager"
 	add_child(career)
@@ -663,7 +674,7 @@ func _handle_service_interaction() -> void:
 		truck.refuel()
 		truck.repair()
 		_save_progress()
-		status_label.text = "ROADSIDE RECOVERY • €%d" % rescue_cost
+		_show_message("ROADSIDE RECOVERY • €%d" % rescue_cost)
 		_update_service_button()
 		return
 	if not near_service_station:
@@ -672,7 +683,7 @@ func _handle_service_interaction() -> void:
 	var repair_cost := int(ceil(truck.damage * 25.0))
 	var total_cost := fuel_cost + repair_cost
 	if total_cost <= 0:
-		status_label.text = "TRUCK ALREADY SERVICED"
+		_show_message("TRUCK ALREADY SERVICED")
 		return
 	if total_cost > career.game_cash and (truck.fuel_percent <= 0.0 or truck.damage >= 80.0):
 		var emergency_cost := mini(250, career.game_cash)
@@ -681,16 +692,16 @@ func _handle_service_interaction() -> void:
 		truck.refuel()
 		truck.repair()
 		_save_progress()
-		status_label.text = "EMERGENCY SERVICE • €%d" % emergency_cost
+		_show_message("EMERGENCY SERVICE • €%d" % emergency_cost)
 		_update_service_button()
 		return
 	if career.spend_cash(total_cost):
 		truck.refuel()
 		truck.repair()
 		_save_progress()
-		status_label.text = "SERVICE COMPLETE • €%d" % total_cost
+		_show_message("SERVICE COMPLETE • €%d" % total_cost)
 	else:
-		status_label.text = "SERVICE COST €%d • INSUFFICIENT FUNDS" % total_cost
+		_show_message("SERVICE COST €%d • INSUFFICIENT FUNDS" % total_cost)
 	_update_hud()
 	_update_service_button()
 
@@ -724,14 +735,14 @@ func _handle_freight_interaction() -> void:
 			var cargo_mass := float(career.active_contract.get("mass_tons", 0.0))
 			truck.set_cargo_mass(cargo_mass)
 			trailer.set_cargo_mass(cargo_mass)
-			status_label.text = "CARGO LOADED • %.1f TONNES" % cargo_mass
+			_show_message("CARGO LOADED • %.1f TONNES" % cargo_mass)
 	elif career.cargo_loaded and near_delivery_depot:
 		if career.unload_cargo():
 			truck.set_cargo_mass(0.0)
 			trailer.set_cargo_mass(0.0)
-			status_label.text = "DELIVERY COMPLETED • REWARD PAID"
+			_show_message("DELIVERY COMPLETED • REWARD PAID")
 		else:
-			status_label.text = "DELIVERY DEPOT • ROUTE DISTANCE NOT COMPLETE"
+			_show_message("DELIVERY DEPOT • ROUTE DISTANCE NOT COMPLETE")
 	_update_hud()
 	_update_freight_action()
 
@@ -761,6 +772,9 @@ func _update_freight_action() -> void:
 
 func _update_traffic_warnings() -> void:
 	if status_label == null or truck == null:
+		return
+	if event_message_timer > 0.0:
+		status_label.text = event_message
 		return
 	if truck.indicators == 0:
 		status_label.text = "FREIGHT • BERLIN REGION"
