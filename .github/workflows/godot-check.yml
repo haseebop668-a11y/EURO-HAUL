@@ -96,6 +96,13 @@ jobs:
           fi
           grep -q "EURO HAUL Godot vertical-slice booted" /tmp/godot-runtime.log
 
+      - name: Run career, company and vehicle logic tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --headless --path Godot --script res://Tests/logic_smoke_test.gd 2>&1 | tee /tmp/godot-logic.log
+          grep -q "EURO HAUL logic smoke tests passed" /tmp/godot-logic.log
+
       - name: Export Android ARM64 debug APK
         shell: bash
         run: |
