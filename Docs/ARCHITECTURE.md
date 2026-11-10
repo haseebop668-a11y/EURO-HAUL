@@ -9,7 +9,7 @@
 - Career: driver profile, XP, levels and Game Cash.
 - Company: company founding, company balance, fleet purchases, one-driver-per-truck hiring, simulated hired-driver deliveries, operating costs and reputation.
 - Persistence: versioned offline JSON saves under Godot `user://`.
-- Platform: Android touch and export settings; Windows input/build after Android stability.
+- Platform: Android touch plus Android ARM64 and Windows x64 debug export presets; physical device/PC launch acceptance remains required.
 - Monetization: isolated optional rewarded-ad adapter; core gameplay must remain functional without ads or network access.
 
 ## Dependency rules
