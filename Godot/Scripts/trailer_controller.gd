@@ -1,4 +1,4 @@
-extends Node3D
+extends AnimatableBody3D
 class_name EuroHaulTrailer
 
 @export var articulation_limit_degrees := 55.0
@@ -12,7 +12,7 @@ var articulation_degrees := 0.0
 func _ready() -> void:
 	_build_trailer_visuals()
 
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if not is_instance_valid(truck):
 		return
 	var speed_factor := clampf(absf(truck.speed_kmh) / 55.0, 0.0, 1.0)
@@ -20,9 +20,17 @@ func _process(delta: float) -> void:
 	var direction := -1.0 if truck.gear == -1 else 1.0
 	var target_angle := -truck.steer_input * speed_factor * gain * 35.0 * direction
 	articulation_degrees = move_toward(articulation_degrees, clampf(target_angle, -articulation_limit_degrees, articulation_limit_degrees), articulation_response * 45.0 * delta)
-	rotation.y = deg_to_rad(articulation_degrees)
+	global_position = truck.global_position + truck.global_transform.basis.z * 3.3
+	global_rotation = Vector3(global_rotation.x, truck.global_rotation.y + deg_to_rad(articulation_degrees), global_rotation.z)
 
 func _build_trailer_visuals() -> void:
+	var cargo_collision := CollisionShape3D.new()
+	var cargo_shape := BoxShape3D.new()
+	cargo_shape.size = Vector3(2.45, 2.65, 8.8)
+	cargo_collision.shape = cargo_shape
+	cargo_collision.position = Vector3(0.0, 2.05, 4.9)
+	add_child(cargo_collision)
+
 	var cargo := MeshInstance3D.new()
 	var cargo_mesh := BoxMesh.new()
 	cargo_mesh.size = Vector3(2.45, 2.65, 8.8)
