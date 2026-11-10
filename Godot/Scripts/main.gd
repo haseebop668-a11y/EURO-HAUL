@@ -791,7 +791,7 @@ func _update_hud() -> void:
 	var contract_text := "No active contract"
 	if not career.active_contract.is_empty():
 		var c: Dictionary = career.active_contract
-		contract_text = "%s → %s | %s | %.1f t %s | DMG %.0f%% | %.2f/%.2f km" % [c.origin, c.destination, c.cargo, float(c.get("mass_tons", 0.0)), str(c.get("fragility", "STANDARD")), float(c.get("damage_percent", 0.0)), c.progress_km, c.distance_km]
+		contract_text = "%s→%s | %s | %.1ft %s | %s | DMG%.0f%% | %.2f/%.2fkm" % [c.origin, c.destination, c.cargo, float(c.get("mass_tons", 0.0)), str(c.get("fragility", "STANDARD")), "LOADED" if career.cargo_loaded else "PICKUP", float(c.get("damage_percent", 0.0)), c.progress_km, c.distance_km]
 	elif not career.offered_contract.is_empty():
 		var o: Dictionary = career.offered_contract
 		contract_text = "Offer: %s → %s | %s | %.2f km | €%d" % [o.origin, o.destination, o.cargo, o.distance_km, int(o.reward)]
