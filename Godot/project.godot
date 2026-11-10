@@ -6,7 +6,7 @@ config_version=5
 config/name="EURO HAUL"
 config/description="Offline-first European trucking career simulator"
 run/main_scene="res://Scenes/Main.tscn"
-config/features=PackedStringArray("4.3", "GL Compatibility")
+config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://Branding/euro-haul-icon.svg"
 
 [display]
