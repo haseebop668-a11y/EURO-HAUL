@@ -133,6 +133,10 @@ func load_company() -> void:
 		reputation = clampi(int(payload.get("reputation", 0)), 0, 1000)
 		completed_company_jobs = maxi(0, int(payload.get("completed_company_jobs", 0)))
 		if read_path != SAVE_PATH:
-			DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
+			if FileAccess.file_exists(SAVE_PATH):
+				var remove_error := DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
+				if remove_error != OK:
+					push_warning("Could not remove corrupt company save before recovery: %s" % error_string(remove_error))
+					return
 			save_company()
 		return
