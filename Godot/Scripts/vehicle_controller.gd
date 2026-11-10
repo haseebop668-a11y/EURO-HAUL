@@ -20,6 +20,7 @@ var throttle_input := 0.0
 var steer_input := 0.0
 var brake_input := 0.0
 var clutch_input := 0.0
+var retarder_input := 0.0
 var gear := 1
 var engine_rpm := 650.0
 var speed_kmh := 0.0
@@ -34,6 +35,9 @@ func set_controls(throttle: float, steering: float, braking: float) -> void:
 	throttle_input = clampf(throttle, -1.0, 1.0)
 	steer_input = clampf(steering, -1.0, 1.0)
 	brake_input = clampf(braking, 0.0, 1.0)
+
+func set_retarder(value: float) -> void:
+	retarder_input = clampf(value, 0.0, 1.0)
 
 func set_clutch(value: float) -> void:
 	clutch_input = clampf(value, 0.0, 1.0)
@@ -112,7 +116,9 @@ func _physics_process(delta: float) -> void:
 	if brake_input > 0.0:
 		longitudinal = move_toward(longitudinal, 0.0, 14.0 * brake_input * delta)
 	else:
-		longitudinal = move_toward(longitudinal, 0.0, (0.18 + absf(longitudinal) * 0.025) * delta)
+		var engine_brake := 0.75 if gear != 0 and clutch_input < 0.6 else 0.0
+		var retarder_deceleration := 5.0 * retarder_input
+		longitudinal = move_toward(longitudinal, 0.0, (0.18 + absf(longitudinal) * 0.025 + engine_brake + retarder_deceleration) * delta)
 	longitudinal = clampf(longitudinal, -max_reverse_kmh / 3.6, max_forward_kmh / 3.6)
 	var safe_angle := rad_to_deg(atan((max_lateral_accel * wheelbase_m) / maxf(0.1, longitudinal * longitudinal)))
 	var steer_angle := deg_to_rad(clampf(steer_input * max_steer_degrees, -minf(max_steer_degrees, safe_angle), minf(max_steer_degrees, safe_angle)))
