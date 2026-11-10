@@ -152,7 +152,9 @@ func _sanitize_contract(value: Variant) -> Dictionary:
 		return {}
 	var distance := float(distance_value)
 	var progress := float(progress_value)
-	if not is_finite(distance) or not is_finite(progress) or distance <= 0.0:
+	var reward_number := float(reward_value)
+	var xp_number := float(xp_value)
+	if not is_finite(distance) or not is_finite(progress) or not is_finite(reward_number) or not is_finite(xp_number) or distance <= 0.0:
 		return {}
 	var contract_id := str(value.get("id", ""))
 	var origin := str(value.get("origin", ""))
@@ -191,8 +193,8 @@ func _sanitize_contract(value: Variant) -> Dictionary:
 		"elapsed_seconds": elapsed,
 		"distance_km": distance,
 		"progress_km": clampf(progress, 0.0, distance),
-		"reward": maxi(0, int(reward_value)),
-		"xp": maxi(0, int(xp_value))
+		"reward": maxi(0, int(reward_number)),
+		"xp": maxi(0, int(xp_number))
 	}
 
 func update_vehicle_state(fuel_percent: float, vehicle_damage: float) -> void:
@@ -254,7 +256,8 @@ func load_save() -> void:
 		xp = maxi(0, int(parsed.get("xp", 0)))
 		game_cash = maxi(0, int(parsed.get("game_cash", 25000)))
 		deliveries = maxi(0, int(parsed.get("deliveries", 0)))
-		total_distance_km = maxf(0.0, float(parsed.get("total_distance_km", 0.0)))
+		var saved_distance := float(parsed.get("total_distance_km", 0.0))
+		total_distance_km = maxf(0.0, saved_distance) if is_finite(saved_distance) else 0.0
 		var active_value: Variant = parsed.get("active_contract", {})
 		var offered_value: Variant = parsed.get("offered_contract", {})
 		active_contract = _sanitize_contract(active_value)
@@ -262,8 +265,10 @@ func load_save() -> void:
 		cargo_loaded = bool(parsed.get("cargo_loaded", false)) and not active_contract.is_empty()
 		var vehicle_state: Variant = parsed.get("vehicle_state", {})
 		if typeof(vehicle_state) == TYPE_DICTIONARY:
-			saved_fuel_percent = clampf(float(vehicle_state.get("fuel_percent", 100.0)), 0.0, 100.0)
-			saved_vehicle_damage = clampf(float(vehicle_state.get("damage", 0.0)), 0.0, 100.0)
+			var saved_fuel := float(vehicle_state.get("fuel_percent", 100.0))
+			var saved_damage := float(vehicle_state.get("damage", 0.0))
+			saved_fuel_percent = clampf(saved_fuel, 0.0, 100.0) if is_finite(saved_fuel) else 100.0
+			saved_vehicle_damage = clampf(saved_damage, 0.0, 100.0) if is_finite(saved_damage) else 0.0
 		if read_path != SAVE_PATH:
 			DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
 			save()
