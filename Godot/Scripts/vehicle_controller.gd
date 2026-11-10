@@ -104,19 +104,18 @@ func _physics_process(delta: float) -> void:
 	var target_rpm := free_rpm if gear == 0 or clutch_input > 0.85 else clampf(maxf(idle_rpm, coupled_rpm), idle_rpm, redline_rpm)
 	engine_rpm = move_toward(engine_rpm, target_rpm, 4200.0 * delta)
 	var torque_factor := 1.0 - 0.22 * pow(clampf((engine_rpm - idle_rpm) / maxf(1.0, redline_rpm - idle_rpm), 0.0, 1.0), 2.0)
+	var drive_command := maxf(0.0, throttle_input) if gear > 0 else (maxf(0.0, -throttle_input) if gear < 0 else 0.0)
 	var drive_accel := 0.0
 	if gear != 0 and clutch_input < 0.95 and damage < 80.0 and fuel_percent > 0.0:
-		drive_accel = throttle_input * engine_load * torque_factor * (engine_max_torque_nm / 1100.0) * absf(ratio) * final_drive * 0.045 * (1.0 - clutch_input)
+		drive_accel = drive_command * engine_load * torque_factor * (engine_max_torque_nm / 1100.0) * absf(ratio) * final_drive * 0.045 * (1.0 - clutch_input)
 		if gear < 0:
-			drive_accel = -absf(drive_accel)
-		elif throttle_input < 0.0:
-			drive_accel = 0.0
+			drive_accel = -drive_accel
 	var longitudinal := signed_speed
 	longitudinal += drive_accel * delta
 	if brake_input > 0.0:
 		longitudinal = move_toward(longitudinal, 0.0, 14.0 * brake_input * delta)
 	else:
-		var engine_brake := 0.75 if gear != 0 and clutch_input < 0.6 else 0.0
+		var engine_brake := 0.75 if gear != 0 and clutch_input < 0.6 and drive_command <= 0.05 else 0.0
 		var retarder_deceleration := 5.0 * retarder_input
 		longitudinal = move_toward(longitudinal, 0.0, (0.18 + absf(longitudinal) * 0.025 + engine_brake + retarder_deceleration) * delta)
 	longitudinal = clampf(longitudinal, -max_reverse_kmh / 3.6, max_forward_kmh / 3.6)
