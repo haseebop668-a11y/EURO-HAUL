@@ -145,6 +145,10 @@ func _sanitize_contract(value: Variant) -> Dictionary:
 	var damage_value: Variant = value.get("damage_percent", 0.0)
 	var mass := float(mass_value) if typeof(mass_value) == TYPE_FLOAT or typeof(mass_value) == TYPE_INT else 0.0
 	var cargo_damage := float(damage_value) if typeof(damage_value) == TYPE_FLOAT or typeof(damage_value) == TYPE_INT else 0.0
+	if not is_finite(mass):
+		mass = 0.0
+	if not is_finite(cargo_damage):
+		cargo_damage = 0.0
 	var fragility := str(value.get("fragility", "STANDARD"))
 	if fragility not in ["STANDARD", "FRAGILE", "HIGH VALUE"]:
 		fragility = "STANDARD"
