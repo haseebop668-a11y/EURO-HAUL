@@ -401,8 +401,9 @@ func _update_freight_action() -> void:
 		freight_action_button.disabled = not near_pickup_depot
 		freight_action_button.text = "LOAD CARGO" if near_pickup_depot else "DRIVE TO PICKUP DEPOT"
 	elif near_delivery_depot:
-		freight_action_button.disabled = false
-		freight_action_button.text = "UNLOAD CARGO"
+		var remaining := maxf(0.0, float(career.active_contract.get("distance_km", 0.0)) - float(career.active_contract.get("progress_km", 0.0)))
+		freight_action_button.disabled = remaining > 0.0
+		freight_action_button.text = "UNLOAD CARGO" if remaining <= 0.0 else "DELIVERY DEPOT • %.2f KM LEFT" % remaining
 	else:
 		freight_action_button.disabled = true
 		var remaining := maxf(0.0, float(career.active_contract.get("distance_km", 0.0)) - float(career.active_contract.get("progress_km", 0.0)))
