@@ -386,6 +386,7 @@ func _build_traffic() -> void:
 		var traffic := EuroHaulTrafficVehicle.new()
 		traffic.position = Vector3(-2.0, 0.0, -55.0 - float(i) * 85.0)
 		traffic.player_target = truck
+		traffic.route_length = ROAD_LENGTH
 		traffic.lane_x = -2.0 if i % 2 == 0 else 2.0
 		traffic.cruise_speed_kmh = 42.0 + float(i % 3) * 8.0
 		var body := _make_box_mesh(Vector3(1.9, 1.5, 4.8), Color("#7892a2") if i % 2 == 0 else Color("#9a624e"))
