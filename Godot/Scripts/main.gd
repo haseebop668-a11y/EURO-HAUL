@@ -18,6 +18,9 @@ var right_indicator_light: OmniLight3D
 var _indicator_blink_timer := 0.0
 var freight_action_button: Button
 var accept_freight_button: Button
+var found_company_button: Button
+var buy_truck_button: Button
+var hire_driver_button: Button
 var near_pickup_depot := false
 var near_delivery_depot := false
 var touch_state := {"throttle": false, "brake": false, "left": false, "right": false}
@@ -377,19 +380,19 @@ func _build_hud() -> void:
 	freight_action_button.custom_minimum_size = Vector2(210, 52)
 	freight_action_button.pressed.connect(_handle_freight_interaction)
 	layer.add_child(freight_action_button)
-	var company_button := Button.new()
-	company_button.text = "FOUND COMPANY • €50,000"
-	company_button.position = Vector2(220, 145)
-	company_button.custom_minimum_size = Vector2(230, 52)
-	company_button.pressed.connect(_found_company)
-	layer.add_child(company_button)
-	var buy_truck_button := Button.new()
+	found_company_button = Button.new()
+	found_company_button.text = "FOUND COMPANY • €50,000"
+	found_company_button.position = Vector2(220, 145)
+	found_company_button.custom_minimum_size = Vector2(230, 52)
+	found_company_button.pressed.connect(_found_company)
+	layer.add_child(found_company_button)
+	buy_truck_button = Button.new()
 	buy_truck_button.text = "BUY FLEET TRUCK • €85,000"
 	buy_truck_button.position = Vector2(20, 205)
 	buy_truck_button.custom_minimum_size = Vector2(230, 48)
 	buy_truck_button.pressed.connect(_buy_company_truck)
 	layer.add_child(buy_truck_button)
-	var hire_driver_button := Button.new()
+	hire_driver_button = Button.new()
 	hire_driver_button.text = "HIRE DRIVER • €5,000"
 	hire_driver_button.position = Vector2(260, 205)
 	hire_driver_button.custom_minimum_size = Vector2(210, 48)
@@ -521,6 +524,14 @@ func _update_hud() -> void:
 	var company_text := "COMPANY • NOT FOUNDED"
 	if company != null and not company.company_name.is_empty():
 		company_text = "%s • €%d • FLEET %d • DRIVERS %d" % [company.company_name, company.company_balance, company.owned_trucks, company.hired_drivers]
+	if found_company_button != null:
+		found_company_button.disabled = company != null and not company.company_name.is_empty()
+		if found_company_button.disabled:
+			found_company_button.text = "COMPANY ACTIVE"
+	if buy_truck_button != null:
+		buy_truck_button.disabled = company == null or company.company_name.is_empty() or company.company_balance < EuroHaulCompanyManager.TRUCK_PURCHASE_COST
+	if hire_driver_button != null:
+		hire_driver_button.disabled = company == null or company.company_name.is_empty() or company.company_balance < EuroHaulCompanyManager.DRIVER_HIRING_COST or company.hired_drivers >= company.owned_trucks
 	var world_text := world_cycle.display_status() if world_cycle != null else "WORLD • DAY"
 	hud.text = "DRIVER  %s  •  LVL %d  •  €%d\n%s\n%s\n%s" % [career.driver_name, career.level, career.game_cash, contract_text, company_text, world_text]
 	if truck != null and speed_label != null:
