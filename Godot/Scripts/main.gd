@@ -6,6 +6,7 @@ const BLUE := Color("#16334e")
 const ROAD_LENGTH := 900.0
 
 var truck: EuroHaulTruck
+var trailer: EuroHaulTrailer
 var career: EuroHaulCareer
 var company: EuroHaulCompanyManager
 var hud: Label
@@ -141,6 +142,11 @@ func _build_truck() -> void:
 	nameplate.modulate = GOLD
 	truck.add_child(nameplate)
 	add_child(truck)
+	trailer = EuroHaulTrailer.new()
+	trailer.name = "ArticulatedTrailer"
+	trailer.truck = truck
+	trailer.position = Vector3(0.0, 0.0, 3.3)
+	truck.add_child(trailer)
 	var camera_rig := SpringArm3D.new()
 	camera_rig.spring_length = 9.0
 	camera_rig.position = Vector3(0, 4.3, 1.0)
