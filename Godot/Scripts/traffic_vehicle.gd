@@ -13,6 +13,7 @@ var _phase := 0.0
 var _base_lane_x := 0.0
 var _avoidance_active := false
 var _clear_timer := 0.0
+var traffic_neighbors: Array[EuroHaulTrafficVehicle] = []
 
 func _ready() -> void:
 	speed_kmh = cruise_speed_kmh
@@ -21,7 +22,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_phase += delta
-	var target_z := -fmod(_phase * cruise_speed_kmh / 3.6, route_length)
+	var target_z := -fmod(_phase * maxf(20.0, speed_kmh) / 3.6, route_length)
 	global_position.z = target_z
 	_update_player_avoidance(delta)
 	global_position.x = move_toward(global_position.x, lane_x, lane_change_speed * delta)
@@ -43,12 +44,31 @@ func _update_player_avoidance(delta: float) -> void:
 	if player_is_closing or traffic_is_closing_from_behind:
 		_avoidance_active = true
 		_clear_timer = 0.0
-		lane_x = 2.0 if _base_lane_x < 0.0 else -2.0
+		var target_lane := 2.0 if _base_lane_x < 0.0 else -2.0
+		if _has_safe_lane(target_lane):
+			lane_x = target_lane
+			speed_kmh = move_toward(speed_kmh, cruise_speed_kmh, 8.0 * delta)
+		elif player_is_closing:
+			var safe_speed := minf(cruise_speed_kmh + 12.0, maxf(20.0, player_speed - 10.0))
+			speed_kmh = move_toward(speed_kmh, safe_speed, 10.0 * delta)
+		else:
+			speed_kmh = move_toward(speed_kmh, maxf(20.0, player_speed + 5.0), 10.0 * delta)
 	elif _avoidance_active:
 		_clear_timer += delta
+		speed_kmh = move_toward(speed_kmh, cruise_speed_kmh, 8.0 * delta)
 		if _clear_timer >= 2.0:
 			_avoidance_active = false
 			lane_x = _base_lane_x
+	else:
+		speed_kmh = move_toward(speed_kmh, cruise_speed_kmh, 8.0 * delta)
+
+func _has_safe_lane(target_lane_x: float) -> bool:
+	for neighbor in traffic_neighbors:
+		if not is_instance_valid(neighbor) or neighbor == self:
+			continue
+		if absf(neighbor.global_position.x - target_lane_x) < 1.5 and absf(neighbor.global_position.z - global_position.z) < 18.0:
+			return false
+	return true
 
 func safety_warning_for_lane(requested_lane_x: float) -> String:
 	var lateral_gap := absf(global_position.x - requested_lane_x)
