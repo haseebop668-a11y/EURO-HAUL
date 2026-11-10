@@ -37,6 +37,14 @@ func _run_tests() -> void:
 	_expect(truck.indicators == 2, "hazards must override the single-side indicator")
 	truck.toggle_hazards()
 	_expect(truck.indicators == 0, "hazards must toggle off cleanly")
+	truck.fuel_percent = 1.0
+	truck.consume_fuel(2.0)
+	_expect(is_equal_approx(truck.fuel_percent, 0.0), "fuel consumption must clamp at empty")
+	truck.refuel()
+	_expect(is_equal_approx(truck.fuel_percent, 100.0), "service refuelling must restore a full tank")
+	truck.damage = 25.0
+	truck.repair()
+	_expect(is_equal_approx(truck.damage, 0.0), "service repair must clear vehicle damage")
 
 	var traffic = TrafficScript.new()
 	root.add_child(traffic)
