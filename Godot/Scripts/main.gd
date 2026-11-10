@@ -34,6 +34,8 @@ var toll_barrier_mesh: MeshInstance3D
 var near_weigh_station := false
 var weigh_checked_this_loop := false
 var weigh_button: Button
+var camera_button: Button
+var camera_mode := 0
 var touch_state := {"throttle": false, "brake": false, "left": false, "right": false, "retarder": false}
 var traffic_vehicles: Array[EuroHaulTrafficVehicle] = []
 var _last_position := Vector3.ZERO
@@ -81,6 +83,7 @@ func _process(delta: float) -> void:
 		weigh_checked_this_loop = false
 		near_weigh_station = false
 		_update_weigh_button()
+	_update_camera_button()
 	elif current_position.z > 20.0:
 		current_position.z -= ROAD_LENGTH
 		truck.global_position = current_position
@@ -151,6 +154,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			KEY_H:
 				truck.sound_horn()
 				_show_message("HORN")
+			KEY_V:
+				_toggle_camera_mode()
 			KEY_Z:
 				truck.set_indicator(-1 if truck.indicators != -1 else 0)
 			KEY_X:
@@ -411,6 +416,33 @@ func _create_service_area(road_z: float) -> void:
 	sign_label.modulate = Color("#f4f5f6")
 	add_child(sign_label)
 
+func _toggle_camera_mode() -> void:
+	camera_mode = (camera_mode + 1) % 3
+	_apply_camera_mode()
+	_update_camera_button()
+	_show_message("CAMERA • %s" % ["CHASE", "CLOSE", "HIGH"][camera_mode])
+
+func _apply_camera_mode() -> void:
+	if camera_rig == null:
+		return
+	match camera_mode:
+		0:
+			camera_rig.position = Vector3(0.0, 4.3, 1.0)
+			camera_rig.rotation_degrees = Vector3(-12.0, 0.0, 0.0)
+			camera_rig.spring_length = 7.5
+		1:
+			camera_rig.position = Vector3(0.0, 3.0, 0.2)
+			camera_rig.rotation_degrees = Vector3(-8.0, 0.0, 0.0)
+			camera_rig.spring_length = 4.2
+		2:
+			camera_rig.position = Vector3(0.0, 7.5, 0.5)
+			camera_rig.rotation_degrees = Vector3(-32.0, 0.0, 0.0)
+			camera_rig.spring_length = 10.0
+
+func _update_camera_button() -> void:
+	if camera_button != null:
+		camera_button.text = "CAMERA • %s" % ["CHASE", "CLOSE", "HIGH"][camera_mode]
+
 func _build_truck() -> void:
 	truck = EuroHaulTruck.new()
 	truck.name = "PlayerTruck"
@@ -650,6 +682,12 @@ func _build_hud() -> void:
 	weigh_button.custom_minimum_size = Vector2(180, 52)
 	weigh_button.pressed.connect(_weigh_vehicle)
 	layer.add_child(weigh_button)
+	camera_button = Button.new()
+	camera_button.text = "CAMERA • CHASE"
+	camera_button.position = Vector2(1130, 175)
+	camera_button.custom_minimum_size = Vector2(160, 52)
+	camera_button.pressed.connect(_toggle_camera_mode)
+	layer.add_child(camera_button)
 	found_company_button = Button.new()
 	found_company_button.text = "FOUND COMPANY • €50,000"
 	found_company_button.position = Vector2(220, 175)
