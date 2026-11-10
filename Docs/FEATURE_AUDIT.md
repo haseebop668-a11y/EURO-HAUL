@@ -21,7 +21,7 @@ This inventory distinguishes code that exists from code that has passed runtime/
 | Lane-change feedback | Indicator-triggered adjacent-lane proximity warning / clear prompt; nearest forward/rear traffic HUD warning | Newly implemented; automated tests authored; CI not yet green |
 | Collision damage | Side-impact filtering and cooldown; damage capped at 100% | Source implemented; traffic collision integration and device QA pending |
 | Career | Driver profile, cash, generated freight offer, accept/deliver, distance, XP and levels | Source implemented; logic tests authored |
-| Company | Company founding, balance, truck purchase, driver hiring, reputation, delivery revenue and simulated daily operating cost | Basic economy implemented; fleet/driver simulation absent |
+| Company | Company founding with seed capital, truck purchase, one-driver-per-truck hiring, simulated daily driver jobs/revenue, operating costs, reputation and delivery revenue | Basic passive driver simulation implemented; full management/dispatch UI absent |
 | Persistence | Local schema-versioned JSON career/company saves with temporary write and backup recovery | Source implemented; restart/corruption QA pending |
 | Offline mode | Core career/company saves and gameplay logic are local; no account/backend dependency | Implemented by architecture |
 
@@ -35,7 +35,7 @@ These are not present as complete gameplay features yet and must not be describe
 4. **Forward/rear awareness** — dedicated front/rear sensing with closing-speed calculation, blind-spot checks, lane-change risk scoring and clear dashboard alerts.
 5. **European world and navigation** — connected road network, multiple cities, junctions, roundabouts, tolls, service stations, rest areas, borders and GPS route guidance. The current road is a straight greybox segment.
 6. **Freight operations** — depot interaction, loading/unloading, cargo types with mass/fragility, trailer selection, damage/late-delivery penalties, weigh stations and delivery confirmation.
-7. **Company progression** — AI driver schedules and wages, truck assignment, fleet maintenance, contracts for hired drivers, company reputation effects and a functional management screen.
+7. **Company progression** — detailed AI driver schedules/routes, truck assignment UI, fleet maintenance, driver wages/skills, contracts for hired drivers, reputation-driven contract access and a full management screen.
 8. **Presentation** — production truck/trailer models, interiors, road assets, animation, weather/day-night cycle, lighting polish, soundscape, engine/air-brake/horn audio and UI polish.
 9. **Platform release** — physical Android install/performance/thermal testing, save/resume testing, and Windows x64 build.
 10. **Release quality** — complete automated tests for persistence, traffic interactions, contract edge cases, economy exploits and long-session stability.
