@@ -2,8 +2,8 @@ extends AnimatableBody3D
 class_name EuroHaulTrailer
 
 @export var articulation_limit_degrees := 55.0
-@export var forward_articulation_gain := 0.22
-@export var reverse_articulation_gain := 0.55
+@export var forward_articulation_gain := 0.35
+@export var reverse_articulation_gain := 1.25
 @export var articulation_response := 2.4
 
 var truck: EuroHaulTruck
