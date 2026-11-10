@@ -33,7 +33,7 @@ func _update_player_avoidance(delta: float) -> void:
 		_avoidance_active = false
 		return
 
-	var gap_ahead := player_target.global_position.z - global_position.z
+	var gap_ahead := _signed_loop_gap(player_target.global_position.z, global_position.z)
 	var player_speed := 0.0
 	var player_truck := player_target as EuroHaulTruck
 	if player_truck != null:
@@ -66,7 +66,8 @@ func _has_safe_lane(target_lane_x: float) -> bool:
 	for neighbor in traffic_neighbors:
 		if not is_instance_valid(neighbor) or neighbor == self:
 			continue
-		if absf(neighbor.global_position.x - target_lane_x) < 1.5 and absf(neighbor.global_position.z - global_position.z) < 18.0:
+		var neighbor_gap := absf(_signed_loop_gap(neighbor.global_position.z, global_position.z))
+		if absf(neighbor.global_position.x - target_lane_x) < 1.5 and neighbor_gap < 18.0:
 			return false
 	return true
 
@@ -76,7 +77,7 @@ func safety_warning_for_lane(requested_lane_x: float) -> String:
 		return ""
 	if not is_instance_valid(player_target):
 		return ""
-	var longitudinal_gap := absf(global_position.z - player_target.global_position.z)
+	var longitudinal_gap := absf(_signed_loop_gap(player_target.global_position.z, global_position.z))
 	if longitudinal_gap < 24.0:
 		return "TRAFFIC IN ADJACENT LANE"
 	return ""
@@ -87,7 +88,7 @@ func get_proximity_report() -> Dictionary:
 	var player_truck := player_target as EuroHaulTruck
 	if player_truck == null:
 		return {}
-	var gap := player_truck.global_position.z - global_position.z
+	var gap := _signed_loop_gap(player_truck.global_position.z, global_position.z)
 	var distance := absf(gap)
 	var player_speed: float = player_truck.speed_kmh
 	if gap > 0.0 and distance <= 45.0 and player_speed > speed_kmh + 2.0:
@@ -95,3 +96,7 @@ func get_proximity_report() -> Dictionary:
 	if gap < 0.0 and distance <= 25.0 and speed_kmh > player_speed + 2.0:
 		return {"zone": "REAR", "distance_m": distance, "closing_kmh": speed_kmh - player_speed}
 	return {}
+
+func _signed_loop_gap(reference_z: float, other_z: float) -> float:
+	var raw_gap := reference_z - other_z
+	return wrapf(raw_gap + route_length * 0.5, 0.0, route_length) - route_length * 0.5
