@@ -4,13 +4,15 @@ const TruckScript = preload("res://Scripts/vehicle_controller.gd")
 const CareerScript = preload("res://Scripts/career_manager.gd")
 const CompanyScript = preload("res://Scripts/company_manager.gd")
 
+var _failed := false
+
 func _initialize() -> void:
 	call_deferred("_run_tests")
 
 func _expect(condition: bool, message: String) -> void:
 	if not condition:
 		push_error("LOGIC TEST FAILED: " + message)
-		quit(1)
+		_failed = true
 
 func _run_tests() -> void:
 	var truck = TruckScript.new()
@@ -60,5 +62,8 @@ func _run_tests() -> void:
 	_expect(company.company_balance == 9970, "company delivery must credit revenue")
 	company.save_company()
 
+	if _failed:
+		quit(1)
+		return
 	print("EURO HAUL logic smoke tests passed")
 	quit(0)
