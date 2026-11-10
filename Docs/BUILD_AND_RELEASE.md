@@ -1,49 +1,48 @@
 # Build and Release Pipeline
 
-## Engine baseline
-- Unity 6.3 LTS, editor version 6000.3.0f1.
-- Unity project root: `Game/`.
-- Android output: APK (not Android App Bundle).
-- Android architecture: ARM64.
-- Windows output: Windows x64 player.
-- Automated validation: Unity EditMode tests before platform builds.
+## Active engine
+- Godot 4.4.1; active project root: `Godot/`.
+- Unity source under `Game/` is retained as migration/reference material only.
+- Android debug output: ARM64 APK, package ID `com.eurohaul.game`.
+- Windows x64 is a later target after the Android vertical slice is stable.
+- No Unity license or Unity account is required for the Godot pipeline.
 
-## Scene generation
-The Editor bootstrap in `Game/Assets/Editor/EuroHaulSceneBootstrap.cs` creates a basic Truck Lab test scene on first Unity Editor startup and registers it in Build Settings. The scene contains a player truck, two same-direction traffic trucks, one oncoming truck, indicators, horn, sensor origins, a camera, road markings and mobile touch buttons. It is a prototype test track, not the full European map.
+## Automated GitHub Actions workflow
+Workflow: `.github/workflows/godot-check.yml`
 
-## GitHub Actions
-Workflow: `.github/workflows/unity-ci.yml`
+The workflow:
+1. Checks out the repository and configures Java 17 plus Android SDK packages.
+2. Downloads the exact Godot 4.4.1 export templates.
+3. Creates a temporary debug keystore for internal testing only.
+4. Imports the Godot project and fails if script parse/load errors appear in the log.
+5. Runs the main scene headlessly and checks for the expected boot marker.
+6. Exports an Android ARM64 debug APK.
+7. Checks that the APK is non-empty, passes ZIP integrity validation, and contains the expected Android package metadata.
+8. Uploads the APK as a GitHub Actions artifact for 14 days.
 
-It is manual-only (`workflow_dispatch`) so an unconfigured Unity license does not break ordinary source commits. It:
-1. Checks out the repository.
-2. Runs EditMode tests.
-3. Builds Android APK and Windows x64 after tests pass.
-4. Uploads test reports and build artifacts.
+## Download a debug APK
+1. Open the repository's Actions tab.
+2. Open the latest successful **Godot validation and Android APK** run.
+3. Under Artifacts, download `EURO-HAUL-Android-debug`.
+4. Extract the ZIP and install `EURO-HAUL-debug.apk` on an ARM64 Android device.
 
-## Required repository secrets
-A Unity Personal license activation is required by the GameCI runner. In GitHub, open repository Settings → Secrets and variables → Actions → New repository secret.
+A debug artifact is not a Play Store release. It is signed with an ephemeral CI debug key and should be used for testing only.
 
-- `UNITY_LICENSE`: Unity license file contents.
-- `UNITY_EMAIL`: Unity account email if required by the activation flow.
-- `UNITY_PASSWORD`: Unity account password if required by the activation flow.
-
-Never put license values in source files, workflow YAML, issues, or chat. Do not share these values with anyone.
-
-## Run a build
-1. Configure the Unity secrets above.
-2. Open the repository Actions tab.
-3. Select “Unity validation and builds”.
-4. Choose “Run workflow”.
-5. Wait for EditMode tests and both platform builds.
-6. Download the Android and Windows artifacts from the completed workflow run.
-
-## Important status
-The workflow definition and automatic test scene generator are committed, but no CI run has been executed in this repository yet. No APK or Windows executable is currently verified. A valid Unity license secret and successful CI results are required before claiming a build.
+## Build troubleshooting
+- Missing export templates: confirm the template archive version exactly matches Godot 4.4.1 and is installed under `~/.local/share/godot/export_templates/4.4.1.stable/`.
+- Missing Java/SDK: inspect the Java 17 and Android SDK setup steps and verify `JAVA_HOME`, `ANDROID_HOME`, and `ANDROID_SDK_ROOT`.
+- Script parse errors: inspect the Import and runtime smoke-test logs; CI fails on GDScript parse/load errors.
+- APK metadata/integrity failure: inspect the export log and the aapt/unzip validation output.
 
 ## Release gates
-- All EditMode tests pass.
-- Android ARM64 APK installs and launches on a physical device.
-- Windows x64 build launches.
-- No missing scripts or serialized references.
-- Driving, traffic sensing, signals, collision warnings, and mobile controls pass manual play tests.
-- Performance and thermal tests are recorded on a physical Android device.
+- [ ] Godot import completes with no GDScript parse/load errors.
+- [ ] Headless main-scene smoke test passes.
+- [ ] Android ARM64 APK exports and passes ZIP/package validation.
+- [ ] APK installs and launches on the target physical Android device.
+- [ ] Touch controls, steering, throttle, brake, shifting, signals and horn pass device testing.
+- [ ] Career and company saves survive app restart and malformed-save recovery.
+- [ ] Traffic and collision behaviour pass the QA plan.
+- [ ] Ten-minute drive completes without crashes, stuck input or excessive thermal load.
+- [ ] Windows x64 build launches after Android slice is stable.
+
+Only mark a gate complete after the corresponding test actually ran. A successful headless run or APK export does not prove physical-device compatibility.
