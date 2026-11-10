@@ -21,6 +21,7 @@ var accept_freight_button: Button
 var found_company_button: Button
 var buy_truck_button: Button
 var hire_driver_button: Button
+var pause_button: Button
 var near_pickup_depot := false
 var near_delivery_depot := false
 var touch_state := {"throttle": false, "brake": false, "left": false, "right": false}
@@ -71,6 +72,11 @@ func _process(delta: float) -> void:
 	_update_freight_action()
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		get_tree().paused = not get_tree().paused
+		if status_label != null:
+			status_label.text = "PAUSED" if get_tree().paused else "RESUMED"
+		return
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
 		for key in touch_state.keys():
 			touch_state[key] = false
@@ -315,6 +321,7 @@ func _build_career() -> void:
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()
 	layer.name = "HUD"
+	layer.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(layer)
 	var panel := PanelContainer.new()
 	panel.position = Vector2(20, 18)
@@ -370,6 +377,14 @@ func _build_hud() -> void:
 	horn.text = "HORN"
 	horn.pressed.connect(func(): truck.sound_horn())
 	signal_row.add_child(horn)
+	pause_button = Button.new()
+	pause_button.text = "PAUSE"
+	pause_button.pressed.connect(func():
+		get_tree().paused = not get_tree().paused
+		pause_button.text = "RESUME" if get_tree().paused else "PAUSE"
+		status_label.text = "PAUSED" if get_tree().paused else "RESUMED"
+	)
+	signal_row.add_child(pause_button)
 	accept_freight_button = Button.new()
 	accept_freight_button.text = "ACCEPT FREIGHT"
 	accept_freight_button.position = Vector2(20, 175)
