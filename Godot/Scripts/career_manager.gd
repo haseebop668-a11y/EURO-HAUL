@@ -270,6 +270,10 @@ func load_save() -> void:
 			saved_fuel_percent = clampf(saved_fuel, 0.0, 100.0) if is_finite(saved_fuel) else 100.0
 			saved_vehicle_damage = clampf(saved_damage, 0.0, 100.0) if is_finite(saved_damage) else 0.0
 		if read_path != SAVE_PATH:
-			DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
+			if FileAccess.file_exists(SAVE_PATH):
+				var remove_error := DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
+				if remove_error != OK:
+					push_warning("Could not remove corrupt career save before recovery: %s" % error_string(remove_error))
+					return
 			save()
 		return
