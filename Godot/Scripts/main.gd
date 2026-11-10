@@ -277,9 +277,12 @@ func _update_toll_button() -> void:
 	elif not near_toll_gate:
 		toll_button.text = "TOLL GATE AHEAD"
 		toll_button.disabled = true
+	elif career.game_cash < 15:
+		toll_button.text = "NEED €15 FOR TOLL"
+		toll_button.disabled = true
 	else:
 		toll_button.text = "PAY TOLL • €15"
-		toll_button.disabled = career.game_cash < 15
+		toll_button.disabled = false
 
 func _create_service_area(road_z: float) -> void:
 	var service_area := Area3D.new()
