@@ -542,9 +542,11 @@ func _update_hud() -> void:
 	if company != null and not company.company_name.is_empty():
 		company_text = "%s • €%d • FLEET %d • DRIVERS %d" % [company.company_name, company.company_balance, company.owned_trucks, company.hired_drivers]
 	if found_company_button != null:
-		found_company_button.disabled = company != null and not company.company_name.is_empty()
-		if found_company_button.disabled:
+		found_company_button.disabled = (company != null and not company.company_name.is_empty()) or career.game_cash < EuroHaulCompanyManager.FOUNDING_COST
+		if company != null and not company.company_name.is_empty():
 			found_company_button.text = "COMPANY ACTIVE"
+		elif career.game_cash < EuroHaulCompanyManager.FOUNDING_COST:
+			found_company_button.text = "NEED €50,000 TO FOUND"
 	if buy_truck_button != null:
 		buy_truck_button.disabled = company == null or company.company_name.is_empty() or company.company_balance < EuroHaulCompanyManager.TRUCK_PURCHASE_COST
 	if hire_driver_button != null:
