@@ -139,6 +139,7 @@ func _run_tests() -> void:
 	career.add_xp(300)
 	_expect(career.level >= 3, "large XP award must process multiple level-ups")
 	career.game_cash = 43210
+	career.update_vehicle_state(42.0, 12.0)
 	career.save()
 	var career_save_absolute := ProjectSettings.globalize_path("user://euro_haul_career.json")
 	var career_backup_absolute := ProjectSettings.globalize_path("user://euro_haul_career.json.bak")
@@ -150,6 +151,8 @@ func _run_tests() -> void:
 	career.game_cash = 1
 	career.load_save()
 	_expect(career.game_cash == 43210, "career loader must recover from a corrupt primary save using its backup")
+	_expect(is_equal_approx(career.saved_fuel_percent, 42.0), "career save must preserve truck fuel")
+	_expect(is_equal_approx(career.saved_vehicle_damage, 12.0), "career save must preserve truck damage")
 
 	var company = CompanyScript.new()
 	root.add_child(company)
