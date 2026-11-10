@@ -178,7 +178,7 @@ func _create_depot_area(depot_name: String, road_z: float, is_pickup: bool) -> v
 	depot.name = depot_name
 	depot.position = Vector3(0.0, 1.0, road_z)
 	depot.collision_layer = 0
-	depot.collision_mask = 1
+	depot.collision_mask = 2
 	var trigger := CollisionShape3D.new()
 	var trigger_shape := SphereShape3D.new()
 	trigger_shape.radius = 10.0
@@ -217,7 +217,7 @@ func _create_toll_gate(road_z: float) -> void:
 	toll_area.name = "TollGateTrigger"
 	toll_area.position = Vector3(0.0, 1.0, road_z)
 	toll_area.collision_layer = 0
-	toll_area.collision_mask = 1
+	toll_area.collision_mask = 2
 	var trigger := CollisionShape3D.new()
 	var trigger_shape := SphereShape3D.new()
 	trigger_shape.radius = 40.0
@@ -295,7 +295,7 @@ func _create_service_area(road_z: float) -> void:
 	service_area.name = "ServiceStation"
 	service_area.position = Vector3(0.0, 1.0, road_z)
 	service_area.collision_layer = 0
-	service_area.collision_mask = 1
+	service_area.collision_mask = 2
 	var trigger := CollisionShape3D.new()
 	var shape := SphereShape3D.new()
 	shape.radius = 15.0
@@ -323,6 +323,8 @@ func _create_service_area(road_z: float) -> void:
 func _build_truck() -> void:
 	truck = EuroHaulTruck.new()
 	truck.name = "PlayerTruck"
+	truck.collision_layer = 2
+	truck.collision_mask = 1
 	truck.position = Vector3(0.0, 0.15, -8.0)
 	var collision := CollisionShape3D.new()
 	var shape := BoxShape3D.new()
