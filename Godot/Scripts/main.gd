@@ -788,7 +788,10 @@ func _handle_service_interaction() -> void:
 		rescue_position.y = 0.15
 		rescue_position.z = -600.0
 		truck.global_position = rescue_position
+		truck.global_rotation = Vector3.ZERO
 		truck.velocity = Vector3.ZERO
+		if trailer != null:
+			trailer.articulation_degrees = 0.0
 		truck.refuel()
 		truck.repair()
 		_save_progress()
