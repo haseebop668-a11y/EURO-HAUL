@@ -6,6 +6,7 @@ const CompanyScript = preload("res://Scripts/company_manager.gd")
 const TrafficScript = preload("res://Scripts/traffic_vehicle.gd")
 const TrailerScript = preload("res://Scripts/trailer_controller.gd")
 const WorldCycleScript = preload("res://Scripts/world_environment_controller.gd")
+const MainScript = preload("res://Scripts/main.gd")
 
 var _failed := false
 
@@ -95,6 +96,9 @@ func _run_tests() -> void:
 	world_cycle._apply_environment()
 	_expect(world_cycle.environment.fog_enabled, "fog weather must enable environment fog")
 	_expect(world_cycle.display_status().contains("FOG"), "world status must report current weather")
+	var main_scene_logic = MainScript.new()
+	var horn_stream: AudioStreamWAV = main_scene_logic._create_horn_stream()
+	_expect(horn_stream.data.size() > 0, "generated horn audio must contain PCM samples")
 
 	var career = CareerScript.new()
 	root.add_child(career)
