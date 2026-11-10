@@ -747,6 +747,8 @@ func _handle_freight_interaction() -> void:
 			_show_message("CARGO LOADED • %.1f TONNES" % cargo_mass)
 	elif career.cargo_loaded and near_delivery_depot:
 		if career.unload_cargo():
+			if company != null and not company.company_name.is_empty():
+				company.complete_company_delivery(int(round(float(career.last_delivery_reward) * 0.35)))
 			truck.set_cargo_mass(0.0)
 			trailer.set_cargo_mass(0.0)
 			_show_message("DELIVERY COMPLETED • REWARD PAID")
