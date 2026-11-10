@@ -153,6 +153,14 @@ func _create_depot_area(depot_name: String, road_z: float, is_pickup: bool) -> v
 		_update_freight_action()
 	)
 	add_child(depot)
+	var sign_color := GOLD if is_pickup else Color("#78a9bd")
+	_add_box("%s Sign" % depot_name, Vector3(-9.0, 2.0, road_z), Vector3(0.25, 3.0, 4.0), sign_color, false)
+	var sign_label := Label3D.new()
+	sign_label.text = "FREIGHT PICKUP" if is_pickup else "FREIGHT DELIVERY"
+	sign_label.position = Vector3(-9.0, 4.0, road_z)
+	sign_label.font_size = 36
+	sign_label.modulate = Color("#f4f5f6")
+	add_child(sign_label)
 
 func _build_truck() -> void:
 	truck = EuroHaulTruck.new()
