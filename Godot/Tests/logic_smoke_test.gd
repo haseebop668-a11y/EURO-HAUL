@@ -38,6 +38,14 @@ func _run_tests() -> void:
 	truck.speed_kmh = 70.0
 	traffic.speed_kmh = 40.0
 	_expect(traffic.safety_warning_for_lane(-2.0) == "TRAFFIC IN ADJACENT LANE", "lane-change sensor must warn about nearby traffic")
+	var front_report := traffic.get_proximity_report()
+	_expect(front_report.get("zone", "") == "FRONT", "forward sensor must identify slower traffic ahead")
+	traffic.position.z = 10.0
+	traffic.speed_kmh = 90.0
+	var rear_report := traffic.get_proximity_report()
+	_expect(rear_report.get("zone", "") == "REAR", "rear sensor must identify a faster approaching vehicle")
+	traffic.position.z = -10.0
+	traffic.speed_kmh = 40.0
 	traffic._update_player_avoidance(0.1)
 	_expect(is_equal_approx(traffic.lane_x, 2.0), "slower traffic ahead must move away from a closing player")
 	traffic.position.z = -100.0
