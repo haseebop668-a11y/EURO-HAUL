@@ -126,7 +126,18 @@ func _run_tests() -> void:
 	_expect(career.active_contract.is_empty(), "completed contract must clear")
 	career.add_xp(300)
 	_expect(career.level >= 3, "large XP award must process multiple level-ups")
+	career.game_cash = 43210
 	career.save()
+	var career_save_absolute := ProjectSettings.globalize_path("user://euro_haul_career.json")
+	var career_backup_absolute := ProjectSettings.globalize_path("user://euro_haul_career.json.bak")
+	DirAccess.copy_absolute(career_save_absolute, career_backup_absolute)
+	var corrupt_career_file := FileAccess.open("user://euro_haul_career.json", FileAccess.WRITE)
+	if corrupt_career_file != null:
+		corrupt_career_file.store_string("{corrupt")
+		corrupt_career_file.close()
+	career.game_cash = 1
+	career.load_save()
+	_expect(career.game_cash == 43210, "career loader must recover from a corrupt primary save using its backup")
 
 	var company = CompanyScript.new()
 	root.add_child(company)
@@ -148,6 +159,16 @@ func _run_tests() -> void:
 	company.complete_company_delivery(500)
 	_expect(company.company_balance == 11770, "company delivery must credit revenue")
 	company.save_company()
+	var company_save_absolute := ProjectSettings.globalize_path("user://euro_haul_company.json")
+	var company_backup_absolute := ProjectSettings.globalize_path("user://euro_haul_company.json.bak")
+	DirAccess.copy_absolute(company_save_absolute, company_backup_absolute)
+	var corrupt_company_file := FileAccess.open("user://euro_haul_company.json", FileAccess.WRITE)
+	if corrupt_company_file != null:
+		corrupt_company_file.store_string("{corrupt")
+		corrupt_company_file.close()
+	company.company_balance = 0
+	company.load_company()
+	_expect(company.company_balance == 11770, "company loader must recover from a corrupt primary save using its backup")
 
 	if _failed:
 		quit(1)
