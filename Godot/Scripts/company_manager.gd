@@ -115,22 +115,21 @@ func save_company() -> void:
 		DirAccess.remove_absolute(backup_absolute)
 
 func load_company() -> void:
-	var read_path := SAVE_PATH
-	if not FileAccess.file_exists(read_path):
-		read_path += ".bak"
+	for read_path in [SAVE_PATH, SAVE_PATH + ".bak"]:
 		if not FileAccess.file_exists(read_path):
-			return
-	var file := FileAccess.open(read_path, FileAccess.READ)
-	if file == null:
-		push_warning("Could not open company save file for reading: %s" % FileAccess.get_open_error())
+			continue
+		var file := FileAccess.open(read_path, FileAccess.READ)
+		if file == null:
+			push_warning("Could not open company save candidate: %s" % read_path)
+			continue
+		var payload: Variant = JSON.parse_string(file.get_as_text())
+		if typeof(payload) != TYPE_DICTIONARY or int(payload.get("schema", 0)) != 1:
+			push_warning("Company save candidate is invalid or uses an unsupported schema: %s" % read_path)
+			continue
+		company_name = str(payload.get("company_name", ""))
+		company_balance = maxi(0, int(payload.get("company_balance", 0)))
+		owned_trucks = maxi(0, int(payload.get("owned_trucks", 0)))
+		hired_drivers = maxi(0, mini(owned_trucks, int(payload.get("hired_drivers", 0))))
+		reputation = clampi(int(payload.get("reputation", 0)), 0, 1000)
+		completed_company_jobs = maxi(0, int(payload.get("completed_company_jobs", 0)))
 		return
-	var payload: Variant = JSON.parse_string(file.get_as_text())
-	if typeof(payload) != TYPE_DICTIONARY or int(payload.get("schema", 0)) != 1:
-		push_warning("Company save file is invalid or uses an unsupported schema")
-		return
-	company_name = str(payload.get("company_name", ""))
-	company_balance = maxi(0, int(payload.get("company_balance", 0)))
-	owned_trucks = maxi(0, int(payload.get("owned_trucks", 0)))
-	hired_drivers = maxi(0, int(payload.get("hired_drivers", 0)))
-	reputation = clampi(int(payload.get("reputation", 0)), 0, 1000)
-	completed_company_jobs = maxi(0, int(payload.get("completed_company_jobs", 0)))
