@@ -794,7 +794,7 @@ func _update_hud() -> void:
 	var world_text := world_cycle.display_status() if world_cycle != null else "WORLD • DAY"
 	hud.text = "DRIVER  %s  •  LVL %d  •  €%d\n%s\n%s\n%s" % [career.driver_name, career.level, career.game_cash, contract_text, company_text, world_text]
 	if truck != null and speed_label != null:
-		speed_label.text = "%03d km/h     RPM %04d     GEAR %s     DAMAGE %d%%" % [int(absf(truck.speed_kmh)), int(truck.engine_rpm), "R" if truck.gear == -1 else ("N" if truck.gear == 0 else str(truck.gear)), int(truck.damage)]
+		speed_label.text = "%03d km/h     RPM %04d     GEAR %s     FUEL %d%%     DAMAGE %d%%" % [int(absf(truck.speed_kmh)), int(truck.engine_rpm), "R" if truck.gear == -1 else ("N" if truck.gear == 0 else str(truck.gear)), int(truck.fuel_percent), int(truck.damage)]
 
 func _add_box(label: String, position_value: Vector3, size_value: Vector3, color: Color, solid: bool) -> void:
 	var node := StaticBody3D.new() if solid else Node3D.new()
