@@ -1,6 +1,8 @@
 extends AnimatableBody3D
 class_name EuroHaulTrailer
 
+signal cargo_damaged(amount: float)
+
 @export var articulation_limit_degrees := 55.0
 @export var forward_articulation_gain := 0.35
 @export var reverse_articulation_gain := 1.25
@@ -8,6 +10,10 @@ class_name EuroHaulTrailer
 
 var truck: EuroHaulTruck
 var articulation_degrees := 0.0
+var cargo_mass_tons := 0.0
+
+func set_cargo_mass(mass_tons: float) -> void:
+	cargo_mass_tons = clampf(mass_tons, 0.0, 30.0)
 
 func _ready() -> void:
 	collision_layer = 4
@@ -98,3 +104,4 @@ func _on_trailer_body_entered(body: Node3D) -> void:
 	if absf(truck.speed_kmh) > 8.0:
 		var impact_damage := clampf(absf(truck.speed_kmh) / 35.0 * 6.0, 1.0, 18.0)
 		truck.apply_damage(impact_damage)
+		cargo_damaged.emit(impact_damage * 0.75)
