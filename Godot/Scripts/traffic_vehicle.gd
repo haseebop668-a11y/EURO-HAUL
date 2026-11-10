@@ -19,7 +19,7 @@ func _ready() -> void:
 	_base_lane_x = lane_x
 	_phase = absf(global_position.z) * 3.6 / maxf(1.0, cruise_speed_kmh)
 
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	_phase += delta
 	var target_z := -fmod(_phase * cruise_speed_kmh / 3.6, route_length)
 	global_position.z = target_z
@@ -59,3 +59,15 @@ func safety_warning_for_lane(requested_lane_x: float) -> String:
 	if longitudinal_gap < 24.0:
 		return "TRAFFIC IN ADJACENT LANE"
 	return ""
+
+func get_proximity_report() -> Dictionary:
+	if not is_instance_valid(player_target) or not (player_target is EuroHaulTruck):
+		return {}
+	var gap := player_target.global_position.z - global_position.z
+	var distance := absf(gap)
+	var player_speed: float = player_target.speed_kmh
+	if gap > 0.0 and distance <= 45.0 and player_speed > speed_kmh + 2.0:
+		return {"zone": "FRONT", "distance_m": distance, "closing_kmh": player_speed - speed_kmh}
+	if gap < 0.0 and distance <= 25.0 and speed_kmh > player_speed + 2.0:
+		return {"zone": "REAR", "distance_m": distance, "closing_kmh": speed_kmh - player_speed}
+	return {}
