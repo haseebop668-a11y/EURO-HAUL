@@ -42,7 +42,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0" "cmdline-tools;latest"
           echo "ANDROID_HOME=${ANDROID_HOME}" >> "$GITHUB_ENV"
           echo "ANDROID_SDK_ROOT=${ANDROID_HOME}" >> "$GITHUB_ENV"
 
@@ -119,7 +119,7 @@ keystore/debug_password="android"' Godot/export_presets.cfg
           test -s build/Android/EURO-HAUL-debug.apk
           unzip -t build/Android/EURO-HAUL-debug.apk
           "${ANDROID_HOME}/build-tools/35.0.0/aapt" dump badging build/Android/EURO-HAUL-debug.apk > /tmp/euro-haul-badging.txt
-          head -n 8 /tmp/euro-haul-badging.txt
+          head -n 10 /tmp/euro-haul-badging.txt
           sha256sum build/Android/EURO-HAUL-debug.apk
 
       - name: Upload debug APK
