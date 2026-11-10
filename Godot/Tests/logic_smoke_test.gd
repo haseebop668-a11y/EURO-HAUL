@@ -103,7 +103,7 @@ func _run_tests() -> void:
 	trailer._physics_process(0.1)
 	var forward_articulation := trailer.articulation_degrees
 	truck.gear = -1
-	trailer._process(0.1)
+	trailer._physics_process(0.1)
 	_expect(trailer.articulation_degrees > forward_articulation, "reverse steering must articulate the trailer in the opposite direction")
 	_expect(absf(trailer.articulation_degrees) <= trailer.articulation_limit_degrees, "trailer articulation must remain within the jackknife safety limit")
 
@@ -146,6 +146,13 @@ func _run_tests() -> void:
 	_expect(career.accept_offer(), "new freight offer must be accepted")
 	_expect(not career.accept_offer(), "second acceptance must fail while a contract is active")
 	career.active_contract = {
+		"id": "QA-DELIVERY",
+		"origin": "A",
+		"destination": "B",
+		"cargo": "Test Freight",
+		"mass_tons": 20.0,
+		"fragility": "FRAGILE",
+		"damage_percent": 0.0,
 		"distance_km": 0.2,
 		"progress_km": 0.0,
 		"reward": 100,
@@ -192,6 +199,8 @@ func _run_tests() -> void:
 	company.company_balance = 0
 	company.owned_trucks = 0
 	company.hired_drivers = 0
+	company.reputation = 0
+	company.completed_company_jobs = 0
 	company.found_company("QA Logistics", 50000)
 	_expect(company.company_balance == 100000, "new company must receive starting operating capital")
 	_expect(company.purchase_truck(), "company must be able to buy a fleet truck")
