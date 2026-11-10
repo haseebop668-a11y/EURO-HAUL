@@ -3,6 +3,7 @@ extends SceneTree
 const TruckScript = preload("res://Scripts/vehicle_controller.gd")
 const CareerScript = preload("res://Scripts/career_manager.gd")
 const CompanyScript = preload("res://Scripts/company_manager.gd")
+const TrafficScript = preload("res://Scripts/traffic_vehicle.gd")
 
 var _failed := false
 
@@ -27,6 +28,20 @@ func _run_tests() -> void:
 	_expect(is_equal_approx(truck.throttle_input, 1.0), "throttle must clamp to 1")
 	_expect(is_equal_approx(truck.steer_input, -1.0), "steering must clamp to -1")
 	_expect(is_equal_approx(truck.brake_input, 1.0), "brake must clamp to 1")
+
+	var traffic = TrafficScript.new()
+	root.add_child(traffic)
+	traffic.player_target = truck
+	traffic.position = Vector3(-2.0, 0.0, -10.0)
+	truck.position = Vector3.ZERO
+	truck.speed_kmh = 70.0
+	traffic.speed_kmh = 40.0
+	_expect(traffic.safety_warning_for_lane(-2.0) == "TRAFFIC IN ADJACENT LANE", "lane-change sensor must warn about nearby traffic")
+	traffic._update_player_avoidance(0.1)
+	_expect(is_equal_approx(traffic.lane_x, 2.0), "slower traffic ahead must move away from a closing player")
+	traffic.position.z = -100.0
+	traffic._update_player_avoidance(2.1)
+	_expect(is_equal_approx(traffic.lane_x, -2.0), "traffic must return to its lane after the gap clears")
 
 	var career = CareerScript.new()
 	root.add_child(career)
