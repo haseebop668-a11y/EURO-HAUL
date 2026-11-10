@@ -31,6 +31,9 @@ var toll_paid_this_loop := false
 var toll_button: Button
 var toll_barrier_collision: CollisionShape3D
 var toll_barrier_mesh: MeshInstance3D
+var near_weigh_station := false
+var weigh_checked_this_loop := false
+var weigh_button: Button
 var touch_state := {"throttle": false, "brake": false, "left": false, "right": false, "retarder": false}
 var traffic_vehicles: Array[EuroHaulTrafficVehicle] = []
 var _last_position := Vector3.ZERO
@@ -75,6 +78,8 @@ func _process(delta: float) -> void:
 		current_position.z += ROAD_LENGTH
 		truck.global_position = current_position
 		_reset_toll_gate()
+		weigh_checked_this_loop = false
+		_update_weigh_button()
 	elif current_position.z > 20.0:
 		current_position.z -= ROAD_LENGTH
 		truck.global_position = current_position
@@ -93,6 +98,7 @@ func _process(delta: float) -> void:
 	_update_freight_action()
 	_update_service_button()
 	_update_toll_button()
+	_update_weigh_button()
 
 func _show_message(message: String, duration: float = 3.0) -> void:
 	event_message = message
@@ -189,6 +195,7 @@ func _build_world() -> void:
 	_create_depot_area("DeliveryDepot", -820.0, false)
 	_create_service_area(-600.0)
 	_create_toll_gate(-280.0)
+	_create_weigh_station(-740.0)
 
 func _create_depot_area(depot_name: String, road_z: float, is_pickup: bool) -> void:
 	var depot := Area3D.new()
@@ -228,6 +235,72 @@ func _create_depot_area(depot_name: String, road_z: float, is_pickup: bool) -> v
 	sign_label.font_size = 36
 	sign_label.modulate = Color("#f4f5f6")
 	add_child(sign_label)
+
+func _create_weigh_station(road_z: float) -> void:
+	var weigh_area := Area3D.new()
+	weigh_area.name = "WeighStation"
+	weigh_area.position = Vector3(0.0, 1.0, road_z)
+	weigh_area.collision_layer = 0
+	weigh_area.collision_mask = 2
+	var trigger := CollisionShape3D.new()
+	var trigger_shape := SphereShape3D.new()
+	trigger_shape.radius = 18.0
+	trigger.shape = trigger_shape
+	weigh_area.add_child(trigger)
+	weigh_area.body_entered.connect(func(body: Node3D):
+		if body == truck:
+			near_weigh_station = true
+			_update_weigh_button()
+	)
+	weigh_area.body_exited.connect(func(body: Node3D):
+		if body == truck:
+			near_weigh_station = false
+			_update_weigh_button()
+	)
+	add_child(weigh_area)
+	_add_box("Weigh Station Platform", Vector3(0.0, 0.12, road_z), Vector3(10.0, 0.08, 18.0), Color("#777f86"), false)
+	_add_box("Weigh Station Sign", Vector3(-9.0, 2.0, road_z), Vector3(0.25, 3.0, 4.0), Color("#5da68a"), false)
+	var sign_label := Label3D.new()
+	sign_label.text = "WEIGH STATION • MAX 26T"
+	sign_label.position = Vector3(-9.0, 4.0, road_z)
+	sign_label.font_size = 30
+	sign_label.modulate = Color("#f4f5f6")
+	add_child(sign_label)
+
+func _weigh_vehicle() -> void:
+	if not near_weigh_station or weigh_checked_this_loop or truck == null or career == null:
+		return
+	if absf(truck.speed_kmh) > 3.0:
+		_show_message("STOP ON THE WEIGH PLATFORM")
+		return
+	weigh_checked_this_loop = true
+	var gross_weight := 10.0 + truck.cargo_mass_tons
+	var excess_weight := maxf(0.0, gross_weight - 26.0)
+	var fine := int(ceil(excess_weight * 250.0))
+	if fine > 0:
+		var paid := mini(fine, career.game_cash)
+		if paid > 0:
+			career.spend_cash(paid)
+		_show_message("OVERWEIGHT • %.1fT • FINE €%d" % [gross_weight, paid])
+	else:
+		_show_message("WEIGH CHECK CLEAR • %.1f TONNES" % gross_weight)
+	_update_weigh_button()
+
+func _update_weigh_button() -> void:
+	if weigh_button == null or truck == null:
+		return
+	if weigh_checked_this_loop:
+		weigh_button.text = "WEIGH CHECK COMPLETE"
+		weigh_button.disabled = true
+	elif not near_weigh_station:
+		weigh_button.text = "WEIGH STATION AHEAD"
+		weigh_button.disabled = true
+	elif absf(truck.speed_kmh) > 3.0:
+		weigh_button.text = "STOP FOR WEIGHING"
+		weigh_button.disabled = true
+	else:
+		weigh_button.text = "WEIGH TRUCK"
+		weigh_button.disabled = false
 
 func _create_toll_gate(road_z: float) -> void:
 	var toll_area := Area3D.new()
@@ -570,6 +643,12 @@ func _build_hud() -> void:
 	toll_button.custom_minimum_size = Vector2(180, 52)
 	toll_button.pressed.connect(_pay_toll)
 	layer.add_child(toll_button)
+	weigh_button = Button.new()
+	weigh_button.text = "WEIGH STATION AHEAD"
+	weigh_button.position = Vector2(930, 175)
+	weigh_button.custom_minimum_size = Vector2(180, 52)
+	weigh_button.pressed.connect(_weigh_vehicle)
+	layer.add_child(weigh_button)
 	found_company_button = Button.new()
 	found_company_button.text = "FOUND COMPANY • €50,000"
 	found_company_button.position = Vector2(220, 175)
