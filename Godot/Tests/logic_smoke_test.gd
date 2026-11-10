@@ -67,6 +67,15 @@ func _run_tests() -> void:
 
 	var career = CareerScript.new()
 	root.add_child(career)
+	career.driver_name = "QA Driver"
+	career.level = 1
+	career.xp = 0
+	career.game_cash = 25000
+	career.deliveries = 0
+	career.total_distance_km = 0.0
+	career.active_contract.clear()
+	career.offered_contract.clear()
+	career.generate_offer()
 	_expect(not career.offered_contract.is_empty(), "new career must generate a freight offer")
 	_expect(career.accept_offer(), "new freight offer must be accepted")
 	_expect(not career.accept_offer(), "second acceptance must fail while a contract is active")
@@ -87,15 +96,21 @@ func _run_tests() -> void:
 
 	var company = CompanyScript.new()
 	root.add_child(company)
-	company.company_name = "QA Logistics"
-	company.company_balance = 10000
-	company.owned_trucks = 1
-	company.hired_drivers = 1
+	company.company_name = ""
+	company.company_balance = 0
+	company.owned_trucks = 0
+	company.hired_drivers = 0
+	company.found_company("QA Logistics", 50000)
+	_expect(company.company_balance == 100000, "new company must receive starting operating capital")
+	_expect(company.purchase_truck(), "company must be able to buy a fleet truck")
+	_expect(company.company_balance == 15000, "truck purchase must deduct the correct price")
+	_expect(company.hire_driver(), "company must hire a driver for an owned truck")
 	_expect(not company.hire_driver(), "company must not hire more drivers than owned trucks")
 	company._process(299.0)
-	_expect(company.company_balance == 10000, "operating costs must not be charged before a simulated day")
+	_expect(company.company_balance == 10000, "operating costs and driver revenue must wait until a full simulated day")
 	company._process(1.0)
 	_expect(company.company_balance == 11270, "one simulated day must apply driver revenue and operating costs")
+	_expect(company.completed_company_jobs == 1, "active hired driver must complete one simulated job per day")
 	company.complete_company_delivery(500)
 	_expect(company.company_balance == 11770, "company delivery must credit revenue")
 	company.save_company()
