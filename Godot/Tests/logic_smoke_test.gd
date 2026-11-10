@@ -5,6 +5,7 @@ const CareerScript = preload("res://Scripts/career_manager.gd")
 const CompanyScript = preload("res://Scripts/company_manager.gd")
 const TrafficScript = preload("res://Scripts/traffic_vehicle.gd")
 const TrailerScript = preload("res://Scripts/trailer_controller.gd")
+const WorldCycleScript = preload("res://Scripts/world_environment_controller.gd")
 
 var _failed := false
 
@@ -70,6 +71,22 @@ func _run_tests() -> void:
 	trailer._process(0.1)
 	_expect(trailer.articulation_degrees > forward_articulation, "reverse steering must articulate the trailer in the opposite direction")
 	_expect(absf(trailer.articulation_degrees) <= trailer.articulation_limit_degrees, "trailer articulation must remain within the jackknife safety limit")
+
+	var world_cycle = WorldCycleScript.new()
+	root.add_child(world_cycle)
+	world_cycle.environment = Environment.new()
+	world_cycle.sun_light = DirectionalLight3D.new()
+	root.add_child(world_cycle.sun_light)
+	world_cycle.time_of_day_hours = 6.0
+	world_cycle._apply_environment()
+	var night_ambient := world_cycle.environment.ambient_light_energy
+	world_cycle.time_of_day_hours = 12.0
+	world_cycle._apply_environment()
+	_expect(world_cycle.environment.ambient_light_energy > night_ambient, "daylight cycle must increase ambient lighting at noon")
+	world_cycle.weather_state = "FOG"
+	world_cycle._apply_environment()
+	_expect(world_cycle.environment.fog_enabled, "fog weather must enable environment fog")
+	_expect(world_cycle.display_status().contains("FOG"), "world status must report current weather")
 
 	var career = CareerScript.new()
 	root.add_child(career)
