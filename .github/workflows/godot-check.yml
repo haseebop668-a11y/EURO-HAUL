@@ -88,7 +88,10 @@ jobs:
             -storepass android -alias androiddebugkey -keypass android \
             -keyalg RSA -keysize 2048 -validity 10000 \
             -dname "CN=Android Debug,O=EURO HAUL,C=PK"
-          printf '\nkeystore/debug="/tmp/euro-haul-debug.keystore"\nkeystore/debug_user="androiddebugkey"\nkeystore/debug_password="android"\n' >> Godot/export_presets.cfg
+          sed -i '/^\[preset\.1\]/i\\
+keystore/debug="/tmp/euro-haul-debug.keystore"\\
+keystore/debug_user="androiddebugkey"\\
+keystore/debug_password="android"' Godot/export_presets.cfg
 
       - name: Import and validate project scripts
         shell: bash
