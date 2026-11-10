@@ -27,19 +27,84 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Import and validate project
-        working-directory: Godot
-        run: godot --headless --editor --path . --quit
+      - name: Configure Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Configure Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          echo "ANDROID_HOME=${ANDROID_HOME}" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=${ANDROID_HOME}" >> "$GITHUB_ENV"
+
+      - name: Install matching Godot 4.4.1 export templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive=/tmp/godot-4.4.1-export-templates.tpz
+          curl --fail --location --silent --show-error \
+            https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz \
+            --output "$archive"
+          mkdir -p /tmp/godot-export-templates
+          unzip -q "$archive" -d /tmp/godot-export-templates
+          destination="$HOME/.local/share/godot/export_templates/4.4.1.stable"
+          mkdir -p "$destination"
+          cp -R /tmp/godot-export-templates/templates/. "$destination/"
+          test -s "$destination/android_debug.apk"
+          test -s "$destination/android_release.apk"
+
+      - name: Create temporary CI debug keystore
+        shell: bash
+        run: |
+          set -euo pipefail
+          keytool -genkeypair -v \
+            -keystore /tmp/euro-haul-debug.keystore \
+            -storepass android -alias androiddebugkey -keypass android \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=Android Debug,O=EURO HAUL,C=PK"
+          printf '\nkeystore/debug="/tmp/euro-haul-debug.keystore"\nkeystore/debug_user="androiddebugkey"\nkeystore/debug_password="android"\n' >> Godot/export_presets.cfg
+
+      - name: Import and validate project scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          export ANDROID_SDK_ROOT="${ANDROID_HOME}"
+          godot --headless --editor --path Godot --quit 2>&1 | tee /tmp/godot-import.log
+          if grep -E "SCRIPT ERROR|Parse Error|Failed to load script" /tmp/godot-import.log; then
+            echo "Godot script import reported errors."
+            exit 1
+          fi
 
       - name: Headless runtime smoke test
-        working-directory: Godot
-        run: godot --headless --path . --quit-after 5
-
-      - name: Export Android debug APK
-        working-directory: Godot
+        shell: bash
         run: |
-          mkdir -p ../build/Android
-          godot --headless --path . --export-debug Android ../build/Android/EURO-HAUL-debug.apk
+          set -euo pipefail
+          godot --headless --path Godot --quit-after 5 2>&1 | tee /tmp/godot-runtime.log
+          if grep -E "SCRIPT ERROR|Parse Error|Failed to load script" /tmp/godot-runtime.log; then
+            echo "Godot runtime reported script errors."
+            exit 1
+          fi
+          grep -q "EURO HAUL Godot vertical-slice booted" /tmp/godot-runtime.log
+
+      - name: Export Android ARM64 debug APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          export ANDROID_SDK_ROOT="${ANDROID_HOME}"
+          mkdir -p build/Android
+          godot --headless --path Godot --export-debug Android build/Android/EURO-HAUL-debug.apk 2>&1 | tee /tmp/godot-export.log
+          test -s build/Android/EURO-HAUL-debug.apk
+          unzip -t build/Android/EURO-HAUL-debug.apk
+          "${ANDROID_HOME}/build-tools/35.0.0/aapt" dump badging build/Android/EURO-HAUL-debug.apk | head -n 8
+          sha256sum build/Android/EURO-HAUL-debug.apk
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
