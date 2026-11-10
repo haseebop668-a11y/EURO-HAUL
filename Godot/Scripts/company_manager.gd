@@ -8,6 +8,7 @@ const FOUNDING_COST := 50000
 const TRUCK_PURCHASE_COST := 85000
 const DRIVER_HIRING_COST := 5000
 const SIMULATED_DAY_SECONDS := 300.0
+const DRIVER_REVENUE_PER_DAY := 1800
 
 var company_name := ""
 var company_balance := 0
@@ -27,7 +28,7 @@ func found_company(name: String, available_game_cash: int) -> int:
 	company_name = name.strip_edges()
 	if company_name.is_empty():
 		company_name = "Euro Haul Logistics"
-	company_balance = 10000
+	company_balance = 100000
 	company_changed.emit()
 	save_company()
 	return available_game_cash - FOUNDING_COST
@@ -42,7 +43,7 @@ func purchase_truck() -> bool:
 	return true
 
 func hire_driver() -> bool:
-	if company_name.is_empty() or company_balance < DRIVER_HIRING_COST:
+	if company_name.is_empty() or company_balance < DRIVER_HIRING_COST or hired_drivers >= owned_trucks:
 		return false
 	company_balance -= DRIVER_HIRING_COST
 	hired_drivers += 1
@@ -67,11 +68,15 @@ func _process(delta: float) -> void:
 		return
 	var elapsed_days := int(floor(_elapsed_day_seconds / SIMULATED_DAY_SECONDS))
 	_elapsed_day_seconds = fmod(_elapsed_day_seconds, SIMULATED_DAY_SECONDS)
+	var active_drivers := mini(hired_drivers, owned_trucks)
 	var daily_cost := operating_cost_per_day * owned_trucks + hired_drivers * 180
-	if daily_cost > 0:
-		company_balance = maxi(0, company_balance - daily_cost * elapsed_days)
-		company_changed.emit()
-		save_company()
+	var delivery_revenue := active_drivers * DRIVER_REVENUE_PER_DAY * elapsed_days
+	company_balance = maxi(0, company_balance + delivery_revenue - daily_cost * elapsed_days)
+	if active_drivers > 0:
+		completed_company_jobs += active_drivers * elapsed_days
+		reputation = mini(1000, reputation + active_drivers * 2 * elapsed_days)
+	company_changed.emit()
+	save_company()
 
 func save_company() -> void:
 	var payload := {
