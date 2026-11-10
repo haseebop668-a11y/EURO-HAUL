@@ -5,6 +5,7 @@
 - [ ] Main scene starts headlessly and prints the expected boot marker.
 - [ ] Android export templates match the engine version.
 - [ ] Android ARM64 debug APK exports successfully.
+- [ ] Windows x64 debug executable exports successfully and has a valid PE header.
 - [ ] APK passes ZIP integrity and Android package metadata checks.
 - [ ] APK artifact uploads and can be downloaded from the workflow run.
 
