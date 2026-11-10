@@ -56,6 +56,9 @@
 - [ ] Cargo can only be loaded at the pickup depot and cannot be loaded twice.
 - [ ] Contract distance advances only while cargo is loaded and the truck moves forward.
 - [ ] Reversing does not increase freight delivery progress.
+- [ ] Cargo mass affects acceleration, braking, fuel consumption and speed limits.
+- [ ] Fragile cargo receives amplified damage when the trailer impacts another body.
+- [ ] Cargo damage reduces the delivery reward and XP.
 - [ ] Cargo cannot be unloaded before required route distance is complete.
 - [ ] Delivery depot unloads cargo, pays reward once and generates the next offer.
 - [ ] Distance progress is monotonic and does not jump when a frame has a large position delta.
