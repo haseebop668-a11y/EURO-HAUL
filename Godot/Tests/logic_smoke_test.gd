@@ -146,6 +146,8 @@ func _run_tests() -> void:
 	_expect(career.load_cargo(), "active contract must allow cargo pickup")
 	_expect(not career.load_cargo(), "cargo must not be loaded twice")
 	_expect(not career.unload_cargo(), "cargo must not unload before required route distance")
+	career.record_distance(0.2, false)
+	_expect(is_equal_approx(float(career.active_contract.progress_km), 0.0), "reversing must not advance freight route progress")
 	career.record_distance(0.2)
 	_expect(career.deliveries == 0, "contract must not auto-deliver before depot unloading")
 	_expect(career.unload_cargo(), "loaded contract at full route distance must unload successfully")
