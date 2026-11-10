@@ -95,10 +95,11 @@ func _run_tests() -> void:
 	trailer.truck = truck
 	trailer.set_cargo_mass(20.0)
 	_expect(is_equal_approx(trailer.cargo_mass_tons, 20.0), "trailer must retain its cargo mass")
+	var cargo_visual := trailer.get_node("CargoVisual") as MeshInstance3D
 	trailer.set_cargo_loaded(true, false)
-	_expect(trailer.cargo_loaded and trailer.get_node("CargoVisual").visible, "loaded cargo must be visible in the trailer")
+	_expect(trailer.cargo_loaded and cargo_visual.visible, "loaded cargo must be visible in the trailer")
 	trailer.set_cargo_loaded(false, false)
-	_expect(not trailer.cargo_loaded and not trailer.get_node("CargoVisual").visible, "unloaded cargo must be hidden from the trailer")
+	_expect(not trailer.cargo_loaded and not cargo_visual.visible, "unloaded cargo must be hidden from the trailer")
 	_expect(trailer is AnimatableBody3D, "trailer must be an independent physics body")
 	_expect(trailer.get_node_or_null("TrailerImpactSensor") != null, "trailer must expose an impact sensor")
 	truck.gear = 1
