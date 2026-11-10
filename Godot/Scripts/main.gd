@@ -26,6 +26,11 @@ var near_pickup_depot := false
 var near_delivery_depot := false
 var near_service_station := false
 var service_button: Button
+var near_toll_gate := false
+var toll_paid_this_loop := false
+var toll_button: Button
+var toll_barrier_collision: CollisionShape3D
+var toll_barrier_mesh: MeshInstance3D
 var touch_state := {"throttle": false, "brake": false, "left": false, "right": false}
 var traffic_vehicles: Array[EuroHaulTrafficVehicle] = []
 var _last_position := Vector3.ZERO
@@ -57,9 +62,11 @@ func _process(delta: float) -> void:
 	if current_position.z < -ROAD_LENGTH + 20.0:
 		current_position.z += ROAD_LENGTH
 		truck.global_position = current_position
+		_reset_toll_gate()
 	elif current_position.z > 20.0:
 		current_position.z -= ROAD_LENGTH
 		truck.global_position = current_position
+		_reset_toll_gate()
 	_last_position = current_position
 	var expected_step := (absf(truck.speed_kmh) / 3.6) * delta * 3.0 + 1.0
 	if distance > 0.0 and distance <= maxf(10.0, expected_step) and career != null:
@@ -73,6 +80,7 @@ func _process(delta: float) -> void:
 	_update_traffic_warnings()
 	_update_freight_action()
 	_update_service_button()
+	_update_toll_button()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
@@ -156,6 +164,7 @@ func _build_world() -> void:
 	_create_depot_area("PickupDepot", -50.0, true)
 	_create_depot_area("DeliveryDepot", -820.0, false)
 	_create_service_area(-600.0)
+	_create_toll_gate(-280.0)
 
 func _create_depot_area(depot_name: String, road_z: float, is_pickup: bool) -> void:
 	var depot := Area3D.new()
@@ -195,6 +204,81 @@ func _create_depot_area(depot_name: String, road_z: float, is_pickup: bool) -> v
 	sign_label.font_size = 36
 	sign_label.modulate = Color("#f4f5f6")
 	add_child(sign_label)
+
+func _create_toll_gate(road_z: float) -> void:
+	var toll_area := Area3D.new()
+	toll_area.name = "TollGateTrigger"
+	toll_area.position = Vector3(0.0, 1.0, road_z)
+	toll_area.collision_layer = 0
+	toll_area.collision_mask = 1
+	var trigger := CollisionShape3D.new()
+	var trigger_shape := SphereShape3D.new()
+	trigger_shape.radius = 40.0
+	trigger.shape = trigger_shape
+	toll_area.add_child(trigger)
+	toll_area.body_entered.connect(func(body: Node3D):
+		if body == truck:
+			near_toll_gate = true
+			_update_toll_button()
+	)
+	toll_area.body_exited.connect(func(body: Node3D):
+		if body == truck:
+			near_toll_gate = false
+			_update_toll_button()
+	)
+	add_child(toll_area)
+
+	var barrier := StaticBody3D.new()
+	barrier.name = "TollBarrier"
+	barrier.position = Vector3(0.0, 1.5, road_z - 30.0)
+	toll_barrier_collision = CollisionShape3D.new()
+	var barrier_shape := BoxShape3D.new()
+	barrier_shape.size = Vector3(12.0, 3.0, 0.55)
+	toll_barrier_collision.shape = barrier_shape
+	barrier.add_child(toll_barrier_collision)
+	toll_barrier_mesh = _make_box_mesh(Vector3(12.0, 3.0, 0.55), Color("#d5ad62"))
+	barrier.add_child(toll_barrier_mesh)
+	add_child(barrier)
+	_add_box("Toll Gate Sign", Vector3(-9.0, 2.0, road_z), Vector3(0.25, 3.0, 4.0), GOLD, false)
+	var sign_label := Label3D.new()
+	sign_label.text = "MOTORWAY TOLL • €15"
+	sign_label.position = Vector3(-9.0, 4.0, road_z)
+	sign_label.font_size = 32
+	sign_label.modulate = Color("#f4f5f6")
+	add_child(sign_label)
+
+func _reset_toll_gate() -> void:
+	toll_paid_this_loop = false
+	if toll_barrier_collision != null:
+		toll_barrier_collision.disabled = false
+	if toll_barrier_mesh != null:
+		toll_barrier_mesh.visible = true
+	_update_toll_button()
+
+func _pay_toll() -> void:
+	if not near_toll_gate or toll_paid_this_loop or career == null:
+		return
+	if career.spend_cash(15):
+		toll_paid_this_loop = true
+		if toll_barrier_collision != null:
+			toll_barrier_collision.disabled = true
+		if toll_barrier_mesh != null:
+			toll_barrier_mesh.visible = false
+		status_label.text = "MOTORWAY TOLL PAID • €15"
+	_update_toll_button()
+
+func _update_toll_button() -> void:
+	if toll_button == null or career == null:
+		return
+	if toll_paid_this_loop:
+		toll_button.text = "TOLL PAID"
+		toll_button.disabled = true
+	elif not near_toll_gate:
+		toll_button.text = "TOLL GATE AHEAD"
+		toll_button.disabled = true
+	else:
+		toll_button.text = "PAY TOLL • €15"
+		toll_button.disabled = career.game_cash < 15
 
 func _create_service_area(road_z: float) -> void:
 	var service_area := Area3D.new()
@@ -449,6 +533,12 @@ func _build_hud() -> void:
 	freight_action_button.custom_minimum_size = Vector2(210, 52)
 	freight_action_button.pressed.connect(_handle_freight_interaction)
 	layer.add_child(freight_action_button)
+	toll_button = Button.new()
+	toll_button.text = "TOLL GATE AHEAD"
+	toll_button.position = Vector2(730, 175)
+	toll_button.custom_minimum_size = Vector2(180, 52)
+	toll_button.pressed.connect(_pay_toll)
+	layer.add_child(toll_button)
 	found_company_button = Button.new()
 	found_company_button.text = "FOUND COMPANY • €50,000"
 	found_company_button.position = Vector2(220, 175)
