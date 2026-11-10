@@ -828,7 +828,7 @@ func _update_hud() -> void:
 		contract_text = "Offer: %s → %s | %s | %.2f km | €%d" % [o.origin, o.destination, o.cargo, o.distance_km, int(o.reward)]
 	var company_text := "COMPANY • NOT FOUNDED"
 	if company != null and not company.company_name.is_empty():
-		company_text = "%s • €%d • FLEET %d • DRIVERS %d" % [company.company_name, company.company_balance, company.owned_trucks, company.hired_drivers]
+		company_text = "CO %s • €%d • FLEET %d • DRV %d • REP %d • JOBS %d" % [company.company_name, company.company_balance, company.owned_trucks, company.hired_drivers, company.reputation, company.completed_company_jobs]
 	if found_company_button != null:
 		found_company_button.text = "FOUND COMPANY • €50,000"
 		found_company_button.disabled = false
