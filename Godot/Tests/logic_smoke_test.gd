@@ -153,6 +153,8 @@ func _run_tests() -> void:
 		"mass_tons": 20.0,
 		"fragility": "FRAGILE",
 		"damage_percent": 0.0,
+		"deadline_seconds": 10.0,
+		"elapsed_seconds": 0.0,
 		"distance_km": 0.2,
 		"progress_km": 0.0,
 		"reward": 100,
@@ -160,10 +162,14 @@ func _run_tests() -> void:
 	}
 	career.offered_contract.clear()
 	career.record_distance(0.5)
+	career.advance_contract_time(10.0)
+	_expect(is_equal_approx(float(career.active_contract.elapsed_seconds), 0.0), "delivery deadline must not start before pickup")
 	_expect(is_equal_approx(float(career.active_contract.progress_km), 0.0), "contract distance must not advance before pickup")
 	_expect(career.load_cargo(), "active contract must allow cargo pickup")
 	career.apply_cargo_damage(10.0)
 	_expect(is_equal_approx(float(career.active_contract.damage_percent), 15.0), "fragile cargo must take amplified damage")
+	career.advance_contract_time(130.0)
+	_expect(is_equal_approx(float(career.active_contract.elapsed_seconds), 130.0), "delivery clock must advance while cargo is loaded")
 	_expect(not career.load_cargo(), "cargo must not be loaded twice")
 	_expect(not career.unload_cargo(), "cargo must not unload before required route distance")
 	career.record_distance(0.2, false)
@@ -173,7 +179,7 @@ func _run_tests() -> void:
 	_expect(career.unload_cargo(), "loaded contract at full route distance must unload successfully")
 	_expect(not career.unload_cargo(), "delivery reward must not be claimed twice")
 	_expect(career.deliveries == 1, "completed contract must count once")
-	_expect(career.game_cash == 25090, "cargo damage must reduce the delivery reward")
+	_expect(career.game_cash == 25080, "cargo damage and late delivery must reduce the delivery reward")
 	_expect(career.active_contract.is_empty(), "completed contract must clear")
 	career.add_xp(300)
 	_expect(career.level >= 3, "large XP award must process multiple level-ups")
