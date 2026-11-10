@@ -34,8 +34,9 @@ func _update_player_avoidance(delta: float) -> void:
 
 	var gap_ahead := player_target.global_position.z - global_position.z
 	var player_speed := 0.0
-	if player_target is EuroHaulTruck:
-		player_speed = player_target.speed_kmh
+	var player_truck := player_target as EuroHaulTruck
+	if player_truck != null:
+		player_speed = player_truck.speed_kmh
 	var player_is_closing := gap_ahead > 0.0 and gap_ahead < detection_distance_m and player_speed > speed_kmh + 4.0
 	var traffic_is_closing_from_behind := gap_ahead < 0.0 and absf(gap_ahead) < 18.0 and speed_kmh > player_speed + 8.0
 
@@ -61,11 +62,14 @@ func safety_warning_for_lane(requested_lane_x: float) -> String:
 	return ""
 
 func get_proximity_report() -> Dictionary:
-	if not is_instance_valid(player_target) or not (player_target is EuroHaulTruck):
+	if not is_instance_valid(player_target):
 		return {}
-	var gap := player_target.global_position.z - global_position.z
+	var player_truck := player_target as EuroHaulTruck
+	if player_truck == null:
+		return {}
+	var gap := player_truck.global_position.z - global_position.z
 	var distance := absf(gap)
-	var player_speed: float = player_target.speed_kmh
+	var player_speed: float = player_truck.speed_kmh
 	if gap > 0.0 and distance <= 45.0 and player_speed > speed_kmh + 2.0:
 		return {"zone": "FRONT", "distance_m": distance, "closing_kmh": player_speed - speed_kmh}
 	if gap < 0.0 and distance <= 25.0 and speed_kmh > player_speed + 2.0:
