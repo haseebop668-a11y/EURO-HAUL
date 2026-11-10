@@ -15,7 +15,7 @@ This inventory distinguishes code that exists from code that has passed runtime/
 | Player truck | Custom `CharacterBody3D`, engine RPM/torque approximation, gearbox, clutch, reverse, brake, speed limits, fuel use, service refuelling and repair | Logic smoke tests authored; CI not yet green |
 | Steering safety | Speed-sensitive steering angle using a lateral-acceleration limit | Source implemented; handling not tuned on device |
 | Camera | Third-person SpringArm chase camera | Source implemented; device QA pending |
-| Trailer | Independent kinematic trailer body with cargo collision shape, wheels and capped forward/reverse articulation | Prototype implemented; physical hitch and load dynamics not yet implemented |
+| Trailer | Independent kinematic trailer body with cargo collision shape, impact sensor that propagates damage to truck, wheels and capped forward/reverse articulation | Prototype implemented; physical hitch and load dynamics not yet implemented |
 | Inputs and feedback | Keyboard/touch controls, gear controls, blinking rear indicators/hazards and a generated dual-tone horn audio effect | Source implemented; device/audio QA pending |
 | Traffic | Six scripted vehicles with cruise speed and lane assignment | Basic traffic exists |
 | Traffic response | Physics-tick player-aware proximity detection; checks adjacent traffic gaps before lane changes; slows/adjusts speed when blocked; returns after the gap clears; traffic actors have collision bodies | Newly implemented; automated test authored; CI not yet green |
