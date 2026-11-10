@@ -18,11 +18,11 @@ var traffic_neighbors: Array[EuroHaulTrafficVehicle] = []
 func _ready() -> void:
 	speed_kmh = cruise_speed_kmh
 	_base_lane_x = lane_x
-	_phase = absf(global_position.z) * 3.6 / maxf(1.0, cruise_speed_kmh)
+	_phase = absf(global_position.z)
 
 func _physics_process(delta: float) -> void:
-	_phase += delta
-	var target_z := -fmod(_phase * maxf(20.0, speed_kmh) / 3.6, route_length)
+	_phase += maxf(20.0, speed_kmh) / 3.6 * delta
+	var target_z := -fmod(_phase, route_length)
 	global_position.z = target_z
 	_update_player_avoidance(delta)
 	global_position.x = move_toward(global_position.x, lane_x, lane_change_speed * delta)
