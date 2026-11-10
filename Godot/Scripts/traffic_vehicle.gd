@@ -34,8 +34,8 @@ func _update_player_avoidance(delta: float) -> void:
 
 	var gap_ahead := player_target.global_position.z - global_position.z
 	var player_speed := 0.0
-	if "speed_kmh" in player_target:
-		player_speed = float(player_target.get("speed_kmh"))
+	if player_target is EuroHaulTruck:
+		player_speed = player_target.speed_kmh
 	var player_is_closing := gap_ahead > 0.0 and gap_ahead < detection_distance_m and player_speed > speed_kmh + 4.0
 	var traffic_is_closing_from_behind := gap_ahead < 0.0 and absf(gap_ahead) < 18.0 and speed_kmh > player_speed + 8.0
 
