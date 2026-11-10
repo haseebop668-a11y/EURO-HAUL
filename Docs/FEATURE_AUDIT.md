@@ -20,7 +20,7 @@ This inventory distinguishes code that exists from code that has passed runtime/
 | Traffic response | Physics-tick player-aware proximity detection; slower traffic moves to the other lane when the player closes; returns after the gap clears; traffic actors have collision bodies | Newly implemented; automated test authored; CI not yet green |
 | Lane-change feedback | Indicator-triggered adjacent-lane proximity warning / clear prompt; nearest forward/rear traffic HUD warning | Newly implemented; automated tests authored; CI not yet green |
 | Collision damage | Side-impact filtering and cooldown; damage capped at 100% | Source implemented; traffic collision integration and device QA pending |
-| Career | Driver profile, cash, generated freight offer, accept/deliver, distance, XP and levels | Source implemented; logic tests authored |
+| Career | Driver profile, cash, 2–5 km regional freight offers, accept/deliver, distance, XP and levels; road segment recycles to support continuous driving | Source implemented; logic tests authored; CI not yet green |
 | Company | Company founding with seed capital, truck purchase, one-driver-per-truck hiring, simulated daily driver jobs/revenue, operating costs, reputation and delivery revenue | Basic passive driver simulation implemented; full management/dispatch UI absent |
 | Persistence | Local schema-versioned JSON career/company saves with temporary write and backup recovery | Source implemented; restart/corruption QA pending |
 | Offline mode | Core career/company saves and gameplay logic are local; no account/backend dependency | Implemented by architecture |
@@ -33,7 +33,7 @@ These are not present as complete gameplay features yet and must not be describe
 2. **Full vehicle dynamics** — wheel/tire grip, suspension, axle loads, differential, torque curve calibration, retarder/engine braking, ABS/traction behaviour and service/repair.
 3. **Traffic simulation** — physical traffic collision bodies, multi-vehicle awareness, safe gap selection, overtaking rules, junction behaviour, traffic lights, roundabouts, speed-limit adherence and emergency braking.
 4. **Forward/rear awareness** — dedicated front/rear sensing with closing-speed calculation, blind-spot checks, lane-change risk scoring and clear dashboard alerts.
-5. **European world and navigation** — connected road network, multiple cities, junctions, roundabouts, tolls, service stations, rest areas, borders and GPS route guidance. The current road is a straight greybox segment.
+5. **European world and navigation** — connected road network, city-specific distances, junctions, roundabouts, tolls, service stations, rest areas, borders and GPS route guidance. The current road is a single straight greybox motorway loop.
 6. **Freight operations** — depot interaction, loading/unloading, cargo types with mass/fragility, trailer selection, damage/late-delivery penalties, weigh stations and delivery confirmation.
 7. **Company progression** — detailed AI driver schedules/routes, truck assignment UI, fleet maintenance, driver wages/skills, contracts for hired drivers, reputation-driven contract access and a full management screen.
 8. **Presentation** — production truck/trailer models, interiors, road assets, animation, weather/day-night cycle, lighting polish, soundscape, engine/air-brake/horn audio and UI polish.
