@@ -1,4 +1,4 @@
-extends Node3D
+extends AnimatableBody3D
 class_name EuroHaulTrafficVehicle
 
 @export var cruise_speed_kmh := 48.0
