@@ -45,6 +45,10 @@
 ## Offline career and persistence
 - [ ] New profile creates a valid freight offer.
 - [ ] Accepting a contract moves it from offered to active exactly once.
+- [ ] Cargo can only be loaded at the pickup depot and cannot be loaded twice.
+- [ ] Contract distance advances only while cargo is loaded.
+- [ ] Cargo cannot be unloaded before required route distance is complete.
+- [ ] Delivery depot unloads cargo, pays reward once and generates the next offer.
 - [ ] Distance progress is monotonic and does not jump when a frame has a large position delta.
 - [ ] Road-segment recycling keeps the truck on the motorway and does not add teleport distance to a freight contract.
 - [ ] Delivery completion pays the reward once, awards XP once and generates the next offer.
