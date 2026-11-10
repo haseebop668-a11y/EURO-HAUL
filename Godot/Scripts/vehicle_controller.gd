@@ -26,6 +26,7 @@ var speed_kmh := 0.0
 var damage := 0.0
 var _yaw_rate := 0.0
 var _horn_cooldown := 0.0
+var _impact_cooldown := 0.0
 var indicators := 0
 
 func set_controls(throttle: float, steering: float, braking: float) -> void:
@@ -100,7 +101,6 @@ func _physics_process(delta: float) -> void:
 		longitudinal = move_toward(longitudinal, 0.0, 14.0 * brake_input * delta)
 	else:
 		longitudinal = move_toward(longitudinal, 0.0, (0.18 + absf(longitudinal) * 0.025) * delta)
-	var speed_limit := max_reverse_kmh / 3.6 if longitudinal < 0.0 else max_forward_kmh / 3.6
 	longitudinal = clampf(longitudinal, -max_reverse_kmh / 3.6, max_forward_kmh / 3.6)
 	var safe_angle := rad_to_deg(atan((max_lateral_accel * wheelbase_m) / maxf(0.1, longitudinal * longitudinal)))
 	var steer_angle := deg_to_rad(clampf(steer_input * max_steer_degrees, -minf(max_steer_degrees, safe_angle), minf(max_steer_degrees, safe_angle)))
@@ -111,8 +111,16 @@ func _physics_process(delta: float) -> void:
 	velocity.z = target_velocity.z
 	velocity.y -= 9.8 * delta
 	move_and_slide()
-	if get_slide_collision_count() > 0 and absf(speed_kmh) > 12.0:
+	_impact_cooldown = maxf(0.0, _impact_cooldown - delta)
+	var side_impact := false
+	for collision_index in range(get_slide_collision_count()):
+		var hit := get_slide_collision(collision_index)
+		if absf(hit.get_normal().y) < 0.65:
+			side_impact = true
+			break
+	if side_impact and absf(speed_kmh) > 12.0 and _impact_cooldown <= 0.0:
 		apply_damage(minf(8.0, absf(speed_kmh) * 0.035))
+		_impact_cooldown = 0.65
 	telemetry_changed.emit(absf(speed_kmh), int(engine_rpm), gear)
 
 func _current_ratio() -> float:
