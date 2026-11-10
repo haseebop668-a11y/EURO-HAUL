@@ -23,12 +23,16 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if not is_instance_valid(truck):
 		return
+	global_position = truck.global_position + truck.global_transform.basis.z * 3.3
+	if absf(truck.speed_kmh) < 0.5:
+		global_rotation = Vector3(global_rotation.x, truck.global_rotation.y + deg_to_rad(articulation_degrees), global_rotation.z)
+		return
 	var speed_factor := clampf(absf(truck.speed_kmh) / 55.0, 0.0, 1.0)
 	var gain := reverse_articulation_gain if truck.gear == -1 else forward_articulation_gain
 	var direction := -1.0 if truck.gear == -1 else 1.0
-	var target_angle := -truck.steer_input * speed_factor * gain * 35.0 * direction
+	var load_factor := 1.0 + cargo_mass_tons / 50.0
+	var target_angle := -truck.steer_input * speed_factor * gain * 35.0 * direction * load_factor
 	articulation_degrees = move_toward(articulation_degrees, clampf(target_angle, -articulation_limit_degrees, articulation_limit_degrees), articulation_response * 45.0 * delta)
-	global_position = truck.global_position + truck.global_transform.basis.z * 3.3
 	global_rotation = Vector3(global_rotation.x, truck.global_rotation.y + deg_to_rad(articulation_degrees), global_rotation.z)
 
 func _build_trailer_visuals() -> void:
