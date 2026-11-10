@@ -10,7 +10,7 @@ var _weather_elapsed := 0.0
 const WEATHER_STATES := ["CLEAR", "CLOUDY", "FOG"]
 
 func _process(delta: float) -> void:
-	time_of_day_hours = fmod(time_of_day_hours + maxf(0.0, delta) / 120.0, 24.0)
+	time_of_day_hours = fmod(time_of_day_hours + maxf(0.0, delta) / 12.5, 24.0)
 	_weather_elapsed += maxf(0.0, delta)
 	if _weather_elapsed >= 300.0:
 		var periods := int(floor(_weather_elapsed / 300.0))
