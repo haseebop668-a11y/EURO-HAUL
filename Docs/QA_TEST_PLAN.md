@@ -55,6 +55,7 @@
 - [ ] Level progression handles multiple level-ups from one XP award.
 - [ ] Career save survives app restart.
 - [ ] Missing, malformed and unsupported-version save files do not crash the game.
+- [ ] Malformed contract fields are rejected and route progress is clamped to the contract distance.
 - [ ] Save writes use a recoverable/atomic strategy.
 
 ## Company economy and persistence
