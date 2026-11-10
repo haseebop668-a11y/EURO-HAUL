@@ -102,6 +102,7 @@ func _notification(what: int) -> void:
 			touch_state[key] = false
 		if truck != null:
 			truck.set_controls(0.0, 0.0, 0.0)
+			truck.set_retarder(0.0)
 		_save_progress()
 
 func _unhandled_key_input(event: InputEvent) -> void:
