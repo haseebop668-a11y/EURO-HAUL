@@ -67,8 +67,7 @@ func _process(delta: float) -> void:
 		truck.consume_fuel(distance / 1000.0)
 		_last_distance_save += distance
 	if _last_distance_save >= 100.0:
-		if career != null:
-			career.save()
+		_save_progress()
 		_last_distance_save = 0.0
 	_update_hud()
 	_update_traffic_warnings()
@@ -82,16 +81,14 @@ func _notification(what: int) -> void:
 			pause_button.text = "RESUME" if get_tree().paused else "PAUSE"
 		if status_label != null:
 			status_label.text = "PAUSED" if get_tree().paused else "RESUMED"
+		_save_progress()
 		return
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
 		for key in touch_state.keys():
 			touch_state[key] = false
 		if truck != null:
 			truck.set_controls(0.0, 0.0, 0.0)
-		if career != null:
-			career.save()
-		if company != null:
-			company.save_company()
+		_save_progress()
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and truck != null:
@@ -349,12 +346,23 @@ func _create_horn_stream() -> AudioStreamWAV:
 	stream.data = samples
 	return stream
 
+func _save_progress() -> void:
+	if career != null:
+		if truck != null:
+			career.update_vehicle_state(truck.fuel_percent, truck.damage)
+		else:
+			career.save()
+	if company != null:
+		company.save_company()
+
 func _build_career() -> void:
 	truck.horn_pressed.connect(func(): status_label.text = "HORN • SIGNAL")
 	truck.indicators_changed.connect(func(value: int): status_label.text = "HAZARD LIGHTS" if value == 2 else ("LEFT INDICATOR" if value == -1 else ("RIGHT INDICATOR" if value == 1 else "SIGNALS OFF")))
 	career = EuroHaulCareer.new()
 	career.name = "CareerManager"
 	add_child(career)
+	truck.fuel_percent = career.saved_fuel_percent
+	truck.damage = career.saved_vehicle_damage
 	career.changed.connect(_update_hud)
 	company = EuroHaulCompanyManager.new()
 	company.name = "CompanyManager"
@@ -426,6 +434,7 @@ func _build_hud() -> void:
 		get_tree().paused = not get_tree().paused
 		pause_button.text = "RESUME" if get_tree().paused else "PAUSE"
 		status_label.text = "PAUSED" if get_tree().paused else "RESUMED"
+		_save_progress()
 	)
 	signal_row.add_child(pause_button)
 	accept_freight_button = Button.new()
@@ -540,6 +549,7 @@ func _handle_service_interaction() -> void:
 	if career.spend_cash(total_cost):
 		truck.refuel()
 		truck.repair()
+		_save_progress()
 		status_label.text = "SERVICE COMPLETE • €%d" % total_cost
 	else:
 		status_label.text = "SERVICE COST €%d • INSUFFICIENT FUNDS" % total_cost
