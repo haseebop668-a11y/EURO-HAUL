@@ -16,6 +16,8 @@ var total_distance_km := 0.0
 var active_contract: Dictionary = {}
 var offered_contract: Dictionary = {}
 var cargo_loaded := false
+var saved_fuel_percent := 100.0
+var saved_vehicle_damage := 0.0
 
 func _ready() -> void:
 	load_save()
@@ -130,11 +132,17 @@ func _sanitize_contract(value: Variant) -> Dictionary:
 		"xp": maxi(0, int(xp_value))
 	}
 
+func update_vehicle_state(fuel_percent: float, vehicle_damage: float) -> void:
+	saved_fuel_percent = clampf(fuel_percent, 0.0, 100.0)
+	saved_vehicle_damage = clampf(vehicle_damage, 0.0, 100.0)
+	save()
+
 func save() -> void:
 	var data := {
 		"schema": 1, "driver_name": driver_name, "level": level, "xp": xp,
 		"game_cash": game_cash, "deliveries": deliveries, "total_distance_km": total_distance_km,
-		"active_contract": active_contract, "offered_contract": offered_contract, "cargo_loaded": cargo_loaded
+		"active_contract": active_contract, "offered_contract": offered_contract, "cargo_loaded": cargo_loaded,
+		"vehicle_state": {"fuel_percent": saved_fuel_percent, "damage": saved_vehicle_damage}
 	}
 	var temp_path := SAVE_PATH + ".tmp"
 	var backup_path := SAVE_PATH + ".bak"
@@ -189,6 +197,10 @@ func load_save() -> void:
 		active_contract = _sanitize_contract(active_value)
 		offered_contract = _sanitize_contract(offered_value)
 		cargo_loaded = bool(parsed.get("cargo_loaded", false)) and not active_contract.is_empty()
+		var vehicle_state: Variant = parsed.get("vehicle_state", {})
+		if typeof(vehicle_state) == TYPE_DICTIONARY:
+			saved_fuel_percent = clampf(float(vehicle_state.get("fuel_percent", 100.0)), 0.0, 100.0)
+			saved_vehicle_damage = clampf(float(vehicle_state.get("damage", 0.0)), 0.0, 100.0)
 		if read_path != SAVE_PATH:
 			DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
 			save()
