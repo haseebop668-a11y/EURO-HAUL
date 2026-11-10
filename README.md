@@ -45,6 +45,7 @@ See [Docs/OPEN_SOURCE_ENGINEERING_NOTES.md](Docs/OPEN_SOURCE_ENGINEERING_NOTES.m
 - `Docs/ECONOMY_AND_PLAYER_BUSINESSES.md`: economy and player companies.
 - `Docs/FEATURE_AUDIT.md`: existing vs implemented vs remaining feature inventory.
 - `Docs/QA_TEST_PLAN.md`: automated and physical acceptance checklist.
+- `Docs/REVIEW_GUIDE.md`: recommended source-review order and final acceptance checklist.
 - `Docs/BUILD_AND_RELEASE.md`: Android and Windows CI build instructions.
 
 ## Build and test status
