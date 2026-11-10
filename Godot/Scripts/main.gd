@@ -13,6 +13,7 @@ var hud: Label
 var status_label: Label
 var speed_label: Label
 var freight_action_button: Button
+var accept_freight_button: Button
 var near_pickup_depot := false
 var near_delivery_depot := false
 var touch_state := {"throttle": false, "brake": false, "left": false, "right": false}
@@ -288,12 +289,12 @@ func _build_hud() -> void:
 	horn.text = "HORN"
 	horn.pressed.connect(func(): truck.sound_horn())
 	signal_row.add_child(horn)
-	var accept := Button.new()
-	accept.text = "ACCEPT FREIGHT"
-	accept.position = Vector2(20, 145)
-	accept.custom_minimum_size = Vector2(190, 52)
-	accept.pressed.connect(func(): career.accept_offer(); _update_hud())
-	layer.add_child(accept)
+	accept_freight_button = Button.new()
+	accept_freight_button.text = "ACCEPT FREIGHT"
+	accept_freight_button.position = Vector2(20, 145)
+	accept_freight_button.custom_minimum_size = Vector2(190, 52)
+	accept_freight_button.pressed.connect(func(): career.accept_offer(); _update_hud(); _update_freight_action())
+	layer.add_child(accept_freight_button)
 	freight_action_button = Button.new()
 	freight_action_button.text = "DRIVE TO PICKUP"
 	freight_action_button.position = Vector2(500, 145)
@@ -383,6 +384,8 @@ func _handle_freight_interaction() -> void:
 func _update_freight_action() -> void:
 	if freight_action_button == null or career == null:
 		return
+	if accept_freight_button != null:
+		accept_freight_button.disabled = not career.active_contract.is_empty() or career.offered_contract.is_empty()
 	if career.active_contract.is_empty():
 		freight_action_button.text = "ACCEPT FREIGHT FIRST"
 		freight_action_button.disabled = true
