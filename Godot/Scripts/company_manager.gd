@@ -7,6 +7,7 @@ const SAVE_PATH := "user://euro_haul_company.json"
 const FOUNDING_COST := 50000
 const TRUCK_PURCHASE_COST := 85000
 const DRIVER_HIRING_COST := 5000
+const SIMULATED_DAY_SECONDS := 300.0
 
 var company_name := ""
 var company_balance := 0
@@ -52,8 +53,7 @@ func hire_driver() -> bool:
 func complete_company_delivery(revenue: int) -> void:
 	if company_name.is_empty():
 		return
-	var safe_revenue := maxi(0, revenue)
-	company_balance += safe_revenue
+	company_balance += maxi(0, revenue)
 	completed_company_jobs += 1
 	reputation = mini(1000, reputation + 5)
 	company_changed.emit()
@@ -62,13 +62,16 @@ func complete_company_delivery(revenue: int) -> void:
 func _process(delta: float) -> void:
 	if company_name.is_empty():
 		return
-	_elapsed_day_seconds += delta
-	if _elapsed_day_seconds >= 300.0:
-		_elapsed_day_seconds = 0.0
+	_elapsed_day_seconds += maxf(0.0, delta)
+	if _elapsed_day_seconds < SIMULATED_DAY_SECONDS:
+		return
+	var elapsed_days := int(floor(_elapsed_day_seconds / SIMULATED_DAY_SECONDS))
+	_elapsed_day_seconds = fmod(_elapsed_day_seconds, SIMULATED_DAY_SECONDS)
 	var daily_cost := operating_cost_per_day * owned_trucks + hired_drivers * 180
-	company_balance = maxi(0, company_balance - daily_cost)
-	company_changed.emit()
-	save_company()
+	if daily_cost > 0:
+		company_balance = maxi(0, company_balance - daily_cost * elapsed_days)
+		company_changed.emit()
+		save_company()
 
 func save_company() -> void:
 	var payload := {
@@ -78,6 +81,7 @@ func save_company() -> void:
 	}
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file == null:
+		push_warning("Could not open company save file for writing: %s" % FileAccess.get_open_error())
 		return
 	file.store_string(JSON.stringify(payload))
 	file.close()
@@ -87,9 +91,11 @@ func load_company() -> void:
 		return
 	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
 	if file == null:
+		push_warning("Could not open company save file for reading: %s" % FileAccess.get_open_error())
 		return
 	var payload: Variant = JSON.parse_string(file.get_as_text())
 	if typeof(payload) != TYPE_DICTIONARY or int(payload.get("schema", 0)) != 1:
+		push_warning("Company save file is invalid or uses an unsupported schema")
 		return
 	company_name = str(payload.get("company_name", ""))
 	company_balance = maxi(0, int(payload.get("company_balance", 0)))
