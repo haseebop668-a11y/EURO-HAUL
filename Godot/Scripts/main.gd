@@ -88,14 +88,17 @@ func _process(delta: float) -> void:
 	_update_service_button()
 	_update_toll_button()
 
+func _toggle_pause() -> void:
+	get_tree().paused = not get_tree().paused
+	if pause_button != null:
+		pause_button.text = "RESUME" if get_tree().paused else "PAUSE"
+	if status_label != null:
+		status_label.text = "PAUSED" if get_tree().paused else "RESUMED"
+	_save_progress()
+
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		get_tree().paused = not get_tree().paused
-		if pause_button != null:
-			pause_button.text = "RESUME" if get_tree().paused else "PAUSE"
-		if status_label != null:
-			status_label.text = "PAUSED" if get_tree().paused else "RESUMED"
-		_save_progress()
+		_toggle_pause()
 		return
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
 		for key in touch_state.keys():
@@ -132,7 +135,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			KEY_X:
 				truck.set_indicator(1 if truck.indicators != 1 else 0)
 			KEY_ESCAPE:
-				get_tree().paused = not get_tree().paused
+				_toggle_pause()
 
 func _setup_environment() -> void:
 	var environment := Environment.new()
@@ -533,12 +536,7 @@ func _build_hud() -> void:
 	signal_row.add_child(horn)
 	pause_button = Button.new()
 	pause_button.text = "PAUSE"
-	pause_button.pressed.connect(func():
-		get_tree().paused = not get_tree().paused
-		pause_button.text = "RESUME" if get_tree().paused else "PAUSE"
-		status_label.text = "PAUSED" if get_tree().paused else "RESUMED"
-		_save_progress()
-	)
+	pause_button.pressed.connect(_toggle_pause)
 	signal_row.add_child(pause_button)
 	accept_freight_button = Button.new()
 	accept_freight_button.text = "ACCEPT FREIGHT"
