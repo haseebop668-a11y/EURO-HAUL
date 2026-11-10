@@ -321,6 +321,16 @@ func _update_traffic_warnings() -> void:
 		return
 	if truck.indicators == 0:
 		status_label.text = "FREIGHT • BERLIN REGION"
+		var nearest_zone := ""
+		var nearest_distance := INF
+		for traffic in traffic_vehicles:
+			if is_instance_valid(traffic):
+				var report := traffic.get_proximity_report()
+				if not report.is_empty() and float(report.distance_m) < nearest_distance:
+					nearest_distance = float(report.distance_m)
+					nearest_zone = str(report.zone)
+		if not nearest_zone.is_empty():
+			status_label.text = "%s TRAFFIC • %.0f m" % [nearest_zone, nearest_distance]
 		return
 	var requested_lane := -2.0 if truck.indicators == -1 else (2.0 if truck.indicators == 1 else 0.0)
 	if requested_lane == 0.0:
