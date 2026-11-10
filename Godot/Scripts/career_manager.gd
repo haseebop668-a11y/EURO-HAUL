@@ -92,11 +92,11 @@ func unload_cargo() -> bool:
 	changed.emit()
 	return true
 
-func record_distance(distance_km: float) -> void:
+func record_distance(distance_km: float, forward: bool = true) -> void:
 	if distance_km <= 0.0:
 		return
 	total_distance_km += distance_km
-	if active_contract.is_empty() or not cargo_loaded:
+	if active_contract.is_empty() or not cargo_loaded or not forward:
 		return
 	active_contract.progress_km = minf(active_contract.distance_km, active_contract.progress_km + distance_km)
 
