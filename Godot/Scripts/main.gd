@@ -796,7 +796,7 @@ func _update_hud() -> void:
 			var seconds_left := float(c.get("deadline_seconds", 0.0)) - float(c.get("elapsed_seconds", 0.0))
 			var time_label := "TIME" if seconds_left >= 0.0 else "LATE"
 			var display_seconds := int(absf(seconds_left))
-			contract_text += " | %s %02d:%02d" % [time_label, display_seconds / 60, display_seconds % 60]
+			contract_text += " | %s %02d:%02d" % [time_label, int(display_seconds / 60), display_seconds % 60]
 	elif not career.offered_contract.is_empty():
 		var o: Dictionary = career.offered_contract
 		contract_text = "Offer: %s → %s | %s | %.2f km | €%d" % [o.origin, o.destination, o.cargo, o.distance_km, int(o.reward)]
