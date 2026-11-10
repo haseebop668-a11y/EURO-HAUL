@@ -72,7 +72,8 @@ func _has_safe_lane(target_lane_x: float) -> bool:
 		if not is_instance_valid(neighbor) or neighbor == self:
 			continue
 		var neighbor_gap := absf(_signed_loop_gap(neighbor.global_position.z, global_position.z))
-		if absf(neighbor.global_position.x - target_lane_x) < 1.5 and neighbor_gap < 18.0:
+		var neighbor_occupies_lane := absf(neighbor.global_position.x - target_lane_x) < 1.5 or absf(neighbor.lane_x - target_lane_x) < 1.5
+		if neighbor_occupies_lane and neighbor_gap < 18.0:
 			return false
 	return true
 
