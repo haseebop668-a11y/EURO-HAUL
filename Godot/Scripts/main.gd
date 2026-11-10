@@ -478,7 +478,7 @@ func _build_hud() -> void:
 	add_child(layer)
 	var panel := PanelContainer.new()
 	panel.position = Vector2(20, 18)
-	panel.custom_minimum_size = Vector2(520, 150)
+	panel.custom_minimum_size = Vector2(620, 150)
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.025, 0.055, 0.09, 0.92)
 	style.border_color = GOLD
