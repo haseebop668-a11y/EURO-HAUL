@@ -169,15 +169,15 @@ func _setup_environment() -> void:
 	add_child(world_cycle)
 
 func _build_world() -> void:
-	_add_box("Ground", Vector3(0, -0.65, -ROAD_LENGTH * 0.5), Vector3(100, 1, ROAD_LENGTH), Color("#172b2d"), true)
-	_add_box("European motorway", Vector3(0, -0.05, -ROAD_LENGTH * 0.5), Vector3(12, 0.2, ROAD_LENGTH), Color("#303a43"), true)
+	_add_box("Ground", Vector3(0, -0.65, 20.0 - ROAD_LENGTH * 0.5), Vector3(100, 1, ROAD_LENGTH), Color("#172b2d"), true)
+	_add_box("European motorway", Vector3(0, -0.05, 20.0 - ROAD_LENGTH * 0.5), Vector3(12, 0.2, ROAD_LENGTH), Color("#303a43"), true)
 	for x in [-3.0, 3.0]:
-		_add_box("Road edge", Vector3(x, 0.07, -ROAD_LENGTH * 0.5), Vector3(0.12, 0.025, ROAD_LENGTH), GOLD, false)
-	for z in range(0, -int(ROAD_LENGTH), -12):
+		_add_box("Road edge", Vector3(x, 0.07, 20.0 - ROAD_LENGTH * 0.5), Vector3(0.12, 0.025, ROAD_LENGTH), GOLD, false)
+	for z in range(20, -int(ROAD_LENGTH) + 20, -12):
 		_add_box("Lane dash", Vector3(0, 0.075, float(z)), Vector3(0.14, 0.025, 5.5), Color("#e7e5d7"), false)
 	for side in [-1.0, 1.0]:
-		for i in range(45):
-			var z := -float(i) * 19.0 - 12.0
+		for i in range(48):
+			var z := -float(i) * 19.0 + 8.0
 			_add_box("Roadside barrier", Vector3(side * 7.0, 0.45, z), Vector3(0.18, 0.8, 9.0), Color("#8b969e"), true)
 			if i % 3 == 0:
 				_add_box("Roadside marker", Vector3(side * 8.0, 0.9, z), Vector3(0.16, 1.8, 0.16), Color("#d8dce0"), false)
