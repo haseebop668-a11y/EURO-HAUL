@@ -41,6 +41,7 @@
 - [ ] Horn control produces feedback and does not remain stuck after release.
 - [ ] Traffic collision reactions do not cause uncontrolled physics or repeated damage loops.
 - [ ] Player-aware traffic moves to a safe adjacent lane when the player closes from behind.
+- [ ] Traffic does not change into an occupied adjacent lane and adjusts speed when blocked.
 - [ ] Traffic returns to its base lane only after a clear-gap delay.
 - [ ] Forward and rear proximity reports identify the correct relative zone and closing direction.
 - [ ] Trailer articulation responds to steering in forward/reverse and stays within the configured angle limit.
