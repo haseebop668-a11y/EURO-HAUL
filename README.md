@@ -16,7 +16,7 @@ European Trucking Career Simulator for Android and Windows.
 ## Godot vertical slice foundation
 - Truck controller with diesel-style RPM, clutch, manual gears, reverse, speed-sensitive steering, engine braking, retarder, fuel, cargo-mass handling and collision damage.
 - Three selectable third-person chase camera presets.
-- Procedural 900m looping motorway greybox with road markings, barriers, depot triggers, a paid toll gate and a fuel/service station.
+- Procedural 900m looping motorway greybox with road markings, barriers, three T-junction access roads to pickup/delivery and service yards, a paid toll gate and a weigh station.
 - Six AI traffic vehicles with wrap-aware front/rear proximity, safe-gap lane changes, speed adjustment and collision bodies.
 - Android touch controls plus desktop keyboard controls, including retarder, clutch/gear actions, indicators, hazards and horn.
 - Dashboard telemetry for speed, RPM, gear, fuel, truck damage, cargo mass/fragility/damage and delivery time remaining.
