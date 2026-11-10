@@ -448,7 +448,7 @@ func _build_truck() -> void:
 	truck.name = "PlayerTruck"
 	truck.collision_layer = 2
 	truck.collision_mask = 1
-	truck.position = Vector3(0.0, 0.15, -8.0)
+	truck.position = Vector3(1.5, 0.15, -8.0)
 	var collision := CollisionShape3D.new()
 	var shape := BoxShape3D.new()
 	shape.size = Vector3(2.45, 2.7, 6.2)
