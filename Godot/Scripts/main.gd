@@ -251,7 +251,7 @@ func _reset_toll_gate() -> void:
 	toll_paid_this_loop = false
 	near_toll_gate = false
 	if toll_barrier_collision != null:
-		toll_barrier_collision.disabled = false
+		toll_barrier_collision.set_deferred("disabled", false)
 	if toll_barrier_mesh != null:
 		toll_barrier_mesh.visible = true
 	_update_toll_button()
@@ -264,7 +264,7 @@ func _pay_toll() -> void:
 		career.spend_cash(payment)
 	toll_paid_this_loop = true
 	if toll_barrier_collision != null:
-		toll_barrier_collision.disabled = true
+		toll_barrier_collision.set_deferred("disabled", true)
 	if toll_barrier_mesh != null:
 		toll_barrier_mesh.visible = false
 	status_label.text = "MOTORWAY TOLL PAID • €%d" % payment
