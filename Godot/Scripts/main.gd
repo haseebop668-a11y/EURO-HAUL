@@ -168,6 +168,12 @@ func _build_traffic() -> void:
 		var body := _make_box_mesh(Vector3(1.9, 1.5, 4.8), Color("#7892a2") if i % 2 == 0 else Color("#9a624e"))
 		body.position.y = 0.9
 		traffic.add_child(body)
+		var traffic_collision := CollisionShape3D.new()
+		var traffic_shape := BoxShape3D.new()
+		traffic_shape.size = Vector3(1.9, 1.5, 4.8)
+		traffic_collision.shape = traffic_shape
+		traffic_collision.position.y = 0.9
+		traffic.add_child(traffic_collision)
 		add_child(traffic)
 		traffic_vehicles.append(traffic)
 
