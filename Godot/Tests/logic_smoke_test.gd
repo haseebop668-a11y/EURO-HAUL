@@ -29,6 +29,12 @@ func _run_tests() -> void:
 	_expect(is_equal_approx(truck.throttle_input, 1.0), "throttle must clamp to 1")
 	_expect(is_equal_approx(truck.steer_input, -1.0), "steering must clamp to -1")
 	_expect(is_equal_approx(truck.brake_input, 1.0), "brake must clamp to 1")
+	truck.set_indicator(-1)
+	_expect(truck.indicators == -1, "left indicator must set the correct state")
+	truck.toggle_hazards()
+	_expect(truck.indicators == 2, "hazards must override the single-side indicator")
+	truck.toggle_hazards()
+	_expect(truck.indicators == 0, "hazards must toggle off cleanly")
 
 	var traffic = TrafficScript.new()
 	root.add_child(traffic)
