@@ -36,6 +36,11 @@
 - [ ] Indicator and hazard states update the HUD correctly.
 - [ ] Horn control produces feedback and does not remain stuck after release.
 - [ ] Traffic collision reactions do not cause uncontrolled physics or repeated damage loops.
+- [ ] Player-aware traffic moves to a safe adjacent lane when the player closes from behind.
+- [ ] Traffic returns to its base lane only after a clear-gap delay.
+- [ ] Forward and rear proximity reports identify the correct relative zone and closing direction.
+- [ ] Trailer articulation responds to steering in forward/reverse and stays within the configured angle limit.
+- [ ] Traffic collision bodies interact with the player truck without jitter or tunnelling.
 
 ## Offline career and persistence
 - [ ] New profile creates a valid freight offer.
