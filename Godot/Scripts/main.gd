@@ -368,8 +368,8 @@ func _build_truck() -> void:
 	trailer = EuroHaulTrailer.new()
 	trailer.name = "ArticulatedTrailer"
 	trailer.truck = truck
-	trailer.position = Vector3(0.0, 0.0, 3.3)
-	truck.add_child(trailer)
+	add_child(trailer)
+	trailer.global_position = truck.global_position + Vector3(0.0, 0.0, 3.3)
 	var camera_rig := SpringArm3D.new()
 	camera_rig.spring_length = 9.0
 	camera_rig.position = Vector3(0, 4.3, 1.0)
