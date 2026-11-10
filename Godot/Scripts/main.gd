@@ -58,7 +58,10 @@ func _process(delta: float) -> void:
 	truck.set_controls(throttle, steer, brake)
 	_update_indicator_lights(delta)
 	var current_position := truck.global_position
-	var distance := current_position.distance_to(_last_position)
+	var displacement := current_position - _last_position
+	var signed_road_distance := displacement.dot(-truck.global_basis.z)
+	var distance := absf(signed_road_distance)
+	var moving_forward := signed_road_distance >= 0.0
 	if current_position.z < -ROAD_LENGTH + 20.0:
 		current_position.z += ROAD_LENGTH
 		truck.global_position = current_position
@@ -70,7 +73,7 @@ func _process(delta: float) -> void:
 	_last_position = current_position
 	var expected_step := (absf(truck.speed_kmh) / 3.6) * delta * 3.0 + 1.0
 	if distance > 0.0 and distance <= maxf(10.0, expected_step) and career != null:
-		career.record_distance(distance / 1000.0, truck.speed_kmh >= 0.0)
+		career.record_distance(distance / 1000.0, moving_forward)
 		truck.consume_fuel(distance / 1000.0)
 		_last_distance_save += distance
 	if _last_distance_save >= 100.0:
