@@ -2,7 +2,7 @@
 European Trucking Career Simulator for Android and Windows.
 
 ## Current status
-**Godot 4 is the active build target.** Godot is open-source and does not require a Unity license. The original Unity source under `Game/` is preserved as a reference. The active project now contains a greybox simulation prototype with manual truck controls, AI traffic, freight contracts, cargo mass/damage, deadlines, company economy, tolls, fuel/service, day/night and weather systems; runtime validation is still pending. The project is still a prototype: the connected European road network, production vehicle assets, full fifth-wheel physics and device acceptance remain incomplete. No successful CI build or verified APK/Windows executable has been confirmed yet.
+**Godot 4 is the active build target.** Godot is open-source and does not require a Unity license. The original Unity source under `Game/` is preserved as a reference. The active project now contains a greybox simulation prototype with manual truck controls, AI traffic, freight contracts, cargo mass/damage, deadlines, company economy, tolls, weigh station, fuel/service, three chase-camera modes, day/night and weather systems; runtime validation is still pending. The project is still a prototype: the connected European road network, production vehicle assets, full fifth-wheel physics and device acceptance remain incomplete. No successful CI build or verified APK/Windows executable has been confirmed yet.
 
 ## Engineering principles
 - Offline-first single-player gameplay.
@@ -15,7 +15,7 @@ European Trucking Career Simulator for Android and Windows.
 
 ## Godot vertical slice foundation
 - Truck controller with diesel-style RPM, clutch, manual gears, reverse, speed-sensitive steering, engine braking, retarder, fuel, cargo-mass handling and collision damage.
-- Third-person chase camera.
+- Three selectable third-person chase camera presets.
 - Procedural 900m looping motorway greybox with road markings, barriers, depot triggers, a paid toll gate and a fuel/service station.
 - Six AI traffic vehicles with wrap-aware front/rear proximity, safe-gap lane changes, speed adjustment and collision bodies.
 - Android touch controls plus desktop keyboard controls, including retarder, clutch/gear actions, indicators, hazards and horn.
