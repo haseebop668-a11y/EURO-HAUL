@@ -30,6 +30,18 @@ func _build_trailer_visuals() -> void:
 	cargo_collision.shape = cargo_shape
 	cargo_collision.position = Vector3(0.0, 2.05, 4.9)
 	add_child(cargo_collision)
+	var impact_area := Area3D.new()
+	impact_area.name = "TrailerImpactSensor"
+	impact_area.collision_layer = 0
+	impact_area.collision_mask = 1
+	var impact_shape := CollisionShape3D.new()
+	var impact_box := BoxShape3D.new()
+	impact_box.size = Vector3(2.55, 2.75, 8.9)
+	impact_shape.shape = impact_box
+	impact_shape.position = Vector3(0.0, 2.05, 4.9)
+	impact_area.add_child(impact_shape)
+	impact_area.body_entered.connect(_on_trailer_body_entered)
+	add_child(impact_area)
 
 	var cargo := MeshInstance3D.new()
 	var cargo_mesh := BoxMesh.new()
@@ -77,3 +89,10 @@ func _build_trailer_visuals() -> void:
 	door_material.albedo_color = Color("#b6c0c8")
 	rear_door.material_override = door_material
 	add_child(rear_door)
+
+func _on_trailer_body_entered(body: Node3D) -> void:
+	if body == truck or not is_instance_valid(truck):
+		return
+	if absf(truck.speed_kmh) > 8.0:
+		var impact_damage := clampf(absf(truck.speed_kmh) / 35.0 * 6.0, 1.0, 18.0)
+		truck.apply_damage(impact_damage)
