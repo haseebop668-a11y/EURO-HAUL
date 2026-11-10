@@ -86,6 +86,8 @@ func _run_tests() -> void:
 	var trailer = TrailerScript.new()
 	root.add_child(trailer)
 	trailer.truck = truck
+	_expect(trailer is AnimatableBody3D, "trailer must be an independent physics body")
+	_expect(trailer.get_node_or_null("TrailerImpactSensor") != null, "trailer must expose an impact sensor")
 	truck.gear = 1
 	truck.speed_kmh = 50.0
 	truck.steer_input = 1.0
