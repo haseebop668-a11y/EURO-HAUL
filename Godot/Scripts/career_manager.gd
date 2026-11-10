@@ -190,4 +190,7 @@ func load_save() -> void:
 		active_contract = _sanitize_contract(active_value)
 		offered_contract = _sanitize_contract(offered_value)
 		cargo_loaded = bool(parsed.get("cargo_loaded", false)) and not active_contract.is_empty()
+		if read_path != SAVE_PATH:
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
+			save()
 		return
