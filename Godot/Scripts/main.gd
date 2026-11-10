@@ -67,6 +67,17 @@ func _process(delta: float) -> void:
 	_update_traffic_warnings()
 	_update_freight_action()
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		for key in touch_state.keys():
+			touch_state[key] = false
+		if truck != null:
+			truck.set_controls(0.0, 0.0, 0.0)
+		if career != null:
+			career.save()
+		if company != null:
+			company.save_company()
+
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and truck != null:
 		match event.keycode:
