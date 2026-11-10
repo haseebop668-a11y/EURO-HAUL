@@ -40,8 +40,8 @@ func _process(delta: float) -> void:
 	var current_position := truck.global_position
 	var distance := current_position.distance_to(_last_position)
 	if current_position.z < -ROAD_LENGTH + 20.0:
-		truck.global_position.z += ROAD_LENGTH
-		current_position = truck.global_position
+		current_position.z += ROAD_LENGTH
+		truck.global_position = current_position
 	_last_position = current_position
 	var expected_step := (absf(truck.speed_kmh) / 3.6) * delta * 3.0 + 1.0
 	if distance > 0.0 and distance <= maxf(10.0, expected_step) and career != null:
