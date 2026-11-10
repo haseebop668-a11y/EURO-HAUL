@@ -4,6 +4,7 @@ const TruckScript = preload("res://Scripts/vehicle_controller.gd")
 const CareerScript = preload("res://Scripts/career_manager.gd")
 const CompanyScript = preload("res://Scripts/company_manager.gd")
 const TrafficScript = preload("res://Scripts/traffic_vehicle.gd")
+const TrailerScript = preload("res://Scripts/trailer_controller.gd")
 
 var _failed := false
 
@@ -42,6 +43,19 @@ func _run_tests() -> void:
 	traffic.position.z = -100.0
 	traffic._update_player_avoidance(2.1)
 	_expect(is_equal_approx(traffic.lane_x, -2.0), "traffic must return to its lane after the gap clears")
+
+	var trailer = TrailerScript.new()
+	root.add_child(trailer)
+	trailer.truck = truck
+	truck.gear = 1
+	truck.speed_kmh = 50.0
+	truck.steer_input = 1.0
+	trailer._process(0.1)
+	var forward_articulation := trailer.articulation_degrees
+	truck.gear = -1
+	trailer._process(0.1)
+	_expect(trailer.articulation_degrees > forward_articulation, "reverse steering must articulate the trailer in the opposite direction")
+	_expect(absf(trailer.articulation_degrees) <= trailer.articulation_limit_degrees, "trailer articulation must remain within the jackknife safety limit")
 
 	var career = CareerScript.new()
 	root.add_child(career)
