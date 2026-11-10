@@ -31,7 +31,7 @@ var toll_paid_this_loop := false
 var toll_button: Button
 var toll_barrier_collision: CollisionShape3D
 var toll_barrier_mesh: MeshInstance3D
-var touch_state := {"throttle": false, "brake": false, "left": false, "right": false}
+var touch_state := {"throttle": false, "brake": false, "left": false, "right": false, "retarder": false}
 var traffic_vehicles: Array[EuroHaulTrafficVehicle] = []
 var _last_position := Vector3.ZERO
 var _last_distance_save := 0.0
@@ -50,12 +50,15 @@ func _process(delta: float) -> void:
 		return
 	var throttle := 1.0 if touch_state.throttle else 0.0
 	var brake := 1.0 if touch_state.brake else 0.0
+	var retarder := 1.0 if touch_state.retarder else 0.0
 	var steer := float(touch_state.right) - float(touch_state.left)
 	if not OS.has_feature("mobile"):
 		throttle = Input.get_action_strength("accelerate") - Input.get_action_strength("reverse")
 		brake = Input.get_action_strength("brake")
+		retarder = 1.0 if Input.is_key_pressed(KEY_C) else 0.0
 		steer = Input.get_action_strength("steer_right") - Input.get_action_strength("steer_left")
 	truck.set_controls(throttle, steer, brake)
+	truck.set_retarder(retarder)
 	_update_indicator_lights(delta)
 	var current_position := truck.global_position
 	var displacement := current_position - _last_position
@@ -500,6 +503,7 @@ func _build_hud() -> void:
 	_add_touch_button(buttons, "◀", "left")
 	_add_touch_button(buttons, "BRAKE", "brake")
 	_add_touch_button(buttons, "GAS", "throttle")
+	_add_touch_button(buttons, "RETARDER", "retarder")
 	_add_touch_button(buttons, "▶", "right")
 	_add_shift_button(buttons, "GEAR −", false)
 	_add_shift_button(buttons, "GEAR +", true)
