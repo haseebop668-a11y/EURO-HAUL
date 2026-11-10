@@ -35,7 +35,7 @@
 - [ ] Traffic does not spawn directly inside the player truck.
 - [ ] Front/rear sensing ignores the player's own collision shapes.
 - [ ] Following distance and rear-approach warnings respond to speed and gap.
-- [ ] Blind-spot and lane-change warnings are correct before lane changes are implemented.
+- [ ] Lane-change warnings identify occupied adjacent lanes and rear-approaching traffic.
 - [ ] Indicator and hazard states update the HUD correctly.
 - [ ] Rear indicator lights blink at a stable cadence and hazards blink both sides.
 - [ ] Horn button/key plays the generated horn effect without overlapping audio glitches.
@@ -60,6 +60,10 @@
 - [ ] Delivery completion pays the reward once, awards XP once and generates the next offer.
 - [ ] Level progression handles multiple level-ups from one XP award.
 - [ ] Career save survives app restart.
+- [ ] Fuel and vehicle damage persist across save/restart.
+- [ ] Fuel depletes with distance and throttle and prevents powered driving when empty.
+- [ ] Service station refuels and repairs only when nearby and affordable.
+- [ ] Toll barrier blocks the road until paid, then resets once per road loop.
 - [ ] Missing, malformed and unsupported-version save files do not crash the game.
 - [ ] Malformed contract fields are rejected and route progress is clamped to the contract distance.
 - [ ] Save writes use a recoverable/atomic strategy.
@@ -82,6 +86,10 @@
 - [ ] Verify app background/foreground and screen lock/resume.
 - [ ] Complete a ten-minute drive without crash, stuck controls or save corruption.
 - [ ] Record average frame rate, frame-time spikes, memory use and device temperature.
+
+## Windows PC acceptance
+- [ ] Extract and launch the Windows x64 debug executable on Windows 10/11.
+- [ ] Verify keyboard driving, pause/resume, audio and save persistence.
 
 ## Release rule
 A checked-in script is not proof that a feature works. A headless smoke test is not a physical-device test. Record the workflow run, artifact, device model, Android version and observed result before marking each release gate complete.
