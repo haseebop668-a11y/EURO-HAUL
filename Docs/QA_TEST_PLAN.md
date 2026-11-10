@@ -63,6 +63,7 @@
 - [ ] Fuel and vehicle damage persist across save/restart.
 - [ ] Fuel depletes with distance and throttle and prevents powered driving when empty.
 - [ ] Service station refuels and repairs only when nearby and affordable.
+- [ ] Roadside recovery prevents a softlock if fuel is empty or engine damage prevents movement.
 - [ ] Toll barrier blocks the road until paid, then resets once per road loop.
 - [ ] Missing, malformed and unsupported-version save files do not crash the game.
 - [ ] Malformed contract fields are rejected and route progress is clamped to the contract distance.
