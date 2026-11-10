@@ -632,7 +632,24 @@ func _found_company() -> void:
 		_update_hud()
 
 func _handle_service_interaction() -> void:
-	if not near_service_station or truck == null or career == null:
+	if truck == null or career == null:
+		return
+	if not near_service_station and truck.fuel_percent <= 0.0:
+		var rescue_cost := mini(250, career.game_cash)
+		if rescue_cost > 0:
+			career.spend_cash(rescue_cost)
+		var rescue_position := truck.global_position
+		rescue_position.x = 0.0
+		rescue_position.y = 0.15
+		rescue_position.z = -600.0
+		truck.global_position = rescue_position
+		truck.velocity = Vector3.ZERO
+		truck.refuel()
+		_save_progress()
+		status_label.text = "ROADSIDE RESCUE • €%d" % rescue_cost
+		_update_service_button()
+		return
+	if not near_service_station:
 		return
 	var fuel_cost := int(ceil((100.0 - truck.fuel_percent) * 2.0))
 	var repair_cost := int(ceil(truck.damage * 25.0))
@@ -656,7 +673,10 @@ func _update_service_button() -> void:
 	var fuel_cost := int(ceil((100.0 - truck.fuel_percent) * 2.0))
 	var repair_cost := int(ceil(truck.damage * 25.0))
 	var total_cost := fuel_cost + repair_cost
-	if not near_service_station:
+	if not near_service_station and truck.fuel_percent <= 0.0:
+		service_button.text = "ROADSIDE RESCUE • €250"
+		service_button.disabled = false
+	elif not near_service_station:
 		service_button.text = "DRIVE TO SERVICE"
 		service_button.disabled = true
 	elif total_cost <= 0:
