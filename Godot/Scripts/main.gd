@@ -679,6 +679,9 @@ func _handle_service_interaction() -> void:
 		return
 	if not near_service_station:
 		return
+	if absf(truck.speed_kmh) > 3.0:
+		_show_message("STOP AT SERVICE STATION")
+		return
 	var fuel_cost := int(ceil((100.0 - truck.fuel_percent) * 2.0))
 	var repair_cost := int(ceil(truck.damage * 25.0))
 	var total_cost := fuel_cost + repair_cost
@@ -717,6 +720,9 @@ func _update_service_button() -> void:
 	elif not near_service_station:
 		service_button.text = "DRIVE TO SERVICE"
 		service_button.disabled = true
+	elif absf(truck.speed_kmh) > 3.0:
+		service_button.text = "STOP FOR SERVICE"
+		service_button.disabled = true
 	elif total_cost <= 0:
 		service_button.text = "TRUCK FULLY SERVICED"
 		service_button.disabled = true
@@ -729,6 +735,9 @@ func _update_service_button() -> void:
 
 func _handle_freight_interaction() -> void:
 	if career == null or career.active_contract.is_empty():
+		return
+	if (near_pickup_depot or near_delivery_depot) and absf(truck.speed_kmh) > 3.0:
+		_show_message("STOP BEFORE LOADING OR UNLOADING")
 		return
 	if not career.cargo_loaded and near_pickup_depot:
 		if career.load_cargo():
@@ -755,13 +764,13 @@ func _update_freight_action() -> void:
 		freight_action_button.text = "ACCEPT FREIGHT FIRST"
 		freight_action_button.disabled = true
 	elif not career.cargo_loaded:
-		freight_action_button.disabled = not near_pickup_depot
-		freight_action_button.text = "LOAD CARGO" if near_pickup_depot else "DRIVE TO PICKUP DEPOT"
+		freight_action_button.disabled = not near_pickup_depot or absf(truck.speed_kmh) > 3.0
+		freight_action_button.text = ("STOP TO LOAD CARGO" if absf(truck.speed_kmh) > 3.0 else "LOAD CARGO") if near_pickup_depot else "DRIVE TO PICKUP DEPOT"
 	elif near_delivery_depot:
 		var remaining := maxf(0.0, float(career.active_contract.get("distance_km", 0.0)) - float(career.active_contract.get("progress_km", 0.0)))
 		if remaining <= 0.0:
-			freight_action_button.disabled = false
-			freight_action_button.text = "UNLOAD CARGO"
+			freight_action_button.disabled = absf(truck.speed_kmh) > 3.0
+			freight_action_button.text = "STOP TO UNLOAD" if absf(truck.speed_kmh) > 3.0 else "UNLOAD CARGO"
 		else:
 			freight_action_button.disabled = true
 			freight_action_button.text = "DELIVERY DEPOT • %.2f KM LEFT" % remaining
