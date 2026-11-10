@@ -79,17 +79,43 @@ func save_company() -> void:
 		"owned_trucks": owned_trucks, "hired_drivers": hired_drivers,
 		"reputation": reputation, "completed_company_jobs": completed_company_jobs
 	}
-	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	var temp_path := SAVE_PATH + ".tmp"
+	var backup_path := SAVE_PATH + ".bak"
+	var file := FileAccess.open(temp_path, FileAccess.WRITE)
 	if file == null:
-		push_warning("Could not open company save file for writing: %s" % FileAccess.get_open_error())
+		push_warning("Could not open company save temp file: %s" % FileAccess.get_open_error())
 		return
 	file.store_string(JSON.stringify(payload))
+	file.flush()
 	file.close()
 
-func load_company() -> void:
-	if not FileAccess.file_exists(SAVE_PATH):
+	var save_absolute := ProjectSettings.globalize_path(SAVE_PATH)
+	var temp_absolute := ProjectSettings.globalize_path(temp_path)
+	var backup_absolute := ProjectSettings.globalize_path(backup_path)
+	if FileAccess.file_exists(SAVE_PATH):
+		if FileAccess.file_exists(backup_path):
+			DirAccess.remove_absolute(backup_absolute)
+		var backup_error := DirAccess.rename_absolute(save_absolute, backup_absolute)
+		if backup_error != OK:
+			DirAccess.remove_absolute(temp_absolute)
+			push_warning("Could not preserve previous company save: %s" % error_string(backup_error))
+			return
+	var write_error := DirAccess.rename_absolute(temp_absolute, save_absolute)
+	if write_error != OK:
+		if FileAccess.file_exists(backup_path):
+			DirAccess.rename_absolute(backup_absolute, save_absolute)
+		push_warning("Could not replace company save: %s" % error_string(write_error))
 		return
-	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	if FileAccess.file_exists(backup_path):
+		DirAccess.remove_absolute(backup_absolute)
+
+func load_company() -> void:
+	var read_path := SAVE_PATH
+	if not FileAccess.file_exists(read_path):
+		read_path += ".bak"
+		if not FileAccess.file_exists(read_path):
+			return
+	var file := FileAccess.open(read_path, FileAccess.READ)
 	if file == null:
 		push_warning("Could not open company save file for reading: %s" % FileAccess.get_open_error())
 		return
