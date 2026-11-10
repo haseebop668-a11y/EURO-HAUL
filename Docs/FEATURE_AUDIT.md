@@ -17,7 +17,7 @@ This inventory distinguishes code that exists from code that has passed runtime/
 | Camera | Third-person SpringArm chase camera | Source implemented; device QA pending |
 | Inputs and feedback | Keyboard/touch controls, gear controls, blinking rear indicators/hazards and a generated dual-tone horn audio effect | Source implemented; device/audio QA pending |
 | Traffic | Six scripted vehicles with cruise speed and lane assignment | Basic traffic exists |
-| Traffic response | Physics-tick player-aware proximity detection; slower traffic moves to the other lane when the player closes; returns after the gap clears; traffic actors have collision bodies | Newly implemented; automated test authored; CI not yet green |
+| Traffic response | Physics-tick player-aware proximity detection; checks adjacent traffic gaps before lane changes; slows/adjusts speed when blocked; returns after the gap clears; traffic actors have collision bodies | Newly implemented; automated test authored; CI not yet green |
 | Lane-change feedback | Indicator-triggered adjacent-lane proximity warning / clear prompt; nearest forward/rear traffic HUD warning | Newly implemented; automated tests authored; CI not yet green |
 | Collision damage | Side-impact filtering and cooldown; damage capped at 100% | Source implemented; traffic collision integration and device QA pending |
 | Career and freight | Driver profile, cash, 2–5 km regional offers, accept, pickup loading, route progress, delivery-depot unloading, rewards, XP and levels; road segment recycles to support continuous driving | Source implemented; logic tests authored; CI not yet green |
