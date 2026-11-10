@@ -86,7 +86,12 @@ func _run_tests() -> void:
 		"xp": 100
 	}
 	career.offered_contract.clear()
+	_expect(career.load_cargo(), "active contract must allow cargo pickup")
+	_expect(not career.load_cargo(), "cargo must not be loaded twice")
 	career.record_distance(0.2)
+	_expect(career.deliveries == 0, "contract must not auto-deliver before depot unloading")
+	_expect(career.unload_cargo(), "loaded contract at full route distance must unload successfully")
+	_expect(not career.unload_cargo(), "delivery reward must not be claimed twice")
 	_expect(career.deliveries == 1, "completed contract must count once")
 	_expect(career.game_cash >= 25100, "completed contract must pay its reward")
 	_expect(career.active_contract.is_empty(), "completed contract must clear")
