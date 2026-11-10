@@ -249,6 +249,7 @@ func _create_toll_gate(road_z: float) -> void:
 
 func _reset_toll_gate() -> void:
 	toll_paid_this_loop = false
+	near_toll_gate = false
 	if toll_barrier_collision != null:
 		toll_barrier_collision.disabled = false
 	if toll_barrier_mesh != null:
