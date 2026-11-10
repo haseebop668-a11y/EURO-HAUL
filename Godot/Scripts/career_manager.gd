@@ -18,6 +18,7 @@ var offered_contract: Dictionary = {}
 var cargo_loaded := false
 var saved_fuel_percent := 100.0
 var saved_vehicle_damage := 0.0
+var _contract_time_save_timer := 0.0
 
 func _ready() -> void:
 	load_save()
@@ -56,6 +57,8 @@ func generate_offer() -> void:
 		"mass_tons": randf_range(4.0, 25.0),
 		"fragility": fragility,
 		"damage_percent": 0.0,
+		"deadline_seconds": int(distance * 70.0 + 60.0),
+		"elapsed_seconds": 0.0,
 		"distance_km": distance,
 		"progress_km": 0.0,
 		"reward": int(distance * 1000.0 * randf_range(1.2, 1.8)),
@@ -81,6 +84,15 @@ func load_cargo() -> bool:
 	changed.emit()
 	return true
 
+func advance_contract_time(delta: float) -> void:
+	if active_contract.is_empty() or not cargo_loaded or delta <= 0.0:
+		return
+	active_contract["elapsed_seconds"] = maxf(0.0, float(active_contract.get("elapsed_seconds", 0.0)) + delta)
+	_contract_time_save_timer += delta
+	if _contract_time_save_timer >= 10.0:
+		_contract_time_save_timer = fmod(_contract_time_save_timer, 10.0)
+		save()
+
 func apply_cargo_damage(amount: float) -> void:
 	if active_contract.is_empty() or not cargo_loaded or amount <= 0.0:
 		return
@@ -103,9 +115,13 @@ func unload_cargo() -> bool:
 	var base_reward := int(active_contract.get("reward", 0))
 	var cargo_damage := clampf(float(active_contract.get("damage_percent", 0.0)), 0.0, 100.0)
 	var damage_penalty := cargo_damage / 100.0 * 0.65
-	var final_reward := maxi(0, int(round(float(base_reward) * (1.0 - damage_penalty))))
+	var late_seconds := maxf(0.0, float(active_contract.get("elapsed_seconds", 0.0)) - float(active_contract.get("deadline_seconds", INF)))
+	var late_penalty := minf(0.35, late_seconds / 120.0 * 0.10)
+	var total_penalty := minf(0.9, damage_penalty + late_penalty)
+	var final_reward := maxi(0, int(round(float(base_reward) * (1.0 - total_penalty))))
 	game_cash += final_reward
-	add_xp(int(round(float(active_contract.get("xp", 0)) * (1.0 - cargo_damage / 100.0 * 0.5))))
+	var xp_multiplier := maxf(0.2, 1.0 - cargo_damage / 100.0 * 0.5 - late_penalty * 0.5)
+	add_xp(int(round(float(active_contract.get("xp", 0)) * xp_multiplier)))
 	deliveries += 1
 	active_contract.clear()
 	cargo_loaded = false
@@ -154,6 +170,14 @@ func _sanitize_contract(value: Variant) -> Dictionary:
 	var fragility := str(value.get("fragility", "STANDARD"))
 	if fragility not in ["STANDARD", "FRAGILE", "HIGH VALUE"]:
 		fragility = "STANDARD"
+	var deadline_value: Variant = value.get("deadline_seconds", 0.0)
+	var elapsed_value: Variant = value.get("elapsed_seconds", 0.0)
+	var deadline := float(deadline_value) if typeof(deadline_value) == TYPE_FLOAT or typeof(deadline_value) == TYPE_INT else 0.0
+	var elapsed := float(elapsed_value) if typeof(elapsed_value) == TYPE_FLOAT or typeof(elapsed_value) == TYPE_INT else 0.0
+	if not is_finite(deadline) or deadline < 0.0:
+		deadline = 0.0
+	if not is_finite(elapsed) or elapsed < 0.0:
+		elapsed = 0.0
 	return {
 		"id": contract_id,
 		"origin": origin,
@@ -162,6 +186,8 @@ func _sanitize_contract(value: Variant) -> Dictionary:
 		"mass_tons": clampf(mass, 0.0, 30.0),
 		"fragility": fragility,
 		"damage_percent": clampf(cargo_damage, 0.0, 100.0),
+		"deadline_seconds": deadline,
+		"elapsed_seconds": elapsed,
 		"distance_km": distance,
 		"progress_km": clampf(progress, 0.0, distance),
 		"reward": maxi(0, int(reward_value)),
