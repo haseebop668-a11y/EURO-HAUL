@@ -12,7 +12,7 @@ This inventory distinguishes code that exists from code that has passed runtime/
 | Android project/export preset | Android ARM64 preset, package ID `com.eurohaul.game` | CI export not yet passing |
 | App identity | EURO HAUL name and SVG icon | Source present; launcher appearance not device-verified |
 | 3D world | Procedural straight motorway, lane markings, roadside barriers and warehouse greyboxes | Implemented; visual/performance QA pending |
-| Player truck | Custom `CharacterBody3D`, engine RPM/torque approximation, gearbox, clutch, reverse, brake, speed limits, fuel use, service refuelling and repair | Logic smoke tests authored; CI not yet green |
+| Player truck | Custom `CharacterBody3D`, engine RPM/torque approximation, gearbox, clutch, reverse, brake, speed limits, engine braking, retarder, fuel use, service refuelling and repair | Logic smoke tests authored; CI not yet green |
 | Steering safety | Speed-sensitive steering angle using a lateral-acceleration limit | Source implemented; handling not tuned on device |
 | Camera | Third-person SpringArm chase camera | Source implemented; device QA pending |
 | Trailer | Independent kinematic trailer body with cargo collision shape, impact sensor that propagates damage to truck, wheels and capped forward/reverse articulation | Prototype implemented; physical hitch and load dynamics not yet implemented |
