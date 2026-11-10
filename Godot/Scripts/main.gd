@@ -24,7 +24,7 @@ func _ready() -> void:
 	_build_hud()
 	print("EURO HAUL Godot vertical-slice booted")
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if truck == null:
 		return
 	var throttle := 1.0 if touch_state.throttle else 0.0
@@ -38,7 +38,8 @@ func _process(_delta: float) -> void:
 	var current_position := truck.global_position
 	var distance := current_position.distance_to(_last_position)
 	_last_position = current_position
-	if distance > 0.0 and distance < 5.0 and career != null:
+	var expected_step := (absf(truck.speed_kmh) / 3.6) * delta * 3.0 + 1.0
+	if distance > 0.0 and distance <= maxf(10.0, expected_step) and career != null:
 		career.record_distance(distance / 1000.0)
 		_last_distance_save += distance
 	if _last_distance_save >= 100.0:
@@ -305,10 +306,10 @@ func _update_hud() -> void:
 	var contract_text := "No active contract"
 	if not career.active_contract.is_empty():
 		var c: Dictionary = career.active_contract
-		contract_text = "%s → %s | %s | %d/%d km" % [c.origin, c.destination, c.cargo, int(c.progress_km), int(c.distance_km)]
+		contract_text = "%s → %s | %s | %.2f/%.2f km" % [c.origin, c.destination, c.cargo, c.progress_km, c.distance_km]
 	elif not career.offered_contract.is_empty():
 		var o: Dictionary = career.offered_contract
-		contract_text = "Offer: %s → %s | %s | %d km | €%d" % [o.origin, o.destination, o.cargo, int(o.distance_km), int(o.reward)]
+		contract_text = "Offer: %s → %s | %s | %.2f km | €%d" % [o.origin, o.destination, o.cargo, o.distance_km, int(o.reward)]
 	hud.text = "DRIVER  %s  •  LVL %d  •  €%d\n%s" % [career.driver_name, career.level, career.game_cash, contract_text]
 	if truck != null and speed_label != null:
 		speed_label.text = "%03d km/h     RPM %04d     GEAR %s     DAMAGE %d%%" % [int(absf(truck.speed_kmh)), int(truck.engine_rpm), "R" if truck.gear == -1 else ("N" if truck.gear == 0 else str(truck.gear)), int(truck.damage)]
