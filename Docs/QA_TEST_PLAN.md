@@ -46,6 +46,7 @@
 - [ ] New profile creates a valid freight offer.
 - [ ] Accepting a contract moves it from offered to active exactly once.
 - [ ] Distance progress is monotonic and does not jump when a frame has a large position delta.
+- [ ] Road-segment recycling keeps the truck on the motorway and does not add teleport distance to a freight contract.
 - [ ] Delivery completion pays the reward once, awards XP once and generates the next offer.
 - [ ] Level progression handles multiple level-ups from one XP award.
 - [ ] Career save survives app restart.
