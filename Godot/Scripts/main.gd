@@ -588,6 +588,7 @@ func _build_career() -> void:
 		var saved_mass := float(career.active_contract.get("mass_tons", 0.0))
 		truck.set_cargo_mass(saved_mass)
 		trailer.set_cargo_mass(saved_mass)
+		trailer.set_cargo_loaded(true, false)
 	career.changed.connect(_update_hud)
 	company = EuroHaulCompanyManager.new()
 	company.name = "CompanyManager"
@@ -865,6 +866,7 @@ func _handle_freight_interaction() -> void:
 			var cargo_mass := float(career.active_contract.get("mass_tons", 0.0))
 			truck.set_cargo_mass(cargo_mass)
 			trailer.set_cargo_mass(cargo_mass)
+			trailer.set_cargo_loaded(true)
 			_show_message("CARGO LOADED • %.1f TONNES" % cargo_mass)
 	elif career.cargo_loaded and near_delivery_depot:
 		if career.unload_cargo():
@@ -872,6 +874,7 @@ func _handle_freight_interaction() -> void:
 				company.complete_company_delivery(int(round(float(career.last_delivery_reward) * 0.35)))
 			truck.set_cargo_mass(0.0)
 			trailer.set_cargo_mass(0.0)
+			trailer.set_cargo_loaded(false)
 			_show_message("DELIVERY COMPLETE • €%d PAID" % career.last_delivery_reward)
 		else:
 			_show_message("DELIVERY DEPOT • ROUTE DISTANCE NOT COMPLETE")
