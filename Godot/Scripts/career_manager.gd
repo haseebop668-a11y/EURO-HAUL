@@ -264,7 +264,7 @@ func load_save() -> void:
 		var offered_value: Variant = parsed.get("offered_contract", {})
 		active_contract = _sanitize_contract(active_value)
 		offered_contract = _sanitize_contract(offered_value)
-		cargo_loaded = bool(parsed.get("cargo_loaded", false)) and not active_contract.is_empty()
+		cargo_loaded = bool(parsed.get("cargo_loaded", false)) and not active_contract.is_empty() and not active_contract.is_empty()
 		var vehicle_state: Variant = parsed.get("vehicle_state", {})
 		if typeof(vehicle_state) == TYPE_DICTIONARY:
 			var saved_fuel := float(vehicle_state.get("fuel_percent", 100.0))
