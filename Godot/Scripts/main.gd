@@ -12,6 +12,9 @@ var company: EuroHaulCompanyManager
 var hud: Label
 var status_label: Label
 var speed_label: Label
+var left_indicator_light: OmniLight3D
+var right_indicator_light: OmniLight3D
+var _indicator_blink_timer := 0.0
 var freight_action_button: Button
 var accept_freight_button: Button
 var near_pickup_depot := false
@@ -41,6 +44,7 @@ func _process(delta: float) -> void:
 		brake = Input.get_action_strength("brake")
 		steer = Input.get_action_strength("steer_right") - Input.get_action_strength("steer_left")
 	truck.set_controls(throttle, steer, brake)
+	_update_indicator_lights(delta)
 	var current_position := truck.global_position
 	var distance := current_position.distance_to(_last_position)
 	if current_position.z < -ROAD_LENGTH + 20.0:
@@ -200,6 +204,20 @@ func _build_truck() -> void:
 	horn_audio.volume_db = -4.0
 	truck.add_child(horn_audio)
 	truck.horn_pressed.connect(func(): horn_audio.play())
+	left_indicator_light = OmniLight3D.new()
+	left_indicator_light.light_color = Color("#ffad45")
+	left_indicator_light.light_energy = 1.4
+	left_indicator_light.omni_range = 4.0
+	left_indicator_light.position = Vector3(-1.15, 1.85, -3.0)
+	left_indicator_light.visible = false
+	truck.add_child(left_indicator_light)
+	right_indicator_light = OmniLight3D.new()
+	right_indicator_light.light_color = Color("#ffad45")
+	right_indicator_light.light_energy = 1.4
+	right_indicator_light.omni_range = 4.0
+	right_indicator_light.position = Vector3(1.15, 1.85, -3.0)
+	right_indicator_light.visible = false
+	truck.add_child(right_indicator_light)
 	trailer = EuroHaulTrailer.new()
 	trailer.name = "ArticulatedTrailer"
 	trailer.truck = truck
@@ -234,6 +252,14 @@ func _build_traffic() -> void:
 		traffic.add_child(traffic_collision)
 		add_child(traffic)
 		traffic_vehicles.append(traffic)
+
+func _update_indicator_lights(delta: float) -> void:
+	if truck == null or left_indicator_light == null or right_indicator_light == null:
+		return
+	_indicator_blink_timer += delta
+	var blink_on := fmod(_indicator_blink_timer, 1.0) < 0.5
+	left_indicator_light.visible = blink_on and (truck.indicators == -1 or truck.indicators == 2)
+	right_indicator_light.visible = blink_on and (truck.indicators == 1 or truck.indicators == 2)
 
 func _create_horn_stream() -> AudioStreamWAV:
 	var sample_rate := 22050
