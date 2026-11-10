@@ -946,7 +946,7 @@ func _update_hud() -> void:
 			contract_text += " | %s %02d:%02d" % [time_label, int(display_seconds / 60), display_seconds % 60]
 	elif not career.offered_contract.is_empty():
 		var o: Dictionary = career.offered_contract
-		contract_text = "Offer: %s → %s | %s | %.2f km | €%d" % [o.origin, o.destination, o.cargo, o.distance_km, int(o.reward)]
+		contract_text = "Offer: %s→%s | %s | %.1ft %s | %.2fkm | €%d" % [o.origin, o.destination, o.cargo, float(o.get("mass_tons", 0.0)), str(o.get("fragility", "STANDARD")), o.distance_km, int(o.reward)]
 	var company_text := "COMPANY • NOT FOUNDED"
 	if company != null and not company.company_name.is_empty():
 		company_text = "CO %s • €%d • FLEET %d • DRV %d • REP %d • JOBS %d" % [company.company_name, company.company_balance, company.owned_trucks, company.hired_drivers, company.reputation, company.completed_company_jobs]
