@@ -259,13 +259,15 @@ func _reset_toll_gate() -> void:
 func _pay_toll() -> void:
 	if not near_toll_gate or toll_paid_this_loop or career == null:
 		return
-	if career.spend_cash(15):
-		toll_paid_this_loop = true
-		if toll_barrier_collision != null:
-			toll_barrier_collision.disabled = true
-		if toll_barrier_mesh != null:
-			toll_barrier_mesh.visible = false
-		status_label.text = "MOTORWAY TOLL PAID • €15"
+	var payment := mini(15, career.game_cash)
+	if payment > 0:
+		career.spend_cash(payment)
+	toll_paid_this_loop = true
+	if toll_barrier_collision != null:
+		toll_barrier_collision.disabled = true
+	if toll_barrier_mesh != null:
+		toll_barrier_mesh.visible = false
+	status_label.text = "MOTORWAY TOLL PAID • €%d" % payment
 	_update_toll_button()
 
 func _update_toll_button() -> void:
@@ -277,11 +279,8 @@ func _update_toll_button() -> void:
 	elif not near_toll_gate:
 		toll_button.text = "TOLL GATE AHEAD"
 		toll_button.disabled = true
-	elif career.game_cash < 15:
-		toll_button.text = "NEED €15 FOR TOLL"
-		toll_button.disabled = true
 	else:
-		toll_button.text = "PAY TOLL • €15"
+		toll_button.text = "PAY TOLL • €%d" % mini(15, career.game_cash)
 		toll_button.disabled = false
 
 func _create_service_area(road_z: float) -> void:
