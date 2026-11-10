@@ -280,6 +280,12 @@ func _build_traffic() -> void:
 		traffic.add_child(traffic_collision)
 		add_child(traffic)
 		traffic_vehicles.append(traffic)
+	for traffic in traffic_vehicles:
+		var neighbors: Array[EuroHaulTrafficVehicle] = []
+		for other in traffic_vehicles:
+			if other != traffic:
+				neighbors.append(other)
+		traffic.traffic_neighbors = neighbors
 
 func _update_indicator_lights(delta: float) -> void:
 	if truck == null or left_indicator_light == null or right_indicator_light == null:
