@@ -29,7 +29,8 @@ func _run_tests() -> void:
 	var career = CareerScript.new()
 	root.add_child(career)
 	_expect(not career.offered_contract.is_empty(), "new career must generate a freight offer")
-	_expect(not career.accept_offer(), "accept must not work twice without a new offer")
+	_expect(career.accept_offer(), "new freight offer must be accepted")
+	_expect(not career.accept_offer(), "second acceptance must fail while a contract is active")
 	career.active_contract = {
 		"distance_km": 0.2,
 		"progress_km": 0.0,
