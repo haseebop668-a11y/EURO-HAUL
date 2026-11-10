@@ -353,7 +353,10 @@ func _update_hud() -> void:
 	elif not career.offered_contract.is_empty():
 		var o: Dictionary = career.offered_contract
 		contract_text = "Offer: %s → %s | %s | %.2f km | €%d" % [o.origin, o.destination, o.cargo, o.distance_km, int(o.reward)]
-	hud.text = "DRIVER  %s  •  LVL %d  •  €%d\n%s" % [career.driver_name, career.level, career.game_cash, contract_text]
+	var company_text := "COMPANY • NOT FOUNDED"
+	if company != null and not company.company_name.is_empty():
+		company_text = "%s • €%d • FLEET %d • DRIVERS %d" % [company.company_name, company.company_balance, company.owned_trucks, company.hired_drivers]
+	hud.text = "DRIVER  %s  •  LVL %d  •  €%d\n%s\n%s" % [career.driver_name, career.level, career.game_cash, contract_text, company_text]
 	if truck != null and speed_label != null:
 		speed_label.text = "%03d km/h     RPM %04d     GEAR %s     DAMAGE %d%%" % [int(absf(truck.speed_kmh)), int(truck.engine_rpm), "R" if truck.gear == -1 else ("N" if truck.gear == 0 else str(truck.gear)), int(truck.damage)]
 
