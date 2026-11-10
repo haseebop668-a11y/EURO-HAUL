@@ -18,6 +18,7 @@ var offered_contract: Dictionary = {}
 var cargo_loaded := false
 var saved_fuel_percent := 100.0
 var saved_vehicle_damage := 0.0
+var last_delivery_reward := 0
 var _contract_time_save_timer := 0.0
 
 func _ready() -> void:
@@ -120,6 +121,7 @@ func unload_cargo() -> bool:
 	var late_penalty := minf(0.35, late_seconds / 120.0 * 0.10)
 	var total_penalty := minf(0.9, damage_penalty + late_penalty)
 	var final_reward := maxi(0, int(round(float(base_reward) * (1.0 - total_penalty))))
+	last_delivery_reward = final_reward
 	game_cash += final_reward
 	var xp_multiplier := maxf(0.2, 1.0 - cargo_damage / 100.0 * 0.5 - late_penalty * 0.5)
 	add_xp(int(round(float(active_contract.get("xp", 0)) * xp_multiplier)))
