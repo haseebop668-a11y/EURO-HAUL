@@ -132,6 +132,24 @@ jobs:
           head -n 8 /tmp/euro-haul-badging.txt
           sha256sum build/Android/EURO-HAUL-debug.apk
 
+      - name: Export Windows x64 debug build
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/Windows
+          godot --headless --path Godot --export-debug "Windows Desktop" build/Windows/EURO-HAUL.exe 2>&1 | tee /tmp/godot-windows-export.log
+          test -s build/Windows/EURO-HAUL.exe
+          test "$(dd if=build/Windows/EURO-HAUL.exe bs=1 count=2 2>/dev/null)" = "MZ"
+          sha256sum build/Windows/EURO-HAUL.exe
+
+      - name: Upload Windows desktop build
+        uses: actions/upload-artifact@v4
+        with:
+          name: EURO-HAUL-Windows-x64-debug
+          path: build/Windows/EURO-HAUL.exe
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
