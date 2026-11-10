@@ -106,11 +106,11 @@ func _run_tests() -> void:
 	trailer._physics_process(0.1)
 	_expect(trailer.articulation_degrees > forward_articulation, "reverse steering must articulate the trailer in the opposite direction")
 	_expect(absf(trailer.articulation_degrees) <= trailer.articulation_limit_degrees, "trailer articulation must remain within the jackknife safety limit")
-	var cargo_impact_total := 0.0
-	trailer.cargo_damaged.connect(func(amount: float): cargo_impact_total += amount)
+	var cargo_impact_total := [0.0]
+	trailer.cargo_damaged.connect(func(amount: float): cargo_impact_total[0] += amount)
 	trailer._on_trailer_body_entered(lane_blocker)
 	_expect(truck.damage > 0.0, "trailer impact must damage the truck")
-	_expect(cargo_impact_total > 0.0, "trailer impact must report cargo damage")
+	_expect(cargo_impact_total[0] > 0.0, "trailer impact must report cargo damage")
 
 	var world_cycle = WorldCycleScript.new()
 	root.add_child(world_cycle)
