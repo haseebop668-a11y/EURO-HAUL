@@ -80,6 +80,8 @@ jobs:
           cp -R /tmp/godot-export-templates/templates/. "$destination/"
           test -s "$destination/android_debug.apk"
           test -s "$destination/android_release.apk"
+          test -s "$destination/windows_debug_x86_64.exe"
+          test -s "$destination/windows_release_x86_64.exe"
 
       - name: Create temporary CI debug keystore
         shell: bash
