@@ -460,6 +460,11 @@ func _build_career() -> void:
 	add_child(career)
 	truck.fuel_percent = career.saved_fuel_percent
 	truck.damage = career.saved_vehicle_damage
+	trailer.cargo_damaged.connect(career.apply_cargo_damage)
+	if career.cargo_loaded and not career.active_contract.is_empty():
+		var saved_mass := float(career.active_contract.get("mass_tons", 0.0))
+		truck.set_cargo_mass(saved_mass)
+		trailer.set_cargo_mass(saved_mass)
 	career.changed.connect(_update_hud)
 	company = EuroHaulCompanyManager.new()
 	company.name = "CompanyManager"
@@ -715,9 +720,14 @@ func _handle_freight_interaction() -> void:
 		return
 	if not career.cargo_loaded and near_pickup_depot:
 		if career.load_cargo():
-			status_label.text = "CARGO LOADED • DELIVERY STARTED"
+			var cargo_mass := float(career.active_contract.get("mass_tons", 0.0))
+			truck.set_cargo_mass(cargo_mass)
+			trailer.set_cargo_mass(cargo_mass)
+			status_label.text = "CARGO LOADED • %.1f TONNES" % cargo_mass
 	elif career.cargo_loaded and near_delivery_depot:
 		if career.unload_cargo():
+			truck.set_cargo_mass(0.0)
+			trailer.set_cargo_mass(0.0)
 			status_label.text = "DELIVERY COMPLETED • REWARD PAID"
 		else:
 			status_label.text = "DELIVERY DEPOT • ROUTE DISTANCE NOT COMPLETE"
@@ -781,7 +791,7 @@ func _update_hud() -> void:
 	var contract_text := "No active contract"
 	if not career.active_contract.is_empty():
 		var c: Dictionary = career.active_contract
-		contract_text = "%s → %s | %s | %s | %.2f/%.2f km" % [c.origin, c.destination, c.cargo, "LOADED" if career.cargo_loaded else "PICKUP REQUIRED", c.progress_km, c.distance_km]
+		contract_text = "%s → %s | %s | %.1f t %s | DMG %.0f%% | %.2f/%.2f km" % [c.origin, c.destination, c.cargo, float(c.get("mass_tons", 0.0)), str(c.get("fragility", "STANDARD")), float(c.get("damage_percent", 0.0)), c.progress_km, c.distance_km]
 	elif not career.offered_contract.is_empty():
 		var o: Dictionary = career.offered_contract
 		contract_text = "Offer: %s → %s | %s | %.2f km | €%d" % [o.origin, o.destination, o.cargo, o.distance_km, int(o.reward)]
