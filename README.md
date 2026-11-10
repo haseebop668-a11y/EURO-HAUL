@@ -2,7 +2,7 @@
 European Trucking Career Simulator for Android and Windows.
 
 ## Current status
-**Godot 4 is the active build target.** Godot is open-source and does not require a Unity license. The original Unity source under `Game/` is preserved as a reference. The active project now contains a greybox simulation prototype with manual truck controls, AI traffic, freight contracts, cargo mass/damage, deadlines, company economy, tolls, weigh station, fuel/service, three chase-camera modes, day/night and weather systems; runtime validation is still pending. The project is still a prototype: the connected European road network, production vehicle assets, full fifth-wheel physics and device acceptance remain incomplete. No successful CI build or verified APK/Windows executable has been confirmed yet.
+**Godot 4 is the active build target.** Godot is open-source and does not require a Unity license. The original Unity source under `Game/` is preserved as a reference. The active project now contains a greybox simulation prototype with manual truck controls, AI traffic, freight contracts, cargo mass/damage, animated trailer loading/unloading, deadlines, company economy, tolls, weigh station, fuel/service, three chase-camera modes, day/night and weather systems; runtime validation is still pending. The project is still a prototype: the connected European road network, production vehicle assets, full fifth-wheel physics and device acceptance remain incomplete. No successful CI build or verified APK/Windows executable has been confirmed yet.
 
 ## Engineering principles
 - Offline-first single-player gameplay.
