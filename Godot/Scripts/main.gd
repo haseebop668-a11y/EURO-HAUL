@@ -97,6 +97,9 @@ func _toggle_pause() -> void:
 	_save_progress()
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		_save_progress()
+		return
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		_toggle_pause()
 		return
