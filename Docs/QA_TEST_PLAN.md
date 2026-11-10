@@ -46,6 +46,7 @@
 - [ ] Traffic returns to its base lane only after a clear-gap delay.
 - [ ] Forward and rear proximity reports identify the correct relative zone and closing direction.
 - [ ] Trailer articulation responds to steering in forward/reverse and stays within the configured angle limit.
+- [ ] Trailer impact sensor detects collisions and applies bounded damage to the truck.
 - [ ] Traffic collision bodies interact with the player truck without jitter or tunnelling.
 
 ## Offline career and persistence
