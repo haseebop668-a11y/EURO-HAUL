@@ -314,6 +314,7 @@ func _update_traffic_warnings() -> void:
 	if status_label == null or truck == null:
 		return
 	if truck.indicators == 0:
+		status_label.text = "FREIGHT • BERLIN REGION"
 		return
 	var requested_lane := -2.0 if truck.indicators == -1 else (2.0 if truck.indicators == 1 else 0.0)
 	if requested_lane == 0.0:
