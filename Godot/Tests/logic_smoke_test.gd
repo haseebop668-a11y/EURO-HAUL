@@ -60,6 +60,12 @@ func _run_tests() -> void:
 	traffic.speed_kmh = 90.0
 	var rear_report := traffic.get_proximity_report()
 	_expect(rear_report.get("zone", "") == "REAR", "rear sensor must identify a faster approaching vehicle")
+	truck.position.z = -880.0
+	traffic.position.z = -20.0
+	traffic.speed_kmh = 40.0
+	var loop_report := traffic.get_proximity_report()
+	_expect(loop_report.get("zone", "") == "FRONT", "traffic sensing must calculate gaps across the road loop seam")
+	truck.position.z = 0.0
 	traffic.position.z = -10.0
 	traffic.speed_kmh = 40.0
 	var lane_blocker = TrafficScript.new()
