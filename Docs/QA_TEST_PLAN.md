@@ -59,6 +59,8 @@
 - [ ] Cargo mass affects acceleration, braking, fuel consumption and speed limits.
 - [ ] Fragile cargo receives amplified damage when the trailer impacts another body.
 - [ ] Cargo damage reduces the delivery reward and XP.
+- [ ] Delivery timer starts only after pickup, persists across restart and pauses with the game.
+- [ ] Late delivery reduces reward and XP according to the configured penalty cap.
 - [ ] Cargo cannot be unloaded before required route distance is complete.
 - [ ] Delivery depot unloads cargo, pays reward once and generates the next offer.
 - [ ] Distance progress is monotonic and does not jump when a frame has a large position delta.
@@ -81,6 +83,7 @@
 - [ ] Company balance does not drain every rendered frame.
 - [ ] Operating costs are charged once per simulated day (300 seconds), with elapsed time handled correctly.
 - [ ] Company delivery revenue and reputation are credited once.
+- [ ] Player freight deliveries credit the company with the configured reward share.
 - [ ] New company receives the configured seed balance and can buy its first truck.
 - [ ] Hired-driver count cannot exceed owned fleet trucks.
 - [ ] Each active hired driver generates one simulated delivery per game day, with costs/revenue applied once.
