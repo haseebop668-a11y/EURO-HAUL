@@ -59,6 +59,9 @@
 - [ ] Company balance does not drain every rendered frame.
 - [ ] Operating costs are charged once per simulated day (300 seconds), with elapsed time handled correctly.
 - [ ] Company delivery revenue and reputation are credited once.
+- [ ] New company receives the configured seed balance and can buy its first truck.
+- [ ] Hired-driver count cannot exceed owned fleet trucks.
+- [ ] Each active hired driver generates one simulated delivery per game day, with costs/revenue applied once.
 - [ ] Company save survives app restart and malformed data does not crash the game.
 
 ## Physical Android device acceptance
