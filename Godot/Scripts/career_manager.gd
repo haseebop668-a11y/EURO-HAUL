@@ -92,6 +92,8 @@ func apply_cargo_damage(amount: float) -> void:
 		multiplier = 2.0
 	var current_damage := float(active_contract.get("damage_percent", 0.0))
 	active_contract["damage_percent"] = clampf(current_damage + amount * multiplier, 0.0, 100.0)
+	save()
+	changed.emit()
 
 func unload_cargo() -> bool:
 	if active_contract.is_empty() or not cargo_loaded:
