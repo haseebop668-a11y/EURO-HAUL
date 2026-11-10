@@ -675,7 +675,7 @@ func _update_service_button() -> void:
 	var repair_cost := int(ceil(truck.damage * 25.0))
 	var total_cost := fuel_cost + repair_cost
 	if not near_service_station and (truck.fuel_percent <= 0.0 or truck.damage >= 80.0):
-		service_button.text = "ROADSIDE RECOVERY • €250"
+		service_button.text = "ROADSIDE RECOVERY • €%d" % mini(250, career.game_cash)
 		service_button.disabled = false
 	elif not near_service_station:
 		service_button.text = "DRIVE TO SERVICE"
