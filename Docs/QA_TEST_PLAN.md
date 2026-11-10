@@ -34,6 +34,8 @@
 - [ ] Following distance and rear-approach warnings respond to speed and gap.
 - [ ] Blind-spot and lane-change warnings are correct before lane changes are implemented.
 - [ ] Indicator and hazard states update the HUD correctly.
+- [ ] Rear indicator lights blink at a stable cadence and hazards blink both sides.
+- [ ] Horn button/key plays the generated horn effect without overlapping audio glitches.
 - [ ] Horn control produces feedback and does not remain stuck after release.
 - [ ] Traffic collision reactions do not cause uncontrolled physics or repeated damage loops.
 - [ ] Player-aware traffic moves to a safe adjacent lane when the player closes from behind.
