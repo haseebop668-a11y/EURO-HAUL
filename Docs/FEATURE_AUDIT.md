@@ -17,8 +17,8 @@ This inventory distinguishes code that exists from code that has passed runtime/
 | Camera | Third-person SpringArm chase camera | Source implemented; device QA pending |
 | Inputs | Keyboard and touch throttle/brake/steering, gear controls, indicators, hazards and horn feedback | Source implemented; touch QA pending |
 | Traffic | Six scripted vehicles with cruise speed and lane assignment | Basic traffic exists |
-| Traffic response | Player-aware proximity detection; slower traffic moves to the other lane when the player closes; returns after the gap clears | Newly implemented; automated test authored; CI not yet green |
-| Lane-change feedback | Indicator-triggered adjacent-lane proximity warning / clear prompt | Newly implemented; automated test authored; CI not yet green |
+| Traffic response | Physics-tick player-aware proximity detection; slower traffic moves to the other lane when the player closes; returns after the gap clears; traffic actors have collision bodies | Newly implemented; automated test authored; CI not yet green |
+| Lane-change feedback | Indicator-triggered adjacent-lane proximity warning / clear prompt; nearest forward/rear traffic HUD warning | Newly implemented; automated tests authored; CI not yet green |
 | Collision damage | Side-impact filtering and cooldown; damage capped at 100% | Source implemented; traffic collision integration and device QA pending |
 | Career | Driver profile, cash, generated freight offer, accept/deliver, distance, XP and levels | Source implemented; logic tests authored |
 | Company | Company founding, balance, truck purchase, driver hiring, reputation, delivery revenue and simulated daily operating cost | Basic economy implemented; fleet/driver simulation absent |
@@ -29,7 +29,7 @@ This inventory distinguishes code that exists from code that has passed runtime/
 
 These are not present as complete gameplay features yet and must not be described as finished:
 
-1. **Articulated trailer simulation** — trailer body, fifth-wheel/pivot articulation, trailer wheels, reverse jack-knifing behaviour, trailer collision and load-dependent handling.
+1. **Articulated trailer simulation** — a visual/kinematic trailer prototype with wheels and capped steering articulation now exists; physical fifth-wheel constraint, trailer collision, load-dependent handling and realistic reverse jack-knifing remain incomplete.
 2. **Full vehicle dynamics** — wheel/tire grip, suspension, axle loads, differential, torque curve calibration, retarder/engine braking, ABS/traction behaviour and service/repair.
 3. **Traffic simulation** — physical traffic collision bodies, multi-vehicle awareness, safe gap selection, overtaking rules, junction behaviour, traffic lights, roundabouts, speed-limit adherence and emergency braking.
 4. **Forward/rear awareness** — dedicated front/rear sensing with closing-speed calculation, blind-spot checks, lane-change risk scoring and clear dashboard alerts.
