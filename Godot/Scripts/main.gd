@@ -354,6 +354,8 @@ func _build_hud() -> void:
 	_add_touch_button(buttons, "▶", "right")
 	_add_shift_button(buttons, "GEAR −", false)
 	_add_shift_button(buttons, "GEAR +", true)
+	_add_special_gear_button(buttons, "NEUTRAL", false)
+	_add_special_gear_button(buttons, "REVERSE", true)
 	var signal_row := HBoxContainer.new()
 	signal_row.position = Vector2(20, 265)
 	signal_row.custom_minimum_size = Vector2(500, 44)
@@ -427,6 +429,21 @@ func _add_shift_button(parent: Control, caption: String, up: bool) -> void:
 			truck.shift_up()
 		else:
 			truck.shift_down()
+		truck.set_clutch(0.0)
+	)
+	parent.add_child(button)
+
+func _add_special_gear_button(parent: Control, caption: String, reverse: bool) -> void:
+	var button := Button.new()
+	button.text = caption
+	button.custom_minimum_size = Vector2(110, 82)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.pressed.connect(func():
+		truck.set_clutch(1.0)
+		if reverse:
+			truck.select_reverse()
+		else:
+			truck.select_neutral()
 		truck.set_clutch(0.0)
 	)
 	parent.add_child(button)
