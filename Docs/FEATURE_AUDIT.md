@@ -15,7 +15,7 @@ This inventory distinguishes code that exists from code that has passed runtime/
 | Player truck | Custom `CharacterBody3D`, engine RPM/torque approximation, gearbox, clutch, reverse, brake and speed limits | Logic smoke tests authored; CI not yet green |
 | Steering safety | Speed-sensitive steering angle using a lateral-acceleration limit | Source implemented; handling not tuned on device |
 | Camera | Third-person SpringArm chase camera | Source implemented; device QA pending |
-| Inputs | Keyboard and touch throttle/brake/steering, gear controls, indicators, hazards and horn feedback | Source implemented; touch QA pending |
+| Inputs and feedback | Keyboard/touch controls, gear controls, blinking rear indicators/hazards and a generated dual-tone horn audio effect | Source implemented; device/audio QA pending |
 | Traffic | Six scripted vehicles with cruise speed and lane assignment | Basic traffic exists |
 | Traffic response | Physics-tick player-aware proximity detection; slower traffic moves to the other lane when the player closes; returns after the gap clears; traffic actors have collision bodies | Newly implemented; automated test authored; CI not yet green |
 | Lane-change feedback | Indicator-triggered adjacent-lane proximity warning / clear prompt; nearest forward/rear traffic HUD warning | Newly implemented; automated tests authored; CI not yet green |
@@ -36,7 +36,7 @@ These are not present as complete gameplay features yet and must not be describe
 5. **European world and navigation** — connected road network, city-specific distances, junctions, roundabouts, tolls, service stations, rest areas, borders and GPS route guidance. The current road is a single straight greybox motorway loop.
 6. **Freight operations** — pickup and delivery depot triggers with load/unload interaction now exist; remaining work includes real depot yards, cargo mass/fragility, cargo loading animation, trailer selection, damage/late-delivery penalties, weigh stations and route-specific delivery confirmation.
 7. **Company progression** — detailed AI driver schedules/routes, truck assignment UI, fleet maintenance, driver wages/skills, contracts for hired drivers, reputation-driven contract access and a full management screen.
-8. **Presentation** — production truck/trailer models, interiors, road assets, animation, weather/day-night cycle, lighting polish, soundscape, engine/air-brake/horn audio and UI polish.
+8. **Presentation** — a basic horn sound and indicator lights now exist; production truck/trailer models, interiors, road assets, animations, weather/day-night cycle, lighting polish, engine/air-brake ambience and UI polish remain.
 9. **Platform release** — physical Android install/performance/thermal testing, save/resume testing, and Windows x64 build.
 10. **Release quality** — complete automated tests for persistence, traffic interactions, contract edge cases, economy exploits and long-session stability.
 
