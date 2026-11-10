@@ -1,0 +1,54 @@
+# EURO HAUL Feature Inventory and Gap Audit
+
+Audit date: 2026-11-10
+Active project: `Godot/` (Godot 4.4.1). The Unity project under `Game/` is preserved as reference material.
+
+This inventory distinguishes code that exists from code that has passed runtime/device QA. A feature marked **Implemented (not device-verified)** exists in the current source but is not yet certified on a physical Android phone.
+
+## Existing systems
+
+| System | Current implementation | Verification status |
+|---|---|---|
+| Android project/export preset | Android ARM64 preset, package ID `com.eurohaul.game` | CI export not yet passing |
+| App identity | EURO HAUL name and SVG icon | Source present; launcher appearance not device-verified |
+| 3D world | Procedural straight motorway, lane markings, roadside barriers and warehouse greyboxes | Implemented; visual/performance QA pending |
+| Player truck | Custom `CharacterBody3D`, engine RPM/torque approximation, gearbox, clutch, reverse, brake and speed limits | Logic smoke tests authored; CI not yet green |
+| Steering safety | Speed-sensitive steering angle using a lateral-acceleration limit | Source implemented; handling not tuned on device |
+| Camera | Third-person SpringArm chase camera | Source implemented; device QA pending |
+| Inputs | Keyboard and touch throttle/brake/steering, gear controls, indicators, hazards and horn feedback | Source implemented; touch QA pending |
+| Traffic | Six scripted vehicles with cruise speed and lane assignment | Basic traffic exists |
+| Traffic response | Player-aware proximity detection; slower traffic moves to the other lane when the player closes; returns after the gap clears | Newly implemented; automated test authored; CI not yet green |
+| Lane-change feedback | Indicator-triggered adjacent-lane proximity warning / clear prompt | Newly implemented; automated test authored; CI not yet green |
+| Collision damage | Side-impact filtering and cooldown; damage capped at 100% | Source implemented; traffic collision integration and device QA pending |
+| Career | Driver profile, cash, generated freight offer, accept/deliver, distance, XP and levels | Source implemented; logic tests authored |
+| Company | Company founding, balance, truck purchase, driver hiring, reputation, delivery revenue and simulated daily operating cost | Basic economy implemented; fleet/driver simulation absent |
+| Persistence | Local schema-versioned JSON career/company saves with temporary write and backup recovery | Source implemented; restart/corruption QA pending |
+| Offline mode | Core career/company saves and gameplay logic are local; no account/backend dependency | Implemented by architecture |
+
+## Missing or incomplete systems
+
+These are not present as complete gameplay features yet and must not be described as finished:
+
+1. **Articulated trailer simulation** — trailer body, fifth-wheel/pivot articulation, trailer wheels, reverse jack-knifing behaviour, trailer collision and load-dependent handling.
+2. **Full vehicle dynamics** — wheel/tire grip, suspension, axle loads, differential, torque curve calibration, retarder/engine braking, ABS/traction behaviour and service/repair.
+3. **Traffic simulation** — physical traffic collision bodies, multi-vehicle awareness, safe gap selection, overtaking rules, junction behaviour, traffic lights, roundabouts, speed-limit adherence and emergency braking.
+4. **Forward/rear awareness** — dedicated front/rear sensing with closing-speed calculation, blind-spot checks, lane-change risk scoring and clear dashboard alerts.
+5. **European world and navigation** — connected road network, multiple cities, junctions, roundabouts, tolls, service stations, rest areas, borders and GPS route guidance. The current road is a straight greybox segment.
+6. **Freight operations** — depot interaction, loading/unloading, cargo types with mass/fragility, trailer selection, damage/late-delivery penalties, weigh stations and delivery confirmation.
+7. **Company progression** — AI driver schedules and wages, truck assignment, fleet maintenance, contracts for hired drivers, company reputation effects and a functional management screen.
+8. **Presentation** — production truck/trailer models, interiors, road assets, animation, weather/day-night cycle, lighting polish, soundscape, engine/air-brake/horn audio and UI polish.
+9. **Platform release** — physical Android install/performance/thermal testing, save/resume testing, and Windows x64 build.
+10. **Release quality** — complete automated tests for persistence, traffic interactions, contract edge cases, economy exploits and long-session stability.
+
+## Current priority order
+
+- P0: Get CI green: import, headless scene, logic tests and ARM64 APK export.
+- P1: Add and test forward/rear traffic sensing, safe lane-change decision logic and actual traffic collision bodies.
+- P2: Add articulated trailer prototype and test forward/reverse handling.
+- P3: Build route/depot/loading gameplay loop before expanding the map.
+- P4: Expand company simulation, vehicle dynamics, audio, weather and production assets.
+- P5: Android device acceptance, performance tuning and Windows export.
+
+## Review rule
+
+A source file or a passing headless test is not proof of full feature quality. Mark a feature complete only after its acceptance criteria pass. The user review should happen after the planned implementation and CI gates have stabilized; defects found in that review should be logged, fixed and retested in a separate review pass.
