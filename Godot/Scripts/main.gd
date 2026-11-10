@@ -48,7 +48,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if truck == null:
 		return
-	var throttle := 1.0 if touch_state.throttle else 0.0
+	var throttle := (-1.0 if truck.gear == -1 else 1.0) if touch_state.throttle else 0.0
 	var brake := 1.0 if touch_state.brake else 0.0
 	var retarder := 1.0 if touch_state.retarder else 0.0
 	var steer := float(touch_state.right) - float(touch_state.left)
