@@ -14,6 +14,8 @@
 - [ ] Truck remains on the motorway and does not fall through the road.
 - [ ] Roadside barriers and scenery do not create unintended blocking collisions.
 - [ ] App pause/resume does not leave the simulation in a broken state.
+- [ ] Android Back and the pause button pause/resume the simulation while keeping HUD controls responsive.
+- [ ] App focus loss clears held touch inputs and saves career/company progress.
 
 ## Driving and input
 - [ ] Keyboard steering, throttle and brake work in the desktop/headless-compatible test environment.
@@ -21,7 +23,7 @@
 - [ ] Simultaneous throttle/brake and left/right inputs resolve safely.
 - [ ] Input returns to neutral after button release, focus loss and app pause.
 - [ ] Gear up/down only works with clutch engaged.
-- [ ] Neutral and reverse selection obey speed/clutch constraints.
+- [ ] Neutral and reverse selection obey speed/clutch constraints on keyboard and touch controls.
 - [ ] Forward and reverse speed limits are respected.
 - [ ] Braking stops the truck without unintended acceleration.
 - [ ] Steering response is reduced at high speed to respect the lateral-acceleration limit.
