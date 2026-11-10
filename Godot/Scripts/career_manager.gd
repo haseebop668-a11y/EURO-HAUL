@@ -86,23 +86,49 @@ func save() -> void:
 		"game_cash": game_cash, "deliveries": deliveries, "total_distance_km": total_distance_km,
 		"active_contract": active_contract, "offered_contract": offered_contract
 	}
-	var file := FileAccess.open(SAVE_PATH + ".tmp", FileAccess.WRITE)
+	var temp_path := SAVE_PATH + ".tmp"
+	var backup_path := SAVE_PATH + ".bak"
+	var file := FileAccess.open(temp_path, FileAccess.WRITE)
 	if file == null:
+		push_warning("Could not open career save temp file: %s" % FileAccess.get_open_error())
 		return
 	file.store_string(JSON.stringify(data))
+	file.flush()
 	file.close()
+
+	var save_absolute := ProjectSettings.globalize_path(SAVE_PATH)
+	var temp_absolute := ProjectSettings.globalize_path(temp_path)
+	var backup_absolute := ProjectSettings.globalize_path(backup_path)
 	if FileAccess.file_exists(SAVE_PATH):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
-	DirAccess.rename_absolute(ProjectSettings.globalize_path(SAVE_PATH + ".tmp"), ProjectSettings.globalize_path(SAVE_PATH))
+		if FileAccess.file_exists(backup_path):
+			DirAccess.remove_absolute(backup_absolute)
+		var backup_error := DirAccess.rename_absolute(save_absolute, backup_absolute)
+		if backup_error != OK:
+			DirAccess.remove_absolute(temp_absolute)
+			push_warning("Could not preserve previous career save: %s" % error_string(backup_error))
+			return
+	var write_error := DirAccess.rename_absolute(temp_absolute, save_absolute)
+	if write_error != OK:
+		if FileAccess.file_exists(backup_path):
+			DirAccess.rename_absolute(backup_absolute, save_absolute)
+		push_warning("Could not replace career save: %s" % error_string(write_error))
+		return
+	if FileAccess.file_exists(backup_path):
+		DirAccess.remove_absolute(backup_absolute)
 
 func load_save() -> void:
-	if not FileAccess.file_exists(SAVE_PATH):
-		return
-	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	var read_path := SAVE_PATH
+	if not FileAccess.file_exists(read_path):
+		read_path += ".bak"
+		if not FileAccess.file_exists(read_path):
+			return
+	var file := FileAccess.open(read_path, FileAccess.READ)
 	if file == null:
+		push_warning("Could not open career save: %s" % FileAccess.get_open_error())
 		return
 	var parsed: Variant = JSON.parse_string(file.get_as_text())
 	if typeof(parsed) != TYPE_DICTIONARY or int(parsed.get("schema", 0)) != 1:
+		push_warning("Career save is invalid or uses an unsupported schema")
 		return
 	driver_name = str(parsed.get("driver_name", driver_name))
 	level = maxi(1, int(parsed.get("level", 1)))
@@ -110,5 +136,7 @@ func load_save() -> void:
 	game_cash = maxi(0, int(parsed.get("game_cash", 25000)))
 	deliveries = maxi(0, int(parsed.get("deliveries", 0)))
 	total_distance_km = maxf(0.0, float(parsed.get("total_distance_km", 0.0)))
-	active_contract = parsed.get("active_contract", {})
-	offered_contract = parsed.get("offered_contract", {})
+	var active_value: Variant = parsed.get("active_contract", {})
+	var offered_value: Variant = parsed.get("offered_contract", {})
+	active_contract = active_value if typeof(active_value) == TYPE_DICTIONARY else {}
+	offered_contract = offered_value if typeof(offered_value) == TYPE_DICTIONARY else {}
