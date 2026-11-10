@@ -1,79 +1,67 @@
-# QA Test Plan — Truck Lab
+# EURO HAUL QA Test Plan — Godot 4 Android Vertical Slice
 
-## Editor smoke tests
-- [ ] Project imports with no C# compiler errors.
-- [ ] All serialized wheel references are assigned.
-- [ ] Truck Rigidbody is non-kinematic.
-- [ ] Each WheelCollider contacts the ground.
-- [ ] Wheel meshes follow collider poses.
-- [ ] Camera follows the truck without jitter.
-- [ ] Keyboard steering works both directions.
-- [ ] Forward throttle accelerates the vehicle.
-- [ ] Reverse throttle moves the vehicle backward.
-- [ ] Service brake slows and stops the vehicle.
-- [ ] Vehicle respects configured forward/reverse speed limits.
-- [ ] Disabling the input component clears throttle.
+## Automated CI gates
+- [ ] Godot 4.4.1 imports the project with no GDScript parse/load errors.
+- [ ] Main scene starts headlessly and prints the expected boot marker.
+- [ ] Android export templates match the engine version.
+- [ ] Android ARM64 debug APK exports successfully.
+- [ ] APK passes ZIP integrity and Android package metadata checks.
+- [ ] APK artifact uploads and can be downloaded from the workflow run.
 
-## Regression tests
-- [ ] No missing scripts or references.
-- [ ] No console exceptions during a 10-minute drive.
-- [ ] Repeated stop/start cycles do not retain unintended torque.
-- [ ] Vehicle remains controllable after collision and reset.
+## Runtime and scene
+- [ ] Main scene creates world, truck, camera, traffic, career manager, company manager and HUD without runtime errors.
+- [ ] Camera remains behind/above the truck and does not lose its target.
+- [ ] Truck remains on the motorway and does not fall through the road.
+- [ ] Roadside barriers and scenery do not create unintended blocking collisions.
+- [ ] App pause/resume does not leave the simulation in a broken state.
 
-## Platform tests
-- [ ] Windows x64 development build launches.
-- [ ] Android ARM64 development build launches on a physical device.
-- [ ] Android touch controls are added and tested before mobile release.
-- [ ] Frame-time and thermal behaviour measured on target Android devices.
+## Driving and input
+- [ ] Keyboard steering, throttle and brake work in the desktop/headless-compatible test environment.
+- [ ] Touch steering, throttle and brake respond to press and release.
+- [ ] Simultaneous throttle/brake and left/right inputs resolve safely.
+- [ ] Input returns to neutral after button release, focus loss and app pause.
+- [ ] Gear up/down only works with clutch engaged.
+- [ ] Neutral and reverse selection obey speed/clutch constraints.
+- [ ] Forward and reverse speed limits are respected.
+- [ ] Braking stops the truck without unintended acceleration.
+- [ ] Steering response is reduced at high speed to respect the lateral-acceleration limit.
+- [ ] Collision damage increases only on actual blocking collisions and cannot exceed 100%.
+
+## Traffic and road safety
+- [ ] Traffic vehicles stay within their assigned lanes and road bounds.
+- [ ] Traffic does not spawn directly inside the player truck.
+- [ ] Front/rear sensing ignores the player's own collision shapes.
+- [ ] Following distance and rear-approach warnings respond to speed and gap.
+- [ ] Blind-spot and lane-change warnings are correct before lane changes are implemented.
+- [ ] Indicator and hazard states update the HUD correctly.
+- [ ] Horn control produces feedback and does not remain stuck after release.
+- [ ] Traffic collision reactions do not cause uncontrolled physics or repeated damage loops.
+
+## Offline career and persistence
+- [ ] New profile creates a valid freight offer.
+- [ ] Accepting a contract moves it from offered to active exactly once.
+- [ ] Distance progress is monotonic and does not jump when a frame has a large position delta.
+- [ ] Delivery completion pays the reward once, awards XP once and generates the next offer.
+- [ ] Level progression handles multiple level-ups from one XP award.
+- [ ] Career save survives app restart.
+- [ ] Missing, malformed and unsupported-version save files do not crash the game.
+- [ ] Save writes use a recoverable/atomic strategy.
+
+## Company economy and persistence
+- [ ] Company can only be founded once and deducts the founding fee once.
+- [ ] Fleet purchase and driver hiring require sufficient company balance.
+- [ ] Company balance does not drain every rendered frame.
+- [ ] Operating costs are charged once per simulated day (300 seconds), with elapsed time handled correctly.
+- [ ] Company delivery revenue and reputation are credited once.
+- [ ] Company save survives app restart and malformed data does not crash the game.
+
+## Physical Android device acceptance
+- [ ] Install and launch on an ARM64 Android phone.
+- [ ] Verify portrait/landscape behaviour and HUD safe-area layout.
+- [ ] Verify touch controls at native resolution and during simultaneous touches.
+- [ ] Verify app background/foreground and screen lock/resume.
+- [ ] Complete a ten-minute drive without crash, stuck controls or save corruption.
+- [ ] Record average frame rate, frame-time spikes, memory use and device temperature.
 
 ## Release rule
-Only mark a checkbox complete after a real test run and recorded result. Repository presence or compilation alone does not prove playable behaviour.
-
-## Manual powertrain test cases (not yet executed)
-1. Start with first gear selected and clutch released; verify idle RPM is shown.
-2. Apply throttle in first gear; verify rear wheels receive positive torque and speed rises.
-3. Press clutch, shift up; verify gear changes only while clutch is sufficiently pressed.
-4. Attempt a shift without clutch; verify the shift is rejected.
-5. Select neutral with clutch pressed; verify drive torque becomes zero while engine RPM can rise with throttle.
-6. Select reverse with clutch pressed; apply throttle and verify reverse wheel torque and speed limiting.
-7. Apply service brake; verify all four wheel brakes receive brake torque.
-8. Verify HUD speed, RPM, gear and clutch values follow telemetry.
-9. On Android, wire touch press/release events and verify controls return to neutral on component disable.
-10. Verify steering input clamps to -1..1 and throttle/brake/clutch inputs remain within their documented ranges.
-
-These are planned checks only. They have not been run in Unity Editor, on a device, or in an automated test runner. A Unity project/scene and Android build pipeline are still required before APK validation.
-
-
-## Traffic and road-safety tests (not yet executed)
-1. Confirm forward and rear sensors ignore the player's own colliders.
-2. Place a slower vehicle ahead and verify following distance increases with player speed.
-3. Place a fast vehicle behind and verify rear-approach warning appears before it reaches the truck.
-4. Place a vehicle in each blind spot and verify lane-change clearance is denied.
-5. Place an oncoming vehicle in the passing lane and verify overtaking clearance is denied.
-6. Confirm right-lane changes are denied on the generated test road because the right side is a shoulder, not a traffic lane.
-7. Confirm indicator lamps blink and hazard mode flashes both sides.
-8. Hold the horn and verify nearby traffic receivers hear and acknowledge it; release the horn and verify audio stops.
-9. Verify a rear AI vehicle sounds its courtesy horn only when approaching a slow obstacle within the configured gap.
-10. Verify stopping-distance warnings respond to speed and front gap.
-11. Verify curve speed advice changes with authored road curvature markers.
-12. Verify a moderate impact activates hazards and emergency braking; a critical impact locks the truck until service repair.
-13. Verify mobile controls support simultaneous clutch and reverse press, and release safely when a pointer exits a button.
-14. Verify keyboard and touch adapters are mutually exclusive on the selected platform.
-
-## Build pipeline tests (not yet executed)
-- [ ] Unity EditMode test job succeeds on Unity 6000.3.0f1.
-- [ ] Android ARM64 APK build succeeds and artifact uploads.
-- [ ] Windows x64 build succeeds and artifact uploads.
-- [ ] APK installs and launches on a physical Android device.
-- [ ] Android touch buttons are tested on the target device.
-- [ ] Ten-minute traffic drive completes without console exceptions.
-
-
-## Additional physics and signal checks (not yet executed)
-15. Verify steering angle is clamped by the lateral-acceleration envelope as speed rises, and remains more responsive at low speed.
-16. Verify player horn broadcasts to traffic receivers within range and the horn stops on release.
-17. Verify a rear traffic AI sounds a courtesy horn when closing on slow traffic, then respects its cooldown.
-18. Verify front and rear indicator lamps blink together on the selected side and both sides flash in hazard mode.
-19. Verify emergency braking overrides keyboard/touch throttle after a severe impact.
-20. Verify a critical impact locks the truck and `RepairAtService()` restores driving controls.
-21. Verify traffic vehicles stop at the end of a non-looping route instead of driving beyond the test road.
+A checked-in script is not proof that a feature works. A headless smoke test is not a physical-device test. Record the workflow run, artifact, device model, Android version and observed result before marking each release gate complete.
