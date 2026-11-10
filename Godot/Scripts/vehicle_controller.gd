@@ -117,11 +117,10 @@ func _physics_process(delta: float) -> void:
 			drive_accel = -drive_accel
 	var longitudinal := signed_speed
 	longitudinal += drive_accel * delta
+	var brake_load_factor := 1.0 / (1.0 + cargo_mass_tons / 40.0)
 	if brake_input > 0.0:
-		var brake_load_factor := 1.0 / (1.0 + cargo_mass_tons / 40.0)
 		longitudinal = move_toward(longitudinal, 0.0, 14.0 * brake_load_factor * brake_input * delta)
 	else:
-		var brake_load_factor := 1.0 / (1.0 + cargo_mass_tons / 40.0)
 		var engine_brake := 0.75 * brake_load_factor if gear != 0 and clutch_input < 0.6 and drive_command <= 0.05 else 0.0
 		var retarder_deceleration := 5.0 * brake_load_factor * retarder_input
 		longitudinal = move_toward(longitudinal, 0.0, (0.18 + absf(longitudinal) * 0.025 + engine_brake + retarder_deceleration) * delta)
