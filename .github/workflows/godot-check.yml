@@ -135,6 +135,14 @@ keystore/debug_password="android"' Godot/export_presets.cfg
           head -n 8 /tmp/euro-haul-badging.txt
           sha256sum build/Android/EURO-HAUL-debug.apk
 
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: EURO-HAUL-Android-debug
+          path: build/Android/EURO-HAUL-debug.apk
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Export Windows x64 debug build
         shell: bash
         run: |
@@ -150,13 +158,5 @@ keystore/debug_password="android"' Godot/export_presets.cfg
         with:
           name: EURO-HAUL-Windows-x64-debug
           path: build/Windows/EURO-HAUL.exe
-          if-no-files-found: error
-          retention-days: 14
-
-      - name: Upload debug APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: EURO-HAUL-Android-debug
-          path: build/Android/EURO-HAUL-debug.apk
           if-no-files-found: error
           retention-days: 14
