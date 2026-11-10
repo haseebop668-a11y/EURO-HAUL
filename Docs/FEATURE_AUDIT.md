@@ -15,6 +15,7 @@ This inventory distinguishes code that exists from code that has passed runtime/
 | Player truck | Custom `CharacterBody3D`, engine RPM/torque approximation, gearbox, clutch, reverse, brake, speed limits, fuel use, service refuelling and repair | Logic smoke tests authored; CI not yet green |
 | Steering safety | Speed-sensitive steering angle using a lateral-acceleration limit | Source implemented; handling not tuned on device |
 | Camera | Third-person SpringArm chase camera | Source implemented; device QA pending |
+| Trailer | Independent kinematic trailer body with cargo collision shape, wheels and capped forward/reverse articulation | Prototype implemented; physical hitch and load dynamics not yet implemented |
 | Inputs and feedback | Keyboard/touch controls, gear controls, blinking rear indicators/hazards and a generated dual-tone horn audio effect | Source implemented; device/audio QA pending |
 | Traffic | Six scripted vehicles with cruise speed and lane assignment | Basic traffic exists |
 | Traffic response | Physics-tick player-aware proximity detection; checks adjacent traffic gaps before lane changes; slows/adjusts speed when blocked; returns after the gap clears; traffic actors have collision bodies | Newly implemented; automated test authored; CI not yet green |
@@ -29,7 +30,7 @@ This inventory distinguishes code that exists from code that has passed runtime/
 
 These are not present as complete gameplay features yet and must not be described as finished:
 
-1. **Articulated trailer simulation** — a visual/kinematic trailer prototype with wheels and capped steering articulation now exists; physical fifth-wheel constraint, trailer collision, load-dependent handling and realistic reverse jack-knifing remain incomplete.
+1. **Articulated trailer simulation** — an independent kinematic trailer body with wheels, collision shape and capped steering articulation now exists; a physical fifth-wheel constraint, axle/suspension dynamics, load-dependent handling and realistic reverse jack-knifing remain incomplete.
 2. **Full vehicle dynamics** — wheel/tire grip, suspension, axle loads, differential, torque curve calibration, retarder/engine braking, ABS/traction behaviour and service/repair.
 3. **Traffic simulation** — physical traffic collision bodies, multi-vehicle awareness, safe gap selection, overtaking rules, junction behaviour, traffic lights, roundabouts, speed-limit adherence and emergency braking.
 4. **Forward/rear awareness** — dedicated front/rear sensing with closing-speed calculation, blind-spot checks, lane-change risk scoring and clear dashboard alerts.
