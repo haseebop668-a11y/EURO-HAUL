@@ -46,6 +46,9 @@ func _run_tests() -> void:
 	_expect(is_equal_approx(truck.fuel_percent, 0.0), "fuel consumption must clamp at empty")
 	truck.refuel()
 	_expect(is_equal_approx(truck.fuel_percent, 100.0), "service refuelling must restore a full tank")
+	truck.set_cargo_mass(35.0)
+	_expect(is_equal_approx(truck.cargo_mass_tons, 30.0), "truck cargo mass must clamp to safe limits")
+	truck.set_cargo_mass(0.0)
 	truck.damage = 25.0
 	truck.repair()
 	_expect(is_equal_approx(truck.damage, 0.0), "service repair must clear vehicle damage")
@@ -90,6 +93,8 @@ func _run_tests() -> void:
 	var trailer = TrailerScript.new()
 	root.add_child(trailer)
 	trailer.truck = truck
+	trailer.set_cargo_mass(20.0)
+	_expect(is_equal_approx(trailer.cargo_mass_tons, 20.0), "trailer must retain its cargo mass")
 	_expect(trailer is AnimatableBody3D, "trailer must be an independent physics body")
 	_expect(trailer.get_node_or_null("TrailerImpactSensor") != null, "trailer must expose an impact sensor")
 	truck.gear = 1
