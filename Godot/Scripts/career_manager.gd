@@ -15,6 +15,7 @@ var deliveries := 0
 var total_distance_km := 0.0
 var active_contract: Dictionary = {}
 var offered_contract: Dictionary = {}
+var cargo_loaded := false
 
 func _ready() -> void:
 	load_save()
@@ -43,6 +44,7 @@ func generate_offer() -> void:
 	var from_index := randi_range(0, CITY_NAMES.size() - 1)
 	var to_index := (from_index + randi_range(1, CITY_NAMES.size() - 1)) % CITY_NAMES.size()
 	var distance := randf_range(2.0, 5.0)
+	cargo_loaded = false
 	offered_contract = {
 		"id": "EH-%06d" % randi_range(100000, 999999),
 		"origin": CITY_NAMES[from_index],
@@ -60,6 +62,30 @@ func accept_offer() -> bool:
 		return false
 	active_contract = offered_contract.duplicate(true)
 	offered_contract.clear()
+	cargo_loaded = false
+	save()
+	changed.emit()
+	return true
+
+func load_cargo() -> bool:
+	if active_contract.is_empty() or cargo_loaded:
+		return false
+	cargo_loaded = true
+	save()
+	changed.emit()
+	return true
+
+func unload_cargo() -> bool:
+	if active_contract.is_empty() or not cargo_loaded:
+		return false
+	if float(active_contract.get("progress_km", 0.0)) < float(active_contract.get("distance_km", INF)):
+		return false
+	game_cash += int(active_contract.get("reward", 0))
+	add_xp(int(active_contract.get("xp", 0)))
+	deliveries += 1
+	active_contract.clear()
+	cargo_loaded = false
+	generate_offer()
 	save()
 	changed.emit()
 	return true
@@ -68,23 +94,16 @@ func record_distance(distance_km: float) -> void:
 	if distance_km <= 0.0:
 		return
 	total_distance_km += distance_km
-	if active_contract.is_empty():
+	if active_contract.is_empty() or not cargo_loaded:
 		return
 	active_contract.progress_km = minf(active_contract.distance_km, active_contract.progress_km + distance_km)
-	if active_contract.progress_km >= active_contract.distance_km:
-		game_cash += int(active_contract.reward)
-		add_xp(int(active_contract.xp))
-		deliveries += 1
-		active_contract.clear()
-		generate_offer()
-		save()
 	changed.emit()
 
 func save() -> void:
 	var data := {
 		"schema": 1, "driver_name": driver_name, "level": level, "xp": xp,
 		"game_cash": game_cash, "deliveries": deliveries, "total_distance_km": total_distance_km,
-		"active_contract": active_contract, "offered_contract": offered_contract
+		"active_contract": active_contract, "offered_contract": offered_contract, "cargo_loaded": cargo_loaded
 	}
 	var temp_path := SAVE_PATH + ".tmp"
 	var backup_path := SAVE_PATH + ".bak"
@@ -140,3 +159,4 @@ func load_save() -> void:
 	var offered_value: Variant = parsed.get("offered_contract", {})
 	active_contract = active_value if typeof(active_value) == TYPE_DICTIONARY else {}
 	offered_contract = offered_value if typeof(offered_value) == TYPE_DICTIONARY else {}
+	cargo_loaded = bool(parsed.get("cargo_loaded", false)) and not active_contract.is_empty()
