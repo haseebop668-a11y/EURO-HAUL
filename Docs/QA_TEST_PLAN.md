@@ -73,6 +73,7 @@
 - [ ] Service station refuels and repairs only when nearby and affordable.
 - [ ] Roadside recovery prevents a softlock if fuel is empty or engine damage prevents movement.
 - [ ] Toll barrier blocks the road until paid, then resets once per road loop.
+- [ ] Weigh station requires a stop, applies one overweight fine per loop and resets after road recycling.
 - [ ] Missing, malformed and unsupported-version save files do not crash the game.
 - [ ] Malformed contract fields are rejected and route progress is clamped to the contract distance.
 - [ ] Save writes use a recoverable/atomic strategy.
