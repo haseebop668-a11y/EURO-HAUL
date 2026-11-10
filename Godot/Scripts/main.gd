@@ -190,6 +190,13 @@ func _build_world() -> void:
 	for side in [-1.0, 1.0]:
 		for i in range(48):
 			var z := -float(i) * 19.0 + 8.0
+			var opens_for_junction := false
+			for junction_z in [-50.0, -600.0, -820.0]:
+				if absf(z - junction_z) < 12.0:
+					opens_for_junction = true
+					break
+			if opens_for_junction:
+				continue
 			_add_box("Roadside barrier", Vector3(side * 7.0, 0.45, z), Vector3(0.18, 0.8, 9.0), Color("#8b969e"), true)
 			if i % 3 == 0:
 				_add_box("Roadside marker", Vector3(side * 8.0, 0.9, z), Vector3(0.16, 1.8, 0.16), Color("#d8dce0"), false)
