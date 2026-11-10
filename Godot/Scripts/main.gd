@@ -751,7 +751,7 @@ func _handle_freight_interaction() -> void:
 				company.complete_company_delivery(int(round(float(career.last_delivery_reward) * 0.35)))
 			truck.set_cargo_mass(0.0)
 			trailer.set_cargo_mass(0.0)
-			_show_message("DELIVERY COMPLETED • REWARD PAID")
+			_show_message("DELIVERY COMPLETE • €%d PAID" % career.last_delivery_reward)
 		else:
 			_show_message("DELIVERY DEPOT • ROUTE DISTANCE NOT COMPLETE")
 	_update_hud()
