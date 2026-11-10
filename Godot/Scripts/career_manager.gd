@@ -168,27 +168,26 @@ func save() -> void:
 		DirAccess.remove_absolute(backup_absolute)
 
 func load_save() -> void:
-	var read_path := SAVE_PATH
-	if not FileAccess.file_exists(read_path):
-		read_path += ".bak"
+	for read_path in [SAVE_PATH, SAVE_PATH + ".bak"]:
 		if not FileAccess.file_exists(read_path):
-			return
-	var file := FileAccess.open(read_path, FileAccess.READ)
-	if file == null:
-		push_warning("Could not open career save: %s" % FileAccess.get_open_error())
+			continue
+		var file := FileAccess.open(read_path, FileAccess.READ)
+		if file == null:
+			push_warning("Could not open career save candidate: %s" % read_path)
+			continue
+		var parsed: Variant = JSON.parse_string(file.get_as_text())
+		if typeof(parsed) != TYPE_DICTIONARY or int(parsed.get("schema", 0)) != 1:
+			push_warning("Career save candidate is invalid or uses an unsupported schema: %s" % read_path)
+			continue
+		driver_name = str(parsed.get("driver_name", driver_name))
+		level = maxi(1, int(parsed.get("level", 1)))
+		xp = maxi(0, int(parsed.get("xp", 0)))
+		game_cash = maxi(0, int(parsed.get("game_cash", 25000)))
+		deliveries = maxi(0, int(parsed.get("deliveries", 0)))
+		total_distance_km = maxf(0.0, float(parsed.get("total_distance_km", 0.0)))
+		var active_value: Variant = parsed.get("active_contract", {})
+		var offered_value: Variant = parsed.get("offered_contract", {})
+		active_contract = _sanitize_contract(active_value)
+		offered_contract = _sanitize_contract(offered_value)
+		cargo_loaded = bool(parsed.get("cargo_loaded", false)) and not active_contract.is_empty()
 		return
-	var parsed: Variant = JSON.parse_string(file.get_as_text())
-	if typeof(parsed) != TYPE_DICTIONARY or int(parsed.get("schema", 0)) != 1:
-		push_warning("Career save is invalid or uses an unsupported schema")
-		return
-	driver_name = str(parsed.get("driver_name", driver_name))
-	level = maxi(1, int(parsed.get("level", 1)))
-	xp = maxi(0, int(parsed.get("xp", 0)))
-	game_cash = maxi(0, int(parsed.get("game_cash", 25000)))
-	deliveries = maxi(0, int(parsed.get("deliveries", 0)))
-	total_distance_km = maxf(0.0, float(parsed.get("total_distance_km", 0.0)))
-	var active_value: Variant = parsed.get("active_contract", {})
-	var offered_value: Variant = parsed.get("offered_contract", {})
-	active_contract = _sanitize_contract(active_value)
-	offered_contract = _sanitize_contract(offered_value)
-	cargo_loaded = bool(parsed.get("cargo_loaded", false)) and not active_contract.is_empty()
