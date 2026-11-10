@@ -60,6 +60,7 @@ func _run_tests() -> void:
 	traffic.speed_kmh = 90.0
 	var rear_report := traffic.get_proximity_report()
 	_expect(rear_report.get("zone", "") == "REAR", "rear sensor must identify a faster approaching vehicle")
+	traffic.route_length = 900.0
 	truck.position.z = -880.0
 	traffic.position.z = -20.0
 	traffic.speed_kmh = 40.0
