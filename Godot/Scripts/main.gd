@@ -9,6 +9,7 @@ var truck: EuroHaulTruck
 var trailer: EuroHaulTrailer
 var career: EuroHaulCareer
 var company: EuroHaulCompanyManager
+var world_cycle: EuroHaulWorldEnvironmentController
 var hud: Label
 var status_label: Label
 var speed_label: Label
@@ -106,6 +107,11 @@ func _setup_environment() -> void:
 	var world := get_node_or_null("WorldEnvironment") as WorldEnvironment
 	if world:
 		world.environment = environment
+	world_cycle = EuroHaulWorldEnvironmentController.new()
+	world_cycle.name = "WorldCycle"
+	world_cycle.environment = environment
+	world_cycle.sun_light = get_node_or_null("DirectionalLight3D") as DirectionalLight3D
+	add_child(world_cycle)
 
 func _build_world() -> void:
 	_add_box("Ground", Vector3(0, -0.65, -ROAD_LENGTH * 0.5), Vector3(100, 1, ROAD_LENGTH), Color("#172b2d"), true)
@@ -504,7 +510,8 @@ func _update_hud() -> void:
 	var company_text := "COMPANY • NOT FOUNDED"
 	if company != null and not company.company_name.is_empty():
 		company_text = "%s • €%d • FLEET %d • DRIVERS %d" % [company.company_name, company.company_balance, company.owned_trucks, company.hired_drivers]
-	hud.text = "DRIVER  %s  •  LVL %d  •  €%d\n%s\n%s" % [career.driver_name, career.level, career.game_cash, contract_text, company_text]
+	var world_text := world_cycle.display_status() if world_cycle != null else "WORLD • DAY"
+	hud.text = "DRIVER  %s  •  LVL %d  •  €%d\n%s\n%s\n%s" % [career.driver_name, career.level, career.game_cash, contract_text, company_text, world_text]
 	if truck != null and speed_label != null:
 		speed_label.text = "%03d km/h     RPM %04d     GEAR %s     DAMAGE %d%%" % [int(absf(truck.speed_kmh)), int(truck.engine_rpm), "R" if truck.gear == -1 else ("N" if truck.gear == 0 else str(truck.gear)), int(truck.damage)]
 
