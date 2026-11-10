@@ -24,6 +24,8 @@ var hire_driver_button: Button
 var pause_button: Button
 var near_pickup_depot := false
 var near_delivery_depot := false
+var near_service_station := false
+var service_button: Button
 var touch_state := {"throttle": false, "brake": false, "left": false, "right": false}
 var traffic_vehicles: Array[EuroHaulTrafficVehicle] = []
 var _last_position := Vector3.ZERO
@@ -62,6 +64,7 @@ func _process(delta: float) -> void:
 	var expected_step := (absf(truck.speed_kmh) / 3.6) * delta * 3.0 + 1.0
 	if distance > 0.0 and distance <= maxf(10.0, expected_step) and career != null:
 		career.record_distance(distance / 1000.0)
+		truck.consume_fuel(distance / 1000.0)
 		_last_distance_save += distance
 	if _last_distance_save >= 100.0:
 		if career != null:
@@ -154,6 +157,7 @@ func _build_world() -> void:
 		_add_box("Warehouse roof", Vector3(-18.0, 6.2, z), Vector3(10.5, 0.4, 18.5), BLUE, false)
 	_create_depot_area("PickupDepot", -50.0, true)
 	_create_depot_area("DeliveryDepot", -820.0, false)
+	_create_service_area(-600.0)
 
 func _create_depot_area(depot_name: String, road_z: float, is_pickup: bool) -> void:
 	var depot := Area3D.new()
@@ -189,6 +193,36 @@ func _create_depot_area(depot_name: String, road_z: float, is_pickup: bool) -> v
 	_add_box("%s Sign" % depot_name, Vector3(-9.0, 2.0, road_z), Vector3(0.25, 3.0, 4.0), sign_color, false)
 	var sign_label := Label3D.new()
 	sign_label.text = "FREIGHT PICKUP" if is_pickup else "FREIGHT DELIVERY"
+	sign_label.position = Vector3(-9.0, 4.0, road_z)
+	sign_label.font_size = 36
+	sign_label.modulate = Color("#f4f5f6")
+	add_child(sign_label)
+
+func _create_service_area(road_z: float) -> void:
+	var service_area := Area3D.new()
+	service_area.name = "ServiceStation"
+	service_area.position = Vector3(0.0, 1.0, road_z)
+	service_area.collision_layer = 0
+	service_area.collision_mask = 1
+	var trigger := CollisionShape3D.new()
+	var shape := SphereShape3D.new()
+	shape.radius = 15.0
+	trigger.shape = shape
+	service_area.add_child(trigger)
+	service_area.body_entered.connect(func(body: Node3D):
+		if body == truck:
+			near_service_station = true
+			_update_service_button()
+	)
+	service_area.body_exited.connect(func(body: Node3D):
+		if body == truck:
+			near_service_station = false
+			_update_service_button()
+	)
+	add_child(service_area)
+	_add_box("Service Station Sign", Vector3(-9.0, 2.0, road_z), Vector3(0.25, 3.0, 4.0), Color("#5da68a"), false)
+	var sign_label := Label3D.new()
+	sign_label.text = "FUEL • SERVICE"
 	sign_label.position = Vector3(-9.0, 4.0, road_z)
 	sign_label.font_size = 36
 	sign_label.modulate = Color("#f4f5f6")
@@ -423,8 +457,15 @@ func _build_hud() -> void:
 	hire_driver_button.custom_minimum_size = Vector2(210, 48)
 	hire_driver_button.pressed.connect(_hire_company_driver)
 	layer.add_child(hire_driver_button)
+	service_button = Button.new()
+	service_button.text = "DRIVE TO SERVICE"
+	service_button.position = Vector2(500, 235)
+	service_button.custom_minimum_size = Vector2(210, 48)
+	service_button.pressed.connect(_handle_service_interaction)
+	layer.add_child(service_button)
 	_update_hud()
 	_update_freight_action()
+	_update_service_button()
 
 func _add_touch_button(parent: Control, caption: String, key: String) -> void:
 	var button := Button.new()
@@ -485,6 +526,40 @@ func _found_company() -> void:
 	if career.spend_cash(EuroHaulCompanyManager.FOUNDING_COST):
 		company.found_company("EURO HAUL LOGISTICS", EuroHaulCompanyManager.FOUNDING_COST)
 		_update_hud()
+
+func _handle_service_interaction() -> void:
+	if not near_service_station or truck == null or career == null:
+		return
+	var fuel_cost := int(ceil((100.0 - truck.fuel_percent) * 2.0))
+	var repair_cost := int(ceil(truck.damage * 25.0))
+	var total_cost := fuel_cost + repair_cost
+	if total_cost <= 0:
+		status_label.text = "TRUCK ALREADY SERVICED"
+		return
+	if career.spend_cash(total_cost):
+		truck.refuel()
+		truck.repair()
+		status_label.text = "SERVICE COMPLETE • €%d" % total_cost
+	else:
+		status_label.text = "SERVICE COST €%d • INSUFFICIENT FUNDS" % total_cost
+	_update_hud()
+	_update_service_button()
+
+func _update_service_button() -> void:
+	if service_button == null or truck == null or career == null:
+		return
+	var fuel_cost := int(ceil((100.0 - truck.fuel_percent) * 2.0))
+	var repair_cost := int(ceil(truck.damage * 25.0))
+	var total_cost := fuel_cost + repair_cost
+	if not near_service_station:
+		service_button.text = "DRIVE TO SERVICE"
+		service_button.disabled = true
+	elif total_cost <= 0:
+		service_button.text = "TRUCK FULLY SERVICED"
+		service_button.disabled = true
+	else:
+		service_button.text = "REFUEL / REPAIR • €%d" % total_cost
+		service_button.disabled = career.game_cash < total_cost
 
 func _handle_freight_interaction() -> void:
 	if career == null or career.active_contract.is_empty():
