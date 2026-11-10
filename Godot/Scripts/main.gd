@@ -12,6 +12,7 @@ var hud: Label
 var status_label: Label
 var speed_label: Label
 var touch_state := {"throttle": false, "brake": false, "left": false, "right": false}
+var traffic_vehicles: Array[EuroHaulTrafficVehicle] = []
 var _last_position := Vector3.ZERO
 var _last_distance_save := 0.0
 
@@ -47,6 +48,7 @@ func _process(delta: float) -> void:
 			career.save()
 		_last_distance_save = 0.0
 	_update_hud()
+	_update_traffic_warnings()
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and truck != null:
@@ -154,12 +156,14 @@ func _build_traffic() -> void:
 	for i in range(6):
 		var traffic := EuroHaulTrafficVehicle.new()
 		traffic.position = Vector3(-2.0, 0.0, -55.0 - float(i) * 85.0)
+		traffic.player_target = truck
 		traffic.lane_x = -2.0 if i % 2 == 0 else 2.0
 		traffic.cruise_speed_kmh = 42.0 + float(i % 3) * 8.0
 		var body := _make_box_mesh(Vector3(1.9, 1.5, 4.8), Color("#7892a2") if i % 2 == 0 else Color("#9a624e"))
 		body.position.y = 0.9
 		traffic.add_child(body)
 		add_child(traffic)
+		traffic_vehicles.append(traffic)
 
 func _build_career() -> void:
 	truck.horn_pressed.connect(func(): status_label.text = "HORN • SIGNAL")
@@ -299,6 +303,22 @@ func _found_company() -> void:
 	if career.spend_cash(EuroHaulCompanyManager.FOUNDING_COST):
 		company.found_company("EURO HAUL LOGISTICS", EuroHaulCompanyManager.FOUNDING_COST)
 		_update_hud()
+
+func _update_traffic_warnings() -> void:
+	if status_label == null or truck == null:
+		return
+	if truck.indicators == 0:
+		return
+	var requested_lane := -2.0 if truck.indicators == -1 else (2.0 if truck.indicators == 1 else 0.0)
+	if requested_lane == 0.0:
+		return
+	for traffic in traffic_vehicles:
+		if is_instance_valid(traffic):
+			var warning := traffic.safety_warning_for_lane(requested_lane)
+			if not warning.is_empty():
+				status_label.text = warning
+				return
+	status_label.text = "LEFT LANE CLEAR" if truck.indicators == -1 else "RIGHT LANE CLEAR"
 
 func _update_hud() -> void:
 	if hud == null or career == null:
