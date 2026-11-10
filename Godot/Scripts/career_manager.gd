@@ -115,7 +115,8 @@ func unload_cargo() -> bool:
 	var base_reward := int(active_contract.get("reward", 0))
 	var cargo_damage := clampf(float(active_contract.get("damage_percent", 0.0)), 0.0, 100.0)
 	var damage_penalty := cargo_damage / 100.0 * 0.65
-	var late_seconds := maxf(0.0, float(active_contract.get("elapsed_seconds", 0.0)) - float(active_contract.get("deadline_seconds", INF)))
+	var deadline_seconds := float(active_contract.get("deadline_seconds", 0.0))
+	var late_seconds := maxf(0.0, float(active_contract.get("elapsed_seconds", 0.0)) - deadline_seconds) if deadline_seconds > 0.0 else 0.0
 	var late_penalty := minf(0.35, late_seconds / 120.0 * 0.10)
 	var total_penalty := minf(0.9, damage_penalty + late_penalty)
 	var final_reward := maxi(0, int(round(float(base_reward) * (1.0 - total_penalty))))
@@ -170,7 +171,7 @@ func _sanitize_contract(value: Variant) -> Dictionary:
 	var fragility := str(value.get("fragility", "STANDARD"))
 	if fragility not in ["STANDARD", "FRAGILE", "HIGH VALUE"]:
 		fragility = "STANDARD"
-	var deadline_value: Variant = value.get("deadline_seconds", 0.0)
+	var deadline_value: Variant = value.get("deadline_seconds", distance * 70.0 + 60.0)
 	var elapsed_value: Variant = value.get("elapsed_seconds", 0.0)
 	var deadline := float(deadline_value) if typeof(deadline_value) == TYPE_FLOAT or typeof(deadline_value) == TYPE_INT else 0.0
 	var elapsed := float(elapsed_value) if typeof(elapsed_value) == TYPE_FLOAT or typeof(elapsed_value) == TYPE_INT else 0.0
