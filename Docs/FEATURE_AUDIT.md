@@ -12,7 +12,7 @@ This inventory distinguishes code that exists from code that has passed runtime/
 | Android project/export preset | Android ARM64 preset, package ID `com.eurohaul.game` | CI export not yet passing |
 | App identity | EURO HAUL name and SVG icon | Source present; launcher appearance not device-verified |
 | 3D world | Procedural straight motorway, lane markings, roadside barriers and warehouse greyboxes | Implemented; visual/performance QA pending |
-| Player truck | Custom `CharacterBody3D`, engine RPM/torque approximation, gearbox, clutch, reverse, brake and speed limits | Logic smoke tests authored; CI not yet green |
+| Player truck | Custom `CharacterBody3D`, engine RPM/torque approximation, gearbox, clutch, reverse, brake, speed limits, fuel use, service refuelling and repair | Logic smoke tests authored; CI not yet green |
 | Steering safety | Speed-sensitive steering angle using a lateral-acceleration limit | Source implemented; handling not tuned on device |
 | Camera | Third-person SpringArm chase camera | Source implemented; device QA pending |
 | Inputs and feedback | Keyboard/touch controls, gear controls, blinking rear indicators/hazards and a generated dual-tone horn audio effect | Source implemented; device/audio QA pending |
@@ -34,7 +34,7 @@ These are not present as complete gameplay features yet and must not be describe
 3. **Traffic simulation** — physical traffic collision bodies, multi-vehicle awareness, safe gap selection, overtaking rules, junction behaviour, traffic lights, roundabouts, speed-limit adherence and emergency braking.
 4. **Forward/rear awareness** — dedicated front/rear sensing with closing-speed calculation, blind-spot checks, lane-change risk scoring and clear dashboard alerts.
 5. **European world and navigation** — connected road network, city-specific distances, junctions, roundabouts, tolls, service stations, rest areas, borders and GPS route guidance. The current road is a single straight greybox motorway loop.
-6. **Freight operations** — pickup and delivery depot triggers with load/unload interaction now exist; remaining work includes real depot yards, cargo mass/fragility, cargo loading animation, trailer selection, damage/late-delivery penalties, weigh stations and route-specific delivery confirmation.
+6. **Freight operations** — pickup/delivery depots, cargo load/unload, toll payment, fuel consumption, refuelling and repairs now exist as basic loops; remaining work includes real depot yards, cargo mass/fragility, loading animation, trailer selection, damage/late-delivery penalties, weigh stations and route-specific delivery confirmation.
 7. **Company progression** — detailed AI driver schedules/routes, truck assignment UI, fleet maintenance, driver wages/skills, contracts for hired drivers, reputation-driven contract access and a full management screen.
 8. **Presentation** — basic horn audio, rear indicator lights, day/night lighting and clear/cloudy/fog environment states now exist; production truck/trailer models, interiors, detailed road assets, animations, rain effects, engine/air-brake ambience and UI polish remain.
 9. **Platform release** — Android and Windows x64 debug exports are now configured in CI; physical Android install/performance/thermal testing, Windows PC launch testing and long-session acceptance remain.
