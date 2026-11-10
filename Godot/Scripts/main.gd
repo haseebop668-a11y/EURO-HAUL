@@ -203,15 +203,22 @@ func _build_world() -> void:
 	_create_toll_gate(-280.0)
 	_create_weigh_station(-740.0)
 
+func _create_yard_access(yard_name: String, yard_x: float, road_z: float, yard_color: Color) -> void:
+	var branch_center_x := yard_x * 0.5
+	_add_box("%s Access Road" % yard_name, Vector3(branch_center_x, -0.05, road_z), Vector3(absf(yard_x), 0.2, 12.0), Color("#303940"), true)
+	_add_box("%s Yard Surface" % yard_name, Vector3(yard_x, -0.05, road_z), Vector3(30.0, 0.2, 30.0), yard_color, true)
+
 func _create_depot_area(depot_name: String, road_z: float, is_pickup: bool) -> void:
+	var depot_x := -54.0
+	_create_yard_access(depot_name, depot_x, road_z, Color("#454c52"))
 	var depot := Area3D.new()
 	depot.name = depot_name
-	depot.position = Vector3(0.0, 1.0, road_z)
+	depot.position = Vector3(depot_x, 1.0, road_z)
 	depot.collision_layer = 0
 	depot.collision_mask = 2
 	var trigger := CollisionShape3D.new()
 	var trigger_shape := SphereShape3D.new()
-	trigger_shape.radius = 10.0
+	trigger_shape.radius = 12.0
 	trigger.shape = trigger_shape
 	depot.add_child(trigger)
 	depot.body_entered.connect(func(body: Node3D):
@@ -234,10 +241,10 @@ func _create_depot_area(depot_name: String, road_z: float, is_pickup: bool) -> v
 	)
 	add_child(depot)
 	var sign_color := GOLD if is_pickup else Color("#78a9bd")
-	_add_box("%s Sign" % depot_name, Vector3(-9.0, 2.0, road_z), Vector3(0.25, 3.0, 4.0), sign_color, false)
+	_add_box("%s Sign" % depot_name, Vector3(depot_x - 14.0, 2.0, road_z), Vector3(0.25, 3.0, 4.0), sign_color, false)
 	var sign_label := Label3D.new()
 	sign_label.text = "FREIGHT PICKUP" if is_pickup else "FREIGHT DELIVERY"
-	sign_label.position = Vector3(-9.0, 4.0, road_z)
+	sign_label.position = Vector3(depot_x - 14.0, 4.0, road_z)
 	sign_label.font_size = 36
 	sign_label.modulate = Color("#f4f5f6")
 	add_child(sign_label)
@@ -387,9 +394,11 @@ func _update_toll_button() -> void:
 		toll_button.disabled = false
 
 func _create_service_area(road_z: float) -> void:
+	var service_x := 54.0
+	_create_yard_access("Service Station", service_x, road_z, Color("#4b5255"))
 	var service_area := Area3D.new()
 	service_area.name = "ServiceStation"
-	service_area.position = Vector3(0.0, 1.0, road_z)
+	service_area.position = Vector3(service_x, 1.0, road_z)
 	service_area.collision_layer = 0
 	service_area.collision_mask = 2
 	var trigger := CollisionShape3D.new()
@@ -408,10 +417,11 @@ func _create_service_area(road_z: float) -> void:
 			_update_service_button()
 	)
 	add_child(service_area)
-	_add_box("Service Station Sign", Vector3(-9.0, 2.0, road_z), Vector3(0.25, 3.0, 4.0), Color("#5da68a"), false)
+	_add_box("Fuel Pump", Vector3(service_x + 8.0, 0.9, road_z), Vector3(1.4, 1.8, 1.4), Color("#d2a84a"), false)
+	_add_box("Service Station Sign", Vector3(service_x + 14.0, 2.0, road_z), Vector3(0.25, 3.0, 4.0), Color("#d2a84a"), false)
 	var sign_label := Label3D.new()
 	sign_label.text = "FUEL • SERVICE"
-	sign_label.position = Vector3(-9.0, 4.0, road_z)
+	sign_label.position = Vector3(service_x + 14.0, 4.0, road_z)
 	sign_label.font_size = 36
 	sign_label.modulate = Color("#f4f5f6")
 	add_child(sign_label)
