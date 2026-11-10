@@ -24,6 +24,7 @@ var gear := 1
 var engine_rpm := 650.0
 var speed_kmh := 0.0
 var damage := 0.0
+var fuel_percent := 100.0
 var _yaw_rate := 0.0
 var _horn_cooldown := 0.0
 var _impact_cooldown := 0.0
@@ -72,6 +73,17 @@ func toggle_hazards() -> void:
 func sound_horn() -> void:
 	horn_pressed.emit()
 
+func consume_fuel(distance_km: float) -> void:
+	if distance_km > 0.0:
+		var consumption := distance_km * 0.45 * (1.0 + absf(throttle_input) * 0.8)
+		fuel_percent = maxf(0.0, fuel_percent - consumption)
+
+func refuel() -> void:
+	fuel_percent = 100.0
+
+func repair() -> void:
+	damage = 0.0
+
 func apply_damage(amount: float) -> void:
 	damage = clampf(damage + maxf(0.0, amount), 0.0, 100.0)
 	if damage >= 80.0:
@@ -89,7 +101,7 @@ func _physics_process(delta: float) -> void:
 	engine_rpm = move_toward(engine_rpm, target_rpm, 4200.0 * delta)
 	var torque_factor := 1.0 - 0.22 * pow(clampf((engine_rpm - idle_rpm) / maxf(1.0, redline_rpm - idle_rpm), 0.0, 1.0), 2.0)
 	var drive_accel := 0.0
-	if gear != 0 and clutch_input < 0.95 and damage < 80.0:
+	if gear != 0 and clutch_input < 0.95 and damage < 80.0 and fuel_percent > 0.0:
 		drive_accel = throttle_input * engine_load * torque_factor * (engine_max_torque_nm / 1100.0) * absf(ratio) * final_drive * 0.045 * (1.0 - clutch_input)
 		if gear < 0:
 			drive_accel = -absf(drive_accel)
