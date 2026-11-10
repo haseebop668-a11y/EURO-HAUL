@@ -91,12 +91,13 @@ func _run_tests() -> void:
 	company.company_balance = 10000
 	company.owned_trucks = 1
 	company.hired_drivers = 1
+	_expect(not company.hire_driver(), "company must not hire more drivers than owned trucks")
 	company._process(299.0)
 	_expect(company.company_balance == 10000, "operating costs must not be charged before a simulated day")
 	company._process(1.0)
-	_expect(company.company_balance == 9470, "one simulated day must charge exactly one daily cost")
+	_expect(company.company_balance == 11270, "one simulated day must apply driver revenue and operating costs")
 	company.complete_company_delivery(500)
-	_expect(company.company_balance == 9970, "company delivery must credit revenue")
+	_expect(company.company_balance == 11770, "company delivery must credit revenue")
 	company.save_company()
 
 	if _failed:
